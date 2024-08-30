@@ -166,7 +166,6 @@ const ActualizarUsuario = () => {
                     <input
                       className="form-control"
                       id="clave"
-                      value={formData.clave}
                       onChange={handleChange}
                       required
                     />

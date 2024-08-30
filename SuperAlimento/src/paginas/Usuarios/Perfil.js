@@ -167,10 +167,9 @@ const Perfil = () => {
                       <input
                         className="form-control"
                         id="clave"
-                        value={formData.clave}
                         onChange={handleChange}
                         required
-                        type="password"
+                        type="text"
                       />
                     </div>
                   </div>
