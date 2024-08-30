@@ -10,11 +10,18 @@ const ConsultarCate = () => {
     
     // Aplicar el hook de tabla solo después de que los datos se hayan cargado
     useDataTable(tableRef, categorias); 
+    const token = localStorage.getItem('token');
+    const rol = localStorage.getItem('Rol');
 
     useEffect(() => {
       const fetchCategorias = async () => {
         try {
-          const response = await fetch('http://localhost:3001/api/categoria/todos');
+          const response = await fetch('http://localhost:3001/api/categoria/todos', {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'X-Rol': rol, // Agregar el token en los encabezados
+            },
+          });
           if (response.ok) {
             const data = await response.json();
             setCategorias(data);
@@ -27,13 +34,15 @@ const ConsultarCate = () => {
       };
   
       fetchCategorias();
-    }, []);
+    }, [rol, token]);
     const handleEstado = async (id_categoria) => {
         try {
           const response = await fetch(`http://localhost:3001/api/categoria/estado/${id_categoria}`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+              'X-Rol': rol, 
             },
             body: JSON.stringify({ estado: 'Desactivo' }), // Cambia el estado a 'Desactivo'
           });

@@ -8,12 +8,18 @@ const ConsultarVent = () => {
     const [ventas, setVentas] = useState([]);
     const tableRef1 = useRef(null);
     useDataTable(tableRef1, ventas);
-
+    const token = localStorage.getItem('token');
+    const rol = localStorage.getItem('Rol');
     useEffect(() => {
         // Función para obtener las ventas desde el backend
         const fetchVentas = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/venta/todos');
+                const response = await fetch('http://localhost:3001/api/venta/todos', {
+                    headers: {
+                      'Authorization': `Bearer ${token}`,
+                      'X-Rol': rol, // Agregar el token en los encabezados
+                    },
+                });  
                 const data = await response.json();
                 console.log('Ventas obtenidas:', data); // Verifica la respuesta
                 setVentas(data);
@@ -23,12 +29,12 @@ const ConsultarVent = () => {
         };
 
         fetchVentas();
-    }, []);
+    }, [rol, token]);
 
     return (
         <div>
             <Navegacion>
-                <div className="card card-success">
+                <div className="card card-secondary">
                     <div className="card-body colorFondo">
                         <div className="row">
                             <div className="col-12">
@@ -78,7 +84,7 @@ const ConsultarVent = () => {
                                         )}
                                     </div>
                                     <div className="card-header">
-                                        <Link to="#" className="btn btn-primary custom-button">
+                                        <Link to="#" className="btn btn-secondary">
                                             Generar reporte de ventas
                                         </Link>
                                     </div>

@@ -9,21 +9,38 @@ const RegistrarSoli = () => {
     EstadoSolicitud: 'Pendiente',
     PrecioSolicitud: '',
     ObservacionSolicitud: '',
-    id_proveedor: '', // Cambiado a id_proveedor
-    numero_documento: '', // Agregado para el usuario
+    id_proveedor: '',
+    numero_documento: '',  // El número de documento debe estar aquí
   });
 
   const [proveedores, setProveedores] = useState([]);
-  const [productos, setProductos] = useState([]); // Productos inicializados como array vacío
+  const [productos, setProductos] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [usuarios, setUsuarios] = useState([]);
+  const [setUsuarios] = useState([]);
   const [cart, setCart] = useState([]);
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
+  const rol = localStorage.getItem('Rol');
+
+  
+  useEffect(() => {
+
+    const numero_documento = localStorage.getItem('numero_documento');
+    setFormData(prevState => ({
+      ...prevState,
+      numero_documento: numero_documento || ''  
+    }));
+  }, []);  
 
   useEffect(() => {
     const fetchProveedores = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/proveedor/todos');
+        const response = await fetch('http://localhost:3001/api/proveedor/todos', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'X-Rol': rol,
+          },
+        });
         if (response.ok) {
           const data = await response.json();
           setProveedores(data);
@@ -37,7 +54,12 @@ const RegistrarSoli = () => {
 
     const fetchUsuarios = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/usuario/todos');
+        const response = await fetch('http://localhost:3001/api/usuario/todos', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'X-Rol': rol,
+          },
+        });
         if (response.ok) {
           const data = await response.json();
           setUsuarios(data);
@@ -51,32 +73,36 @@ const RegistrarSoli = () => {
 
     fetchProveedores();
     fetchUsuarios();
-  }, []);
+  }, [token, rol, setUsuarios]);
 
   useEffect(() => {
     const fetchProductosPorProveedor = async () => {
-      if (!formData.id_proveedor) { // Cambiado a id_proveedor
-        setProductos([]); // Limpiar productos si no hay proveedor seleccionado
+      if (!formData.id_proveedor) {
+        setProductos([]);
         return;
       }
-
       try {
-        const response = await fetch(`http://localhost:3001/api/producto/por-proveedor/${formData.id_proveedor}`); // Cambiado a id_proveedor
+        const response = await fetch(`http://localhost:3001/api/producto/por-proveedor/${formData.id_proveedor}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'X-Rol': rol,
+          },
+        });
         if (response.ok) {
           const data = await response.json();
           setProductos(data);
         } else {
           console.error('Error al obtener productos del proveedor:', response.statusText);
-          setProductos([]); // Limpiar productos si ocurre un error
+          setProductos([]);
         }
       } catch (error) {
         console.error("Error al obtener productos del proveedor:", error);
-        setProductos([]); // Limpiar productos en caso de error
+        setProductos([]);
       }
     };
 
     fetchProductosPorProveedor();
-  }, [formData.id_proveedor]); // Cambiado a id_proveedor
+  }, [formData.id_proveedor, token, rol]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -89,37 +115,35 @@ const RegistrarSoli = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    // Verificar que el proveedor y usuario estén seleccionados
     if (!formData.id_proveedor || !formData.numero_documento) {
       window.alert('Debe seleccionar un proveedor y un usuario');
       return;
     }
   
-    // Calcular el precio total basado en los productos en el carrito
     const precioTotal = cart.reduce((total, item) => total + item.precio_compra * item.quantity, 0);
   
-    // Preparar la fecha actual si no se ha especificado
     const fechaActual = formData.FechaSolicitud || new Date().toISOString().split('T')[0];
   
-    // Asegurarse de actualizar el precio total en formData
     const solicitudData = {
-      fecha_entrada: fechaActual,  // Enviar la fecha de la solicitud
+      fecha_entrada: fechaActual,
       estado_solicitud: formData.EstadoSolicitud,
-      precio_total: precioTotal,  // Asignar el precio total calculado
+      precio_total: precioTotal,
       observacion: formData.ObservacionSolicitud,
       numero_documento: formData.numero_documento,
       id_proveedor: formData.id_proveedor,
       productos: cart.map(item => ({
         id_producto: item.id_producto,
         cantidad: item.quantity,
-      })),  // Incluir los productos seleccionados con la cantidad
+      })),
     };
   
     try {
       const response = await fetch('http://localhost:3001/api/solicitud/registrar', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'X-Rol': rol,
         },
         body: JSON.stringify(solicitudData)
       });
@@ -136,7 +160,7 @@ const RegistrarSoli = () => {
   };
   
   const handleSearch = (e) => {
-    setSearchTerm(e.target.value || ''); // Asegúrate de que searchTerm siempre sea una cadena
+    setSearchTerm(e.target.value || '');
   };
 
   const handleAddToCart = (product) => {
@@ -155,7 +179,7 @@ const RegistrarSoli = () => {
   return (
     <div>
       <Navegacion>
-        <div className="card card-success" style={{ height: "88vh" }}>
+        <div className="card card-secondary" style={{ height: "88vh" }}>
           <div className="card-body">
             <div className="container-fluid">
               <div className="row">
@@ -251,20 +275,14 @@ const RegistrarSoli = () => {
                         </div>
                         <div className="form-group">
                           <label htmlFor="numero_documento">Usuario</label>
-                          <select
+                          <input
                             className="form-control"
                             id="numero_documento"
-                            value={formData.numero_documento}
-                            onChange={handleChange}
                             required
+                            value={formData.numero_documento}
+                            readOnly
                           >
-                            <option value="">Seleccione un usuario</option>
-                            {usuarios.map((usuario) => (
-                              <option key={usuario.numero_documento} value={usuario.numero_documento}>
-                                {usuario.nombre_usuario}
-                              </option>
-                            ))}
-                          </select>
+                          </input>
                         </div>
                         <div className="form-group">
                           <label>Productos en la solicitud</label>
@@ -290,8 +308,8 @@ const RegistrarSoli = () => {
                         </div>
                       </div>
                       <div className="card-footer">
-                        <button type="submit" className="btn btn-primary custom-button mr-2">Registrar Solicitud</button>
-                        <Link to="/ConsultarSoli" className="btn btn-primary custom-button mr-2">Cancelar</Link>
+                        <button type="submit" className="btn btn-secondary mr-2">Registrar Solicitud</button>
+                        <Link to="/ConsultarSoli" className="btn btn-secondary mr-2">Cancelar</Link>
                       </div>
                     </form>
                   </div>

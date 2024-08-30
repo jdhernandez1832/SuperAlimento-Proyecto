@@ -19,14 +19,31 @@ const RegistrarProd = () => {
         imagen: null,
     });
     const [categorias, setCategorias] = useState([]);
-    const [usuarios, setUsuarios] = useState([]);
+    const [setUsuarios] = useState([]);
     const [proveedores, setProveedores] = useState([]);
     const navigate = useNavigate();
+    const token = localStorage.getItem('token');
+    const rol = localStorage.getItem('Rol');
+
+    
+    useEffect(() => {
+        // Obtener el numero_documento del localStorage y actualizar el estado
+        const numero_documento = localStorage.getItem('numero_documento');
+        setFormData(prevState => ({
+        ...prevState,
+        numero_documento: numero_documento || ''  // Establecer el valor en el estado
+        }));
+    }, []); 
 
     useEffect(() => {
         const fetchCategorias = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/categoria/todos');
+                const response = await fetch('http://localhost:3001/api/categoria/todos', {
+                    headers: {
+                      'Authorization': `Bearer ${token}`,
+                      'X-Rol': rol, // Agregar el token en los encabezados
+                    },
+                  });
                 if (response.ok) {
                     const data = await response.json();
                     setCategorias(data);
@@ -40,7 +57,12 @@ const RegistrarProd = () => {
 
         const fetchUsuarios = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/usuario/todos');
+                const response = await fetch('http://localhost:3001/api/usuario/todos', {
+                    headers: {
+                      'Authorization': `Bearer ${token}`,
+                      'X-Rol': rol, // Agregar el token en los encabezados
+                    },
+                });
                 if (response.ok) {
                     const data = await response.json();
                     setUsuarios(data);
@@ -54,7 +76,12 @@ const RegistrarProd = () => {
 
             const fetchProveedores = async () => {
               try {
-                const response = await fetch('http://localhost:3001/api/proveedor/todos');
+                const response = await fetch('http://localhost:3001/api/proveedor/todos', {
+                    headers: {
+                      'Authorization': `Bearer ${token}`,
+                      'X-Rol': rol, // Agregar el token en los encabezados
+                    },
+                });
                 if (response.ok) {
                   const data = await response.json();
                   console.log('Proveedores obtenidos:', data);
@@ -69,7 +96,7 @@ const RegistrarProd = () => {
         fetchCategorias();
         fetchUsuarios();
         fetchProveedores();
-    }, []);
+    }, [rol, setUsuarios, token]);
 
     const handleChange = (e) => {
         setFormData({
@@ -97,6 +124,10 @@ const RegistrarProd = () => {
             const response = await fetch('http://localhost:3001/api/producto/registrar', {
                 method: 'POST',
                 body: data, // No incluimos headers para que el navegador use multipart/form-data automáticamente
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'X-Rol': rol, // Agregar el token en los encabezados
+                },
             });
 
             if (response.ok) {
@@ -113,9 +144,9 @@ const RegistrarProd = () => {
     return (
         <div>
             <Navegacion>
-                <div className="card card-success">
+                <div className="card card-secondary">
                     <div className="card-body colorFondo">
-                        <div className="card card-success">
+                        <div className="card card-secondary">
                             <div className="card-header">
                                 <h3 className="card-title">Registrar producto</h3>
                             </div>
@@ -222,20 +253,14 @@ const RegistrarProd = () => {
                                     </div>
                                     <div className="form-group">
                                         <label htmlFor="numero_documento">Usuario</label>
-                                        <select
+                                        <input
                                             className="form-control"
                                             id="numero_documento"
-                                            value={formData.numero_documento}
-                                            onChange={handleChange}
                                             required
+                                            value={formData.numero_documento}
+                                            readOnly
                                         >
-                                            <option value="">Seleccione un usuario</option>
-                                            {usuarios.map((usuario) => (
-                                                <option key={usuario.numero_documento} value={usuario.numero_documento}>
-                                                    {usuario.nombre_usuario}
-                                                </option>
-                                            ))}
-                                        </select>
+                                        </input>
                                     </div>
                                     <div className="form-group">
                                         <label htmlFor="id_proveedor">Proveedor</label>
@@ -265,8 +290,8 @@ const RegistrarProd = () => {
                                     </div>
                                 </div>
                                 <div className="card-footer">
-                                    <Link to="/ConsultarProd" className="btn btn-primary custom-button mr-2">Volver</Link>
-                                    <button type="submit" className="btn btn-primary custom-button">Registrar</button>
+                                    <Link to="/ConsultarProd" className="btn btn-secondary mr-2">Volver</Link>
+                                    <button type="submit" className="btn btn-secondary">Registrar</button>
                                 </div>
                             </form>
                         </div>

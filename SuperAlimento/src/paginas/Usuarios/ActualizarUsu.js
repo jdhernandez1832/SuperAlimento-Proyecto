@@ -14,11 +14,18 @@ const ActualizarUsuario = () => {
     telefono_usuario: '',
     id_rol: '',
   });
+  const token = localStorage.getItem('token');
+  const rol = localStorage.getItem('Rol');  
 
   useEffect(() => {
     const fetchUsuario = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/api/usuario/${numero_documento}`);
+        const response = await fetch(`http://localhost:3001/api/usuario/${numero_documento}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'X-Rol': rol,
+          },
+        });
         if (response.ok) {
           const data = await response.json();
           setFormData(data);
@@ -31,7 +38,7 @@ const ActualizarUsuario = () => {
     };
 
     fetchUsuario();
-  }, [numero_documento]);
+  }, [numero_documento, token, rol]); // Dependencias adecuadas
 
   const handleChange = (e) => {
     setFormData({
@@ -47,7 +54,9 @@ const ActualizarUsuario = () => {
       const response = await fetch(`http://localhost:3001/api/usuario/actualizar/${numero_documento}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'X-Rol': rol,
+          'Content-Type': 'application/json', // Asegúrate de agregar este encabezado
         },
         body: JSON.stringify(formData),
       });
@@ -67,9 +76,9 @@ const ActualizarUsuario = () => {
   return (
     <div>
       <Navegacion>
-        <div className="card card-success">
+        <div className="card card-secondary">
           <div className="card-body colorFondo">
-            <div className="card card-success">
+            <div className="card card-secondary">
               <div className="card-header">
                 <h3 className="card-title">Actualizar Usuario</h3>
               </div>
@@ -164,8 +173,8 @@ const ActualizarUsuario = () => {
                   </div>
                 </div>
                 <div className="card-footer">
-                    <Link to="/ConsultarUsu" className="btn btn-primary custom-button mr-2">Volver</Link>
-                  <button type="submit" className="btn btn-primary custom-button">Actualizar</button>
+                  <Link to="/ConsultarUsu" className="btn btn-secondary mr-2">Volver</Link>
+                  <button type="submit" className="btn btn-secondary">Actualizar</button>
                 </div>
               </form>
             </div>

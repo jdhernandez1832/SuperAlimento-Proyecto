@@ -9,11 +9,17 @@ const ActualizarCate = () => {
   const [formData, setFormData] = useState({
     nombre: '',
   });
-
+  const token = localStorage.getItem('token');
+  const rol = localStorage.getItem('Rol');
   useEffect(() => {
     const fetchCategoria = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/api/categoria/${id_categoria}`);
+        const response = await fetch(`http://localhost:3001/api/categoria/${id_categoria}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'X-Rol': rol, // Agregar el token en los encabezados
+          },
+        });
         if (response.ok) {
           const data = await response.json();
           setFormData(data); 
@@ -26,7 +32,7 @@ const ActualizarCate = () => {
     };
 
     fetchCategoria();
-  }, [id_categoria]);
+  }, [id_categoria, rol, token]);
 
   const handleChange = (e) => {
     setFormData({
@@ -43,6 +49,8 @@ const ActualizarCate = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'X-Rol': rol,
         },
         body: JSON.stringify(formData),
       });
@@ -62,9 +70,9 @@ const ActualizarCate = () => {
   return (
     <div>
       <Navegacion>
-        <div className="card card-success">
+        <div className="card card-secondary">
           <div className="card-body colorFondo">
-            <div className="card card-success">
+            <div className="card card-secondary">
               <div className="card-header">
                 <h3 className="card-title">Actualizar categoría</h3>
               </div>
@@ -95,8 +103,8 @@ const ActualizarCate = () => {
                   </div>
                 </div>
                 <div className="card-footer">
-                  <Link to="/ConsultarCate" className="btn btn-primary custom-button mr-2">Volver</Link>
-                  <button type="submit" className="btn btn-primary custom-button">Actualizar</button>
+                  <Link to="/ConsultarCate" className="btn btn-secondary mr-2">Volver</Link>
+                  <button type="submit" className="btn btn-secondary">Actualizar</button>
                 </div>
               </form>
             </div>

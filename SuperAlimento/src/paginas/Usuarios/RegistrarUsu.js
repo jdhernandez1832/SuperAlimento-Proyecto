@@ -25,12 +25,16 @@ const RegistrarUsu = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    const token = localStorage.getItem('token');
+    const rol = localStorage.getItem('Rol');
+    
     try {
       const response = await fetch('http://localhost:3001/api/usuario/registrar', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'X-Rol': rol, 
         },
         body: JSON.stringify(formData),
       });
@@ -53,9 +57,9 @@ const RegistrarUsu = () => {
   return (
     <div>
       <Navegacion>
-        <div className="card card-success">
+        <div className="card card-secondary">
           <div className="card-body colorFondo">
-            <div className="card card-success">
+            <div className="card card-secondary">
               <div className="card-header">
                 <h3 className="card-title">Registrar Usuario</h3>
               </div>
@@ -162,8 +166,8 @@ const RegistrarUsu = () => {
                     </select>
                   </div>
                 <div className="card-footer">
-                  <Link to="/ConsultarUsu" className="btn btn-primary custom-button mr-2">Volver</Link>
-                  <button type="submit" className="btn btn-primary custom-button">Registrar</button>
+                  <Link to="/ConsultarUsu" className="btn btn-secondary mr-2">Volver</Link>
+                  <button type="submit" className="btn btn-secondary">Registrar</button>
                 </div>
               </form>
             </div>

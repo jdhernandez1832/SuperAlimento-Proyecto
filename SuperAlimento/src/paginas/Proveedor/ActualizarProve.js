@@ -13,11 +13,18 @@ const ActualizarProve = () => {
         telefono_proveedor: '',
         correo_proveedor: '',
     });
+    const token = localStorage.getItem('token');
+    const rol = localStorage.getItem('Rol');
 
     useEffect(() => {
         const fetchProveedor = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/api/proveedor/${id_proveedor}`);
+                const response = await fetch(`http://localhost:3001/api/proveedor/${id_proveedor}`, {
+                    headers: {
+                      'Authorization': `Bearer ${token}`,
+                      'X-Rol': rol, // Agregar el token en los encabezados
+                    },
+                  });
                 if (response.ok) {
                     const data = await response.json();
                     setFormData(data);
@@ -30,7 +37,7 @@ const ActualizarProve = () => {
         };
 
         fetchProveedor();
-    }, [id_proveedor]);
+    }, [id_proveedor, token, rol]);
 
     const handleChange = (e) => {
         setFormData({
@@ -47,6 +54,8 @@ const ActualizarProve = () => {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    'X-Rol': rol,
                 },
                 body: JSON.stringify(formData),
             });
@@ -66,9 +75,9 @@ const ActualizarProve = () => {
     return (
         <div>
             <Navegacion>
-                <div className="card card-success">
+                <div className="card card-secondary">
                     <div className="card-body colorFondo">
-                        <div className="card card-success">
+                        <div className="card card-secondary">
                             <div className="card-header">
                                 <h3 className="card-title">Actualizar proveedor</h3>
                             </div>
@@ -150,8 +159,8 @@ const ActualizarProve = () => {
                                     </div>
                                 </div>
                                 <div className="card-footer">
-                                    <Link to="/ConsultarProve" className="btn btn-primary custom-button mr-2">Volver</Link>
-                                    <button type="submit" className="btn btn-primary custom-button">Actualizar</button>
+                                    <Link to="/ConsultarProve" className="btn btn-secondary mr-2">Volver</Link>
+                                    <button type="submit" className="btn btn-secondary">Actualizar</button>
                                 </div>
                             </form>
                         </div>

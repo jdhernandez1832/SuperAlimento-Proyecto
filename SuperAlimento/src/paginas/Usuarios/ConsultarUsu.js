@@ -7,12 +7,24 @@ import useDataTable from '../../hooks/useDataTable';
 const ConsultarUsu = () => {
     const tableRef1 = useRef(null);
     const [usuarios, setUsuarios] = useState([]);
+
     useDataTable(tableRef1, usuarios); // Pasar los datos al hook
-  
+
     useEffect(() => {
       const fetchUsuarios = async () => {
         try {
-          const response = await fetch('http://localhost:3001/api/usuario/todos');
+          // Obtener el token del almacenamiento local
+          const token = localStorage.getItem('token');
+          const rol = localStorage.getItem('Rol');
+
+
+          const response = await fetch('http://localhost:3001/api/usuario/todos', {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'X-Rol': rol, // Agregar el token en los encabezados
+            },
+          });
+
           if (response.ok) {
             const data = await response.json();
             setUsuarios(data);
@@ -23,16 +35,21 @@ const ConsultarUsu = () => {
           console.error('Error en la solicitud:', error);
         }
       };
-  
+
       fetchUsuarios();
     }, []);
   
     const handleEstado = async (numero_documento) => {
       try {
+        const token = localStorage.getItem('token');
+        const rol = localStorage.getItem('Rol');
+
         const response = await fetch(`http://localhost:3001/api/usuario/estado/${numero_documento}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'X-Rol': rol, // Agregar el token en los encabezados
           },
           body: JSON.stringify({ estado: 'Desactivo' }), // Cambia el estado a 'Desactivo'
         });
@@ -76,7 +93,6 @@ const ConsultarUsu = () => {
                               <th>Email</th>
                               <th>Telefono</th>
                               <th>Rol</th>
-                              <th>Clave</th>
                               <th>Actualizar</th>
                               <th>Eliminar</th>
                             </tr>
@@ -91,7 +107,6 @@ const ConsultarUsu = () => {
                                   <td>{usuario.correo_usuario}</td>
                                   <td>{usuario.telefono_usuario}</td>
                                   <td>{usuario.id_rol}</td>
-                                  <td>{usuario.clave}</td>
                                   <td><Link to={`/ActualizarUsu/${usuario.numero_documento}`} className="btn btn-warning">Actualizar</Link></td>
                                   <td>
                                     <button 
@@ -116,6 +131,6 @@ const ConsultarUsu = () => {
         </Navegacion>
       </div>
     );
-  };
+};
 
 export default ConsultarUsu;

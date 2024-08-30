@@ -4,7 +4,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 
 const ActualizarProd = () => {
-    const { id_producto } = useParams(); // Cambié numero_documento a id_producto
+    const { id_producto } = useParams();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         nombre_producto: '',
@@ -22,16 +22,23 @@ const ActualizarProd = () => {
     const [categorias, setCategorias] = useState([]);
     const [usuarios, setUsuarios] = useState([]);
     const [proveedores, setProveedores] = useState([]);
+    const token = localStorage.getItem('token');
+    const rol = localStorage.getItem('Rol');
 
     useEffect(() => {
         const fetchProducto = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/api/producto/${id_producto}`);
+                const response = await fetch(`http://localhost:3001/api/producto/${id_producto}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-Rol': rol,
+                    },
+                });
                 if (response.ok) {
                     const data = await response.json();
                     setFormData(data);
                 } else {
-                    console.error('Error al obtener el producto');
+                    console.error('Error al obtener el producto', await response.text());
                 }
             } catch (error) {
                 console.error('Error en la solicitud:', error);
@@ -40,12 +47,17 @@ const ActualizarProd = () => {
 
         const fetchCategorias = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/categoria/todos');
+                const response = await fetch('http://localhost:3001/api/categoria/todos', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-Rol': rol,
+                    },
+                });
                 if (response.ok) {
                     const data = await response.json();
                     setCategorias(data);
                 } else {
-                    console.error('Error al obtener categorías:', response.statusText);
+                    console.error('Error al obtener categorías:', await response.text());
                 }
             } catch (error) {
                 console.error('Error en la solicitud:', error);
@@ -54,36 +66,47 @@ const ActualizarProd = () => {
 
         const fetchUsuarios = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/usuario/todos');
+                const response = await fetch('http://localhost:3001/api/usuario/todos', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-Rol': rol,
+                    },
+                });
                 if (response.ok) {
                     const data = await response.json();
                     setUsuarios(data);
                 } else {
-                    console.error('Error al obtener usuarios:', response.statusText);
+                    console.error('Error al obtener usuarios:', await response.text());
                 }
             } catch (error) {
                 console.error('Error en la solicitud:', error);
             }
         };
+
         const fetchProveedores = async () => {
             try {
-              const response = await fetch('http://localhost:3001/api/proveedor/todos');
-              if (response.ok) {
-                const data = await response.json();
-                console.log('Proveedores obtenidos:', data);
-                setProveedores(data);
-              } else {
-                console.error('Error al obtener proveedores:', response.statusText);
-              }
+                const response = await fetch('http://localhost:3001/api/proveedor/todos', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'X-Rol': rol,
+                    },
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setProveedores(data);
+                } else {
+                    console.error('Error al obtener proveedores:', await response.text());
+                }
             } catch (error) {
-              console.error("Error al obtener los proveedores:", error);
+                console.error('Error en la solicitud:', error);
             }
-          };
+        };
+
         fetchProducto();
         fetchCategorias();
         fetchUsuarios();
         fetchProveedores();
-    }, [id_producto]);
+    }, [id_producto, rol, token]);
 
     const handleChange = (e) => {
         setFormData({
@@ -111,6 +134,10 @@ const ActualizarProd = () => {
             const response = await fetch(`http://localhost:3001/api/producto/actualizar/${id_producto}`, {
                 method: 'PUT',
                 body: data,
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'X-Rol': rol,
+                },
             });
 
             if (response.ok) {
@@ -118,7 +145,7 @@ const ActualizarProd = () => {
                 console.log('Producto actualizado:', result);
                 navigate('/ConsultarProd');
             } else {
-                console.error('Error al actualizar producto');
+                console.error('Error al actualizar producto', await response.text());
             }
         } catch (error) {
             console.error('Error en la solicitud:', error);
@@ -128,15 +155,15 @@ const ActualizarProd = () => {
     return (
         <div>
             <Navegacion>
-                <div className="card card-success">
+                <div className="card card-secondary">
                     <div className="card-body colorFondo">
-                        <div className="card card-success">
+                        <div className="card card-secondary">
                             <div className="card-header">
                                 <h3 className="card-title">Actualizar producto</h3>
                             </div>
                             <form onSubmit={handleSubmit} encType="multipart/form-data">
                                 <div className="card-body">
-                                <div className="form-group">
+                                    <div className="form-group">
                                         <label htmlFor="id_producto">Id de producto</label>
                                         <input
                                             type="text"
@@ -228,8 +255,8 @@ const ActualizarProd = () => {
                                             required
                                         >
                                             <option value="">Selecciona un estado</option>
-                                            <option value="Activo">Activo</option>
-                                            <option value="Desactivo">Desactivo</option>
+                                            <option value="1">Activo</option>
+                                            <option value="0">Desactivo</option>
                                         </select>
                                     </div>
                                     <div className="form-group">
@@ -283,11 +310,15 @@ const ActualizarProd = () => {
                                             onChange={handleChange} 
                                         >
                                             <option value="">Seleccione un proveedor</option>
-                                            {proveedores.map(proveedor => (
-                                            <option key={proveedor.id_proveedor} value={proveedor.id_proveedor}>
-                                                {proveedor.nombre_proveedor}
-                                            </option>
-                                            ))}
+                                            {proveedores.length > 0 ? (
+                                                proveedores.map(proveedor => (
+                                                    <option key={proveedor.id_proveedor} value={proveedor.id_proveedor}>
+                                                        {proveedor.nombre_proveedor}
+                                                    </option>
+                                                ))
+                                            ) : (
+                                                <option>Cargando proveedores...</option>
+                                            )}
                                         </select>
                                     </div>
                                     <div className="form-group">
@@ -300,8 +331,8 @@ const ActualizarProd = () => {
                                         />
                                     </div>
                                     <div className="card-footer">
-                                        <Link to="/ConsultarProd" className="btn btn-primary custom-button mr-2">Volver</Link>
-                                        <button type="submit" className="btn btn-primary custom-button">Actualizar</button>
+                                        <Link to="/ConsultarProd" className="btn btn-secondary mr-2">Volver</Link>
+                                        <button type="submit" className="btn btn-secondary">Actualizar</button>
                                     </div>
                                 </div>
                             </form>

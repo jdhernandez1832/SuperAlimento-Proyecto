@@ -1,13 +1,45 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../../componentes/css/Login.css"; // Importa el archivo CSS
 
 const Login = () => {
+  const [numeroDocumento, setNumeroDocumento] = useState("");
+  const [clave, setClave] = useState("");
   const navigate = useNavigate();
 
-  const navegacion = (event) => {
-    event.preventDefault(); // Previene el comportamiento predeterminado del formulario
-    navigate("/Index"); // Redirige al usuario al índice
+  const handleLogin = async (event) => {
+    event.preventDefault();
+
+    try {
+      const response = await fetch("http://localhost:3001/api/login/ingreso", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          numero_documento: numeroDocumento,
+          clave: clave,
+        }),
+      });
+
+      const data = await response.json();
+      console.log(data);
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("Rol", data.rol);
+        localStorage.setItem("numero_documento", data.numero_documento)
+
+
+        if (data.rol === "Administrador" || data.rol === "Cajero" || data.rol === "Inventarista") {
+          navigate("/Index"); 
+        }
+      } else {
+        throw new Error("Credenciales incorrectas");
+      }
+    } catch (error) {
+      console.error("Error al iniciar sesión:", error);
+      alert("Credenciales incorrectas, por favor intente nuevamente.");
+    }
   };
 
   return (
@@ -19,10 +51,16 @@ const Login = () => {
         <div className="card">
           <div className="card-body login-card-body bordes">
             <p className="login-box-msg">Ingresa Sesion Aqui!!</p>
-            <form onSubmit={navegacion}>
+            <form onSubmit={handleLogin}>
               <p>Numero de Identificacion</p>
               <div className="input-group mb-3">
-                <input type="number" className="form-control" min="0" />
+                <input
+                  type="number"
+                  className="form-control"
+                  min="0"
+                  value={numeroDocumento}
+                  onChange={(e) => setNumeroDocumento(e.target.value)}
+                />
                 <div className="input-group-append">
                   <div className="input-group-text">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-bookmark" viewBox="0 0 16 16">
@@ -33,7 +71,12 @@ const Login = () => {
               </div>
               <p>Contraseña</p>
               <div className="input-group mb-3">
-                <input type="password" className="form-control" />
+                <input
+                  type="password"
+                  className="form-control"
+                  value={clave}
+                  onChange={(e) => setClave(e.target.value)}
+                />
                 <div className="input-group-append">
                   <div className="input-group-text">
                     <span className="fas fa-lock" />
@@ -50,7 +93,7 @@ const Login = () => {
                   </div>
                 </div>
                 <div className="col-4">
-                  <button type="submit" className="btn btn-primary btn-block custom-button">Ingresar</button>
+                  <button type="submit" className="btn btn-secondary btn-block custom-button">Ingresar</button>
                 </div>
               </div>
             </form>

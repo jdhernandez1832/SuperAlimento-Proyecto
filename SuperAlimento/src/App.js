@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import PrivateRoute from './componentes/componentes/PrivateRoute'; // Asegúrate de que la ruta es correcta
 import Login from './paginas/auth/Login';
 import Index from './paginas/Index';
 import Perfil from './paginas/Usuarios/Perfil';
@@ -28,28 +29,28 @@ function App() {
     <Fragment>
       <Router>
         <Routes>
-          <Route path="/" exact element={<Login />} />
-          <Route path="/Index" element={<Index />} />
-          <Route path="/Perfil" element={<Perfil />} />
-          <Route path='/RegistrarUsu' element={<RegistrarUsu />} />
-          <Route path='/RegistrarSoli' element={<RegistrarSoli />} />
-          <Route path='/RegistrarCate' element={<RegistrarCate />} />
-          <Route path='/RegistrarProve' element={<RegistrarProve />} />
-          <Route path='/RegistrarProd' element={<RegistrarProd />} />
-          <Route path='/RegistrarVent' element={<RegistrarVent />} />
-          <Route path='/ConsultarUsu' element={<ConsultarUsu />} />
-          <Route path='/ConsultarProd' element={<ConsultarProd />} />
-          <Route path='/ConsultarProve' element={<ConsultarProve />} />
-          <Route path='/ConsultarSoli' element={<ConsultarSoli />} />
-          <Route path='/ConsultarCate' element={<ConsultarCate />} />
-          <Route path='/ConsultarVent' element={<ConsultarVent />} />
-          <Route path='/ActualizarUsu/:numero_documento' element={<ActualizarUsu />} />
-          <Route path='/ActualizarProve/:id_proveedor' element={<ActualizarProve />} />
-          <Route path='/ActualizarCate/:id_categoria' element={<ActualizarCate />} />
-          <Route path="/ActualizarProdu/:id_producto" element={<ActualizarProd />} />
-          <Route path='/DetallesSolicitud/:id_solicitud' element={<DetallesSolicitud />} />
-          <Route path='/DetallesVenta/:id_venta' element={<DetallesVenta />} />
-          <Route path='/Contacto' element={<Contacto />} />
+          <Route path="/" element={<Login />} />
+          <Route path="/Index" element={<PrivateRoute element={Index} roles="Administrador, Inventarista, Cajero" />} />
+          <Route path="/Perfil/:numero_documento" element={<PrivateRoute element={Perfil} roles="Administrador, Inventarista, Cajero" />} />
+          <Route path="/RegistrarUsu" element={<PrivateRoute element={RegistrarUsu} roles="Administrador" />} />
+          <Route path="/RegistrarSoli" element={<PrivateRoute element={RegistrarSoli} roles="Administrador, Inventarista" />} />
+          <Route path="/RegistrarCate" element={<PrivateRoute element={RegistrarCate} roles="Administrador, Inventarista" />} />
+          <Route path="/RegistrarProve" element={<PrivateRoute element={RegistrarProve} roles="Administrador, Inventarista" />} />
+          <Route path="/RegistrarProd" element={<PrivateRoute element={RegistrarProd} roles="Administrador, Inventarista" />} />
+          <Route path="/RegistrarVent" element={<PrivateRoute element={RegistrarVent} roles="Administrador, Cajero" />} />
+          <Route path="/ConsultarUsu" element={<PrivateRoute element={ConsultarUsu} roles="Administrador" />} />
+          <Route path="/ConsultarProd" element={<PrivateRoute element={ConsultarProd} roles="Administrador, Inventarista" />} />
+          <Route path="/ConsultarProve" element={<PrivateRoute element={ConsultarProve} roles="Administrador, Inventarista" />} />
+          <Route path="/ConsultarSoli" element={<PrivateRoute element={ConsultarSoli} roles="Administrador, Inventarista" />} />
+          <Route path="/ConsultarCate" element={<PrivateRoute element={ConsultarCate} roles="Administrador, Inventarista" />} />
+          <Route path="/ConsultarVent" element={<PrivateRoute element={ConsultarVent} roles="Administrador, Cajero" />} />
+          <Route path="/ActualizarUsu/:numero_documento" element={<PrivateRoute element={ActualizarUsu} roles="Administrador, Inventarista" />} />
+          <Route path="/ActualizarProve/:id_proveedor" element={<PrivateRoute element={ActualizarProve} roles="Administrador, Inventarista" />} />
+          <Route path="/ActualizarCate/:id_categoria" element={<PrivateRoute element={ActualizarCate} roles="Administrador, Inventarista" />} />
+          <Route path="/ActualizarProd/:id_producto" element={<PrivateRoute element={ActualizarProd} roles="Administrador, Inventarista" />} />
+          <Route path="/DetallesSolicitud/:id_solicitud" element={<PrivateRoute element={DetallesSolicitud} roles="Administrador, Inventarista" />} />
+          <Route path="/DetallesVenta/:id_venta" element={<PrivateRoute element={DetallesVenta} roles="Administrador, Cajero" />} />
+          <Route path="/Contacto" element={<PrivateRoute element={Contacto} roles="Administrador, Inventarista, Cajero" />} />
         </Routes>
       </Router>
     </Fragment>

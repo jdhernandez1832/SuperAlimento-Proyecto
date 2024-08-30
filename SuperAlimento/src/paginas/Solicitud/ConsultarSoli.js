@@ -8,11 +8,18 @@ const ConsultarSoli = () => {
     const [solicitudes, setSolicitudes] = useState([]);
     const tableRef1 = useRef(null);
     useDataTable(tableRef1, solicitudes);
+    const token = localStorage.getItem('token');
+    const rol = localStorage.getItem('Rol');
 
     useEffect(() => {
         const fetchSolicitudes = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/solicitud/todos');
+                const response = await fetch('http://localhost:3001/api/solicitud/todos', {
+                    headers: {
+                      'Authorization': `Bearer ${token}`,
+                      'X-Rol': rol, // Agregar el token en los encabezados
+                    },
+                  });
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Datos obtenidos:', data);
@@ -26,12 +33,17 @@ const ConsultarSoli = () => {
         };
 
         fetchSolicitudes();
-    }, []);
+    }, [rol, token]);
 
     const handleAceptarEntrega = async (id) => {
         try {
             const response = await fetch(`http://localhost:3001/api/solicitud/aceptar-entrega/${id}`, {
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    'X-Rol': rol, // Agregar el token en los encabezados
+                  },
             });
             if (response.ok) {
                 alert('Entrega aceptada y productos actualizados');
@@ -54,7 +66,7 @@ const ConsultarSoli = () => {
     return (
         <div>
             <Navegacion>
-                <div className="card card-success">
+                <div className="card card-secondary">
                     <div className="card-body colorFondo">
                         <div className="row">
                             <div className="col-12">

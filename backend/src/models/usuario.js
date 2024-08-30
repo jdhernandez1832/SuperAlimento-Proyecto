@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'numero_documento',
         as: 'productos'
       });
+      Usuario.belongsTo(models.Rol, { as: 'Rol', foreignKey: 'id_rol' });
     }
   }
   Usuario.init({

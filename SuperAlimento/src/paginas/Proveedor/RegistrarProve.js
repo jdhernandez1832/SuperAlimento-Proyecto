@@ -11,6 +11,8 @@ const RegistrarProve = () => {
         telefono_proveedor: '',
         correo_proveedor: '',
     });
+    const token = localStorage.getItem('token');
+    const rol = localStorage.getItem('Rol');
 
     const navigate = useNavigate();
 
@@ -29,6 +31,8 @@ const RegistrarProve = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    'X-Rol': rol,
                 },
                 body: JSON.stringify(formData),
             });
@@ -47,9 +51,9 @@ const RegistrarProve = () => {
     return (
         <div>
             <Navegacion>
-                <div className="card card-success">
+                <div className="card card-secondary">
                     <div className="card-body colorFondo">
-                        <div className="card card-success">
+                        <div className="card card-secondary">
                             <div className="card-header">
                                 <h3 className="card-title">Registrar proveedor</h3>
                             </div>
@@ -118,8 +122,8 @@ const RegistrarProve = () => {
                                     </div>
                                 </div>
                                 <div className="card-footer">
-                                    <Link to="/ConsultarProve" className="btn btn-primary custom-button mr-2">Volver</Link>
-                                    <button type="submit" className="btn btn-primary custom-button">Registrar</button>
+                                    <Link to="/ConsultarProve" className="btn btn-secondary mr-2">Volver</Link>
+                                    <button type="submit" className="btn btn-secondary">Registrar</button>
                                 </div>
                             </form>
                         </div>

@@ -1,31 +1,29 @@
-
 const express = require('express');
-
 const cors = require('cors');
+const { verifyToken, permitRole } = require('./src/middlewares/middlewares'); // Importa los middlewares
 
-const usuarioRoutes  = require('./src/routes/rutaUsuario'); 
-const categoriaRoutes= require('./src/routes/rutaCategoria');
-const proveedorRoutes= require('./src/routes/rutaProveedor');
-const productoRoutes= require('./src/routes/rutaProducto');
+const usuarioRoutes = require('./src/routes/rutaUsuario');
+const categoriaRoutes = require('./src/routes/rutaCategoria');
+const proveedorRoutes = require('./src/routes/rutaProveedor');
+const productoRoutes = require('./src/routes/rutaProducto');
 const solicitudRoutes = require('./src/routes/rutaSolicitud');
-const ventaRoutes= require('./src/routes/rutaVenta')
+const ventaRoutes = require('./src/routes/rutaVenta');
+const loginRoutes= require('./src/routes/rutaLogin');
+
 const app = express();
 
 app.use(cors());
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads'));
 
-
-// Rutas de API
-app.use('/api/usuario', usuarioRoutes);
-app.use('/api/categoria', categoriaRoutes);
-app.use('/api/proveedor', proveedorRoutes);
-app.use('/api/producto', productoRoutes);
-app.use('/api/solicitud', solicitudRoutes);
-app.use('/api/venta', ventaRoutes);
-
+app.use('/api/login', loginRoutes);
+app.use('/api/usuario', verifyToken, permitRole('Administrador', 'Inventarista', 'Cajero' ), usuarioRoutes);
+app.use('/api/categoria', verifyToken, permitRole('Administrador', 'Inventarista'), categoriaRoutes);
+app.use('/api/proveedor', verifyToken, permitRole('Administrador', 'Inventarista'), proveedorRoutes);
+app.use('/api/producto', verifyToken, permitRole('Administrador', 'Inventarista'), productoRoutes);
+app.use('/api/solicitud', verifyToken, permitRole('Administrador', 'Inventarista'), solicitudRoutes);
+app.use('/api/venta', verifyToken, permitRole('Administrador', 'Cajero'), ventaRoutes);
 
 const port = process.env.PORT || 3001;
 app.listen(port, () => {

@@ -5,22 +5,38 @@ import { Link, useNavigate } from "react-router-dom";
 
 const RegistrarVenta = () => {
   const [formData, setFormData] = useState({
-    FechaVenta: '',
+    FechaVenta: new Date().toISOString().split('T')[0], // Inicializa con la fecha actual
     MetodoPago: '',
     Caja: '',
     NumeroDocumento: '', 
   });
 
-  const [usuarios, setUsuarios] = useState([]);
-  const [productos, setProductos] = useState([]); // Productos inicializados como array vacío
+  const [ setUsuarios] = useState([]);
+  const [productos, setProductos] = useState([]); 
   const [searchTerm, setSearchTerm] = useState('');
   const [cart, setCart] = useState([]);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
+  const rol = localStorage.getItem('Rol');
+
+  useEffect(() => {
+    const numero_documento = localStorage.getItem('numero_documento');
+    setFormData(prevState => ({
+      ...prevState,
+      NumeroDocumento: numero_documento || ''  
+    }));
+  }, []);
 
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/usuario/todos');
+        const response = await fetch('http://localhost:3001/api/usuario/todos', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'X-Rol': rol, 
+          },
+        });
         if (response.ok) {
           const data = await response.json();
           setUsuarios(data);
@@ -33,12 +49,17 @@ const RegistrarVenta = () => {
     };
   
     fetchUsuarios();
-  }, []);
+  }, [rol, setUsuarios, token]);
 
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/producto/todos');
+        const response = await fetch('http://localhost:3001/api/producto/todos', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'X-Rol': rol, 
+          },
+        });
         if (response.ok) {
           const data = await response.json();
           setProductos(data);
@@ -53,7 +74,7 @@ const RegistrarVenta = () => {
     };
 
     fetchProductos();
-  }, []);
+  }, [rol, token]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -65,47 +86,43 @@ const RegistrarVenta = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Verificar que el usuario esté seleccionado
-    if (!formData.NumeroDocumento) {
-      window.alert('Debe seleccionar un usuario');
+
+    // Validar el precio total
+    const precioTotal = cart.reduce((total, item) => total + item.precio_venta * item.quantity, 0);
+    if (precioTotal <= 0) {
+      setError('El precio total debe ser mayor a 0.');
       return;
     }
-  
-    // Calcular el precio total basado en los productos en el carrito
-    const precioTotal = cart.reduce((total, item) => total + item.precio_venta * item.quantity, 0);
-  
-    // Preparar la fecha actual si no se ha especificado
-    const fechaActual = formData.FechaVenta || new Date().toISOString().split('T')[0];
-  
-    // Asegurarse de actualizar el precio total en formData
+
     const ventaData = {
-      fecha_venta: fechaActual,  // Enviar la fecha de la venta
+      fecha_venta: formData.FechaVenta,
       metodo_pago: formData.MetodoPago,
       caja: formData.Caja,
-      total_venta: precioTotal,  // Asignar el precio total calculado
+      total_venta: precioTotal,
       numero_documento: formData.NumeroDocumento,
       productos: cart.map(item => ({
         id_producto: item.id_producto,
         cantidad: item.quantity,
         precio: item.precio_venta,
-      })),  // Incluir los productos seleccionados con la cantidad
+      })),
     };
   
     try {
       const response = await fetch('http://localhost:3001/api/venta/registrar', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'X-Rol': rol,
         },
         body: JSON.stringify(ventaData)
       });
   
       if (response.ok) {
         const result = await response.json();
-        const ventaId = result.id_venta;  // Asumiendo que la respuesta contiene el ID de la venta
+        const ventaId = result.id_venta;
         window.alert('Venta registrada con éxito');
-        navigate(`/DetallesVenta/${ventaId}`);  // Redirigir a la página de detalles de la venta
+        navigate(`/DetallesVenta/${ventaId}`);
       } else {
         const errorMessage = await response.text();
         window.alert(`Error al registrar venta: ${errorMessage}`);
@@ -114,16 +131,23 @@ const RegistrarVenta = () => {
       window.alert(`Error en el registro: ${error}`);
     }
   };
-  
+
   const handleSearch = (e) => {
-    setSearchTerm(e.target.value || ''); // Asegúrate de que searchTerm siempre sea una cadena
+    setSearchTerm(e.target.value || '');
   };
 
   const handleAddToCart = (product) => {
     const quantity = parseInt(prompt('Ingrese la cantidad:'), 10);
-    if (!isNaN(quantity) && quantity > 0) {
-      setCart([...cart, { ...product, quantity }]);
+    if (isNaN(quantity) || quantity <= 0) {
+      setError('La cantidad debe ser un número mayor a 0.');
+      return;
     }
+    if (quantity > product.cantidad) {
+      setError('La cantidad ingresada supera el stock disponible.');
+      return;
+    }
+    setError('');
+    setCart([...cart, { ...product, quantity }]);
   };
 
   const filteredProducts = productos.filter(
@@ -135,7 +159,7 @@ const RegistrarVenta = () => {
   return (
     <div>
       <Navegacion>
-        <div className="card card-success" style={{ height: "88vh" }}>
+        <div className="card card-secondary" style={{ height: "88vh" }}>
           <div className="card-body">
             <div className="container-fluid">
               <div className="row">
@@ -185,9 +209,8 @@ const RegistrarVenta = () => {
                             type="date"
                             className="form-control"
                             id="FechaVenta"
-                            required
                             value={formData.FechaVenta}
-                            onChange={handleChange}
+                            readOnly // Hace que el campo sea de solo lectura
                           />
                         </div>
                         <div className="form-group">
@@ -220,20 +243,13 @@ const RegistrarVenta = () => {
                         </div>
                         <div className="form-group">
                           <label htmlFor="NumeroDocumento">Usuario</label>
-                          <select
+                          <input
                             className="form-control"
                             id="NumeroDocumento"
-                            value={formData.NumeroDocumento}
-                            onChange={handleChange}
                             required
-                          >
-                            <option value="">Seleccione un usuario</option>
-                            {usuarios.map((usuario) => (
-                              <option key={usuario.numero_documento} value={usuario.numero_documento}>
-                                {usuario.nombre_usuario}
-                              </option>
-                            ))}
-                          </select>
+                            value={formData.NumeroDocumento}
+                            readOnly
+                          />
                         </div>
                         <div className="form-group">
                           <label>Productos en el carrito</label>
@@ -257,10 +273,11 @@ const RegistrarVenta = () => {
                             readOnly
                           />
                         </div>
+                        {error && <div className="alert alert-danger">{error}</div>}
                       </div>
                       <div className="card-footer">
-                        <button type="submit" className="btn btn-primary custom-button mr-2">Registrar Venta</button>
-                        <Link to="/ConsultarVent" className="btn btn-primary custom-button mr-2">Cancelar</Link>
+                        <button type="submit" className="btn btn-secondary mr-2">Registrar Venta</button>
+                        <Link to="/ConsultarVent" className="btn btn-secondary mr-2">Cancelar</Link>
                       </div>
                     </form>
                   </div>

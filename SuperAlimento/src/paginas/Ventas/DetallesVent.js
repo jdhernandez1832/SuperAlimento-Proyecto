@@ -12,11 +12,17 @@ const DetallesVenta = () => {
     const [usuarios, setUsuarios] = useState([]);
     const [setTotal] = useState(0); // Estado para el valor total
     const navigate = useNavigate();
-
+    const token = localStorage.getItem('token');
+    const rol = localStorage.getItem('Rol');
     useEffect(() => {
         const fetchVenta = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/api/venta/detalles/${id_venta}`);
+                const response = await fetch(`http://localhost:3001/api/venta/detalles/${id_venta}`, {
+                    headers: {
+                      'Authorization': `Bearer ${token}`,
+                      'X-Rol': rol, // Agregar el token en los encabezados
+                    },
+                  });
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Datos de venta:', data); // Depuración
@@ -35,7 +41,12 @@ const DetallesVenta = () => {
 
         const fetchUsuarios = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/usuario/todos');
+                const response = await fetch('http://localhost:3001/api/usuario/todos', {
+                    headers: {
+                      'Authorization': `Bearer ${token}`,
+                      'X-Rol': rol, // Agregar el token en los encabezados
+                    },
+                });
                 if (response.ok) {
                     const data = await response.json();
                     setUsuarios(data);
@@ -49,7 +60,12 @@ const DetallesVenta = () => {
 
         const fetchProductos = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/producto/todos');
+                const response = await fetch('http://localhost:3001/api/producto/todos', {
+                    headers: {
+                      'Authorization': `Bearer ${token}`,
+                      'X-Rol': rol, // Agregar el token en los encabezados
+                    },
+                });
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Productos existentes:', data); // Depuración
@@ -65,7 +81,8 @@ const DetallesVenta = () => {
         fetchVenta();
         fetchUsuarios();
         fetchProductos();
-    }, );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const calcularTotal = (productos, productosExistentes) => {
         const totalCalculado = productos.reduce((total, producto) => {

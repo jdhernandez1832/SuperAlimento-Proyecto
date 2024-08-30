@@ -16,6 +16,9 @@ const RegistrarCate = () => {
         });
     };
 
+    const token = localStorage.getItem('token');
+    const rol = localStorage.getItem('Rol');
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -24,6 +27,8 @@ const RegistrarCate = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    'X-Rol': rol, //
                 },
                 body: JSON.stringify(formData),
             });
@@ -46,9 +51,9 @@ const RegistrarCate = () => {
     return (
         <div>
             <Navegacion>
-                <div className="card card-success">
+                <div className="card card-secondary">
                     <div className="card-body colorFondo">
-                        <div className="card card-success">
+                        <div className="card card-secondary">
                             <div className="card-header">
                                 <h3 className="card-title">Registrar categoría</h3>
                             </div>
@@ -67,8 +72,8 @@ const RegistrarCate = () => {
                                     </div>
                                 </div>
                                 <div className="card-footer">
-                                    <Link to="/ConsultarCate" className="btn btn-primary custom-button mr-2">Volver</Link>
-                                    <button type="submit" className="btn btn-primary custom-button">Registrar</button>
+                                    <Link to="/ConsultarCate" className="btn btn-secondary mr-2">Volver</Link>
+                                    <button type="submit" className="btn btn-secondary">Registrar</button>
                                 </div>
                             </form>
                         </div>

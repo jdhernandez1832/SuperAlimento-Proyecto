@@ -13,11 +13,19 @@ const DetallesSolicitud = () => {
     const [usuarios, setUsuarios] = useState([]);
     const [setTotal] = useState(0); // Estado para el valor total
     const navigate = useNavigate();
+    const token = localStorage.getItem('token');
+    const rol = localStorage.getItem('Rol');
+
 
     useEffect(() => {
         const fetchSolicitud = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/api/solicitud/detalles/${id_solicitud}`);
+                const response = await fetch(`http://localhost:3001/api/solicitud/detalles/${id_solicitud}`, {
+                    headers: {
+                      'Authorization': `Bearer ${token}`,
+                      'X-Rol': rol, // Agregar el token en los encabezados
+                    },
+                  });
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Datos de solicitud:', data); // Depuración
@@ -36,7 +44,12 @@ const DetallesSolicitud = () => {
 
         const fetchProveedores = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/proveedor/todos');
+                const response = await fetch('http://localhost:3001/api/proveedor/todos', {
+                    headers: {
+                      'Authorization': `Bearer ${token}`,
+                      'X-Rol': rol, // Agregar el token en los encabezados
+                    },
+                });
                 if (response.ok) {
                     const data = await response.json();
                     setProveedores(data);
@@ -50,7 +63,12 @@ const DetallesSolicitud = () => {
 
         const fetchUsuarios = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/usuario/todos');
+                const response = await fetch('http://localhost:3001/api/usuario/todos', {
+                    headers: {
+                      'Authorization': `Bearer ${token}`,
+                      'X-Rol': rol, // Agregar el token en los encabezados
+                    },
+                });
                 if (response.ok) {
                     const data = await response.json();
                     setUsuarios(data);
@@ -64,7 +82,12 @@ const DetallesSolicitud = () => {
 
         const fetchProductos = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/producto/todos');
+                const response = await fetch('http://localhost:3001/api/producto/todos', {
+                    headers: {
+                      'Authorization': `Bearer ${token}`,
+                      'X-Rol': rol, // Agregar el token en los encabezados
+                    },
+                });
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Productos existentes:', data); // Depuración

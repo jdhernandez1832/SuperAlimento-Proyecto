@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { Venta, Detalle_Venta, sequelize } = require('../models');
-
+const { Op } = require('sequelize'); 
 // Ruta para registrar una venta
 router.post('/registrar', async (req, res) => {
   const transaction = await sequelize.transaction();
@@ -65,5 +65,50 @@ router.get('/detalles/:id', async (req, res) => {
     res.status(500).json({ message: 'Error al obtener los detalles de la venta' });
   }
 });
+
+
+
+
+
+router.get('/semana', async (req, res) => {
+  try {
+    const today = new Date();
+    const lastWeek = new Date(today.setDate(today.getDate() - 7));
+
+    // Verifica las fechas generadas
+    console.log('Fecha actual:', today);
+    console.log('Fecha de hace una semana:', lastWeek);
+
+    const ventas = await Venta.findAll({
+      where: {
+        fecha_venta: {
+          [Op.between]: [lastWeek, new Date()]
+        }
+      },
+      attributes: [
+        [sequelize.fn('DATE', sequelize.col('fecha_venta')), 'date'],
+        [sequelize.fn('SUM', sequelize.col('total_venta')), 'total']
+      ],
+      group: ['date'],
+      order: [['date', 'ASC']]
+    });
+
+    // Log de ventas para verificar datos
+    console.log('Ventas:', ventas);
+
+    const result = {
+      dates: ventas.map(v => v.dataValues.date || 'Sin Fecha'),
+      sales: ventas.map(v => parseFloat(v.dataValues.total) || 0)
+    };
+
+    res.json(result);
+  } catch (error) {
+    console.error('Error fetching weekly sales:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+module.exports = router;
+
 
 module.exports = router;
