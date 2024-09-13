@@ -19,11 +19,11 @@ app.use('/uploads', express.static('uploads'));
 
 app.use('/api/login', loginRoutes);
 app.use('/api/usuario', verifyToken, permitRole('Administrador', 'Inventarista', 'Cajero' ), usuarioRoutes);
-app.use('/api/categoria', verifyToken, permitRole('Administrador', 'Inventarista'), categoriaRoutes);
-app.use('/api/proveedor', verifyToken, permitRole('Administrador', 'Inventarista'), proveedorRoutes);
-app.use('/api/producto', verifyToken, permitRole('Administrador', 'Inventarista'), productoRoutes);
-app.use('/api/solicitud', verifyToken, permitRole('Administrador', 'Inventarista'), solicitudRoutes);
-app.use('/api/venta', verifyToken, permitRole('Administrador', 'Cajero'), ventaRoutes);
+app.use('/api/categoria', verifyToken, permitRole('Administrador', 'Inventarista', 'Cajero' ), categoriaRoutes);
+app.use('/api/proveedor', verifyToken, permitRole('Administrador', 'Inventarista', 'Cajero' ), proveedorRoutes);
+app.use('/api/producto', verifyToken, permitRole('Administrador', 'Inventarista', 'Cajero' ), productoRoutes);
+app.use('/api/solicitud', verifyToken, permitRole('Administrador', 'Inventarista', 'Cajero' ), solicitudRoutes);
+app.use('/api/venta', verifyToken, permitRole('Administrador', 'Inventarista', 'Cajero' ), ventaRoutes);
 
 const port = process.env.PORT || 3001;
 app.listen(port, () => {

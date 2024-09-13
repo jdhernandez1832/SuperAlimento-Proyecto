@@ -1,16 +1,27 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { } from 'react';
+import { Link, useNavigate } from "react-router-dom";
 
 const Navegacion = ({ children }) => {
   const numeroDocumento = localStorage.getItem('numero_documento');
-  const rol = localStorage.getItem('Rol'); // Obtén el rol del usuario desde el localStorage o estado global
+  const rol = localStorage.getItem('Rol'); 
+  const navigate = useNavigate();
+
+  
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("Rol");
+    localStorage.removeItem("numero_documento");
+    setTimeout(() => {
+      navigate("/"); 
+    }, 100); 
+  };
 
   return (
     <div className="wrapper">
       <nav className="main-header navbar navbar-expand navbar-dark">
         <ul className="navbar-nav">
           <li className="nav-item">
-            <Link className="nav-link" data-widget="pushmenu" to="#" role="button"><i className="fas fa-bars" /></Link>
+            <Link className="nav-link" data-widget="pushmenu" role="button"><i className="fas fa-bars" /></Link>
           </li>
           <li className="nav-item d-none d-sm-inline-block">
             <Link to="/Index" className="nav-link">Inicio</Link>
@@ -30,7 +41,7 @@ const Navegacion = ({ children }) => {
                 <p>Perfil</p>
               </Link>
               <div className="dropdown-divider" />
-              <Link to="/" className="dropdown-item">
+              <Link onClick={handleLogout} className="dropdown-item">
                 <p>Cerrar Sesión</p>
               </Link>
               <div className="dropdown-divider" />
@@ -42,7 +53,7 @@ const Navegacion = ({ children }) => {
           </li>
         </ul>
       </nav>
-      <aside className="main-sidebar sidebar-dark-primary elevation-4">
+      <aside className="main-sidebar sidebar-dark-primary elevation-4"  >
         <Link to="/Index" className="brand-link">
           <img src="../../dist/img/SuperAlimento.png" className="brand-image img-circle elevation-3" alt="superalimento.logo" style={{ opacity: '.8' }} />
           <span className="brand-text font-weight-light">SuperAlimento</span>

@@ -1,5 +1,5 @@
 .custom-button {
-    background-color: rgb(71, 82, 74); /* Color de fondo en RGB */
+    background-color: #7ED957; /* Color de fondo en RGB */
     color: white; /* Color de las letras */
     border: none;
     padding: 10px 20px;
@@ -10,7 +10,7 @@
   }
   
 .custom-button:hover {
-    background-color: rgb(41, 44, 41); /* Color de fondo más oscuro al pasar el mouse */
+    background-color: rgb(5, 109, 5); /* Color de fondo más oscuro al pasar el mouse */
   }
 .letras{
     color: rgb(81,180,101);
@@ -62,5 +62,9 @@
     max-width: 100%; /* Asegura que la imagen no desborde el contenedor */
     height: auto;
     margin-bottom: 10px;
+  }
+  .table-responsive {
+    overflow-x: auto;
+    white-space: nowrap;
   }
   

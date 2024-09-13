@@ -2,9 +2,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const express = require('express');
 const router = express.Router();
-const { Usuario,  Rol } = require('../models'); 
+const { Usuario, Rol } = require('../models'); 
 const SECRET_KEY = 'superalimento';
-
 
 router.post('/ingreso', async (req, res) => {
     const { numero_documento, clave } = req.body;
@@ -28,10 +27,9 @@ router.post('/ingreso', async (req, res) => {
         {
           id: usuario.numero_documento,
           rol: usuario.Rol.nombre,
-
         },
         SECRET_KEY,
-        { expiresIn: '1h' }
+        { expiresIn: '12h' }  // Duración del token de 12 horas
       );
   
       res.json({ token, rol: usuario.Rol.nombre, numero_documento: usuario.numero_documento });
@@ -41,5 +39,4 @@ router.post('/ingreso', async (req, res) => {
     }
   });
 
-  
 module.exports = router;

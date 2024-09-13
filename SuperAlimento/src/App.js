@@ -23,13 +23,19 @@ import ConsultarVent from './paginas/Ventas/ConsultarVent';
 import Contacto from './paginas/Contacto';
 import DetallesSolicitud from './paginas/Solicitud/DetallesSoli';
 import DetallesVenta from './paginas/Ventas/DetallesVent';
+import Principal from './paginas/Principal';
+import Error from './paginas/Error'
+import Olvido from './paginas/Olvido';
 
 function App() {
   return (
     <Fragment>
       <Router>
         <Routes>
-          <Route path="/" element={<Login />} />
+        <Route path="/" element={<Principal />} />
+        <Route path="/Error" element={<Error />} />
+        <Route path="/Olvido" element={<Olvido />} />
+          <Route path="/Login" element={<Login />} />
           <Route path="/Index" element={<PrivateRoute element={Index} roles="Administrador, Inventarista, Cajero" />} />
           <Route path="/Perfil/:numero_documento" element={<PrivateRoute element={Perfil} roles="Administrador, Inventarista, Cajero" />} />
           <Route path="/RegistrarUsu" element={<PrivateRoute element={RegistrarUsu} roles="Administrador" />} />

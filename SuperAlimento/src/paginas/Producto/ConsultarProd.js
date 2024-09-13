@@ -84,7 +84,7 @@ const ConsultarProd = () => {
                                             <th>Codigo de barras</th>
                                             <th>Precio de compra</th>
                                             <th>Precio de venta</th>
-                                            <th>Categoria</th>
+                                            <th>Descripcion</th>
                                             <th>Cantidad</th>
                                             <th>Actualizar</th>
                                             <th>Eliminar</th>

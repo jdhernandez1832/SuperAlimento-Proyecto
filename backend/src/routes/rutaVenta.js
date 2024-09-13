@@ -69,36 +69,32 @@ router.get('/detalles/:id', async (req, res) => {
 
 
 
-
 router.get('/semana', async (req, res) => {
   try {
     const today = new Date();
-    const lastWeek = new Date(today.setDate(today.getDate() - 7));
+    const lastWeek = new Date(today);
+    lastWeek.setDate(today.getDate() - 7);
 
-    // Verifica las fechas generadas
-    console.log('Fecha actual:', today);
-    console.log('Fecha de hace una semana:', lastWeek);
+    const formattedToday = today.toISOString().split('T')[0];
+    const formattedLastWeek = lastWeek.toISOString().split('T')[0];
 
+    // Consulta simplificada
     const ventas = await Venta.findAll({
       where: {
         fecha_venta: {
-          [Op.between]: [lastWeek, new Date()]
+          [Op.between]: [formattedLastWeek, formattedToday]
         }
       },
-      attributes: [
-        [sequelize.fn('DATE', sequelize.col('fecha_venta')), 'date'],
-        [sequelize.fn('SUM', sequelize.col('total_venta')), 'total']
-      ],
-      group: ['date'],
-      order: [['date', 'ASC']]
+      attributes: ['fecha_venta', 'total_venta'],
+      order: [['fecha_venta', 'ASC']]
     });
 
     // Log de ventas para verificar datos
     console.log('Ventas:', ventas);
 
     const result = {
-      dates: ventas.map(v => v.dataValues.date || 'Sin Fecha'),
-      sales: ventas.map(v => parseFloat(v.dataValues.total) || 0)
+      dates: ventas.map(v => v.fecha_venta || 'Sin Fecha'),
+      sales: ventas.map(v => parseFloat(v.total_venta) || 0)
     };
 
     res.json(result);
@@ -107,8 +103,6 @@ router.get('/semana', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-module.exports = router;
 
 
 module.exports = router;
