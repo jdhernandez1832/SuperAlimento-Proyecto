@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Navegacion from "../../componentes/componentes/navegacion";
 import "../../componentes/css/Login.css";
 import { Link, useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2'; // Importación de SweetAlert
 
 const RegistrarProve = () => {
     const [formData, setFormData] = useState({
@@ -38,13 +39,29 @@ const RegistrarProve = () => {
             });
 
             if (response.ok) {
-                window.alert('Proveedor registrado exitosamente');
-                navigate('/ConsultarProve');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Proveedor registrado',
+                    text: 'El proveedor se ha registrado exitosamente.',
+                    confirmButtonColor: '#28a745', // Color verde para el botón
+                }).then(() => {
+                    navigate('/ConsultarProve');
+                });
             } else {
-                window.alert('Error al registrar proveedor');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error al registrar proveedor.',
+                    confirmButtonColor: '#28a745', // Color verde para el botón
+                });
             }
         } catch (error) {
-            window.alert('Error en la solicitud:', error.message);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error en la solicitud',
+                text: error.message,
+                confirmButtonColor: '#28a745', // Color verde para el botón
+            });
         }
     };
 
@@ -132,6 +149,6 @@ const RegistrarProve = () => {
             </Navegacion>
         </div>
     );
-}
+};
 
 export default RegistrarProve;

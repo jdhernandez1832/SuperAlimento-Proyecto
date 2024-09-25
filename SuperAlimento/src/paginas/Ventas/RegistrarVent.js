@@ -2,17 +2,18 @@ import React, { useState, useEffect } from "react";
 import Navegacion from "../../componentes/componentes/navegacion";
 import "../../componentes/css/Login.css";
 import { Link, useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2'; // Importa SweetAlert
 
 const RegistrarVenta = () => {
   const [formData, setFormData] = useState({
     FechaVenta: new Date().toISOString().split('T')[0], // Inicializa con la fecha actual
     MetodoPago: '',
     Caja: '',
-    NumeroDocumento: '', 
+    NumeroDocumento: '',
   });
 
-  const [ setUsuarios] = useState([]);
-  const [productos, setProductos] = useState([]); 
+  const [setUsuarios] = useState([]);
+  const [productos, setProductos] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [cart, setCart] = useState([]);
   const [error, setError] = useState('');
@@ -24,7 +25,7 @@ const RegistrarVenta = () => {
     const numero_documento = localStorage.getItem('numero_documento');
     setFormData(prevState => ({
       ...prevState,
-      NumeroDocumento: numero_documento || ''  
+      NumeroDocumento: numero_documento || ''
     }));
   }, []);
 
@@ -34,7 +35,7 @@ const RegistrarVenta = () => {
         const response = await fetch('http://localhost:3001/api/usuario/todos', {
           headers: {
             'Authorization': `Bearer ${token}`,
-            'X-Rol': rol, 
+            'X-Rol': rol,
           },
         });
         if (response.ok) {
@@ -47,7 +48,7 @@ const RegistrarVenta = () => {
         console.error("Error al obtener los usuarios:", error);
       }
     };
-  
+
     fetchUsuarios();
   }, [rol, setUsuarios, token]);
 
@@ -57,7 +58,7 @@ const RegistrarVenta = () => {
         const response = await fetch('http://localhost:3001/api/producto/todos', {
           headers: {
             'Authorization': `Bearer ${token}`,
-            'X-Rol': rol, 
+            'X-Rol': rol,
           },
         });
         if (response.ok) {
@@ -106,7 +107,7 @@ const RegistrarVenta = () => {
         precio: item.precio_venta,
       })),
     };
-  
+
     try {
       const response = await fetch('http://localhost:3001/api/venta/registrar', {
         method: 'POST',
@@ -117,18 +118,41 @@ const RegistrarVenta = () => {
         },
         body: JSON.stringify(ventaData)
       });
-  
+
       if (response.ok) {
         const result = await response.json();
         const ventaId = result.id_venta;
-        window.alert('Venta registrada con éxito');
-        navigate(`/DetallesVenta/${ventaId}`);
+
+        // SweetAlert para éxito
+        Swal.fire({
+          title: '¡Éxito!',
+          text: 'Venta registrada con éxito',
+          icon: 'success',
+          confirmButtonText: 'Aceptar',
+          confirmButtonColor: '#28a745', // Verde
+        }).then(() => {
+          navigate(`/DetallesVenta/${ventaId}`);
+        });
       } else {
         const errorMessage = await response.text();
-        window.alert(`Error al registrar venta: ${errorMessage}`);
+        // SweetAlert para error
+        Swal.fire({
+          title: 'Error',
+          text: `Error al registrar venta: ${errorMessage}`,
+          icon: 'error',
+          confirmButtonText: 'Aceptar',
+          confirmButtonColor: '#dc3545', // Rojo
+        });
       }
     } catch (error) {
-      window.alert(`Error en el registro: ${error}`);
+      // SweetAlert para error en la solicitud
+      Swal.fire({
+        title: 'Error',
+        text: `Error en el registro: ${error}`,
+        icon: 'error',
+        confirmButtonText: 'Aceptar',
+        confirmButtonColor: '#dc3545', // Rojo
+      });
     }
   };
 
@@ -187,7 +211,7 @@ const RegistrarVenta = () => {
                           className="product-item"
                           onClick={() => handleAddToCart(producto)}
                         >
-                          <img src={producto.imagen ? `http://localhost:3001/uploads/${producto.imagen}` : "default-product-image.png"} alt={producto.nombre_producto} width={'200'}/>
+                          <img src={producto.imagen ? `http://localhost:3001/uploads/${producto.imagen}` : "default-product-image.png"} alt={producto.nombre_producto} width={'200'} />
                           <h4>{producto.nombre_producto}</h4>
                           <p>{producto.cantidad}</p>
                           <p>${producto.precio_venta.toLocaleString()}</p>

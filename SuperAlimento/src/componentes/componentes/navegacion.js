@@ -1,4 +1,4 @@
-import React, { } from 'react';
+import React from 'react';
 import { Link, useNavigate } from "react-router-dom";
 
 const Navegacion = ({ children }) => {
@@ -6,7 +6,6 @@ const Navegacion = ({ children }) => {
   const rol = localStorage.getItem('Rol'); 
   const navigate = useNavigate();
 
-  
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("Rol");
@@ -15,13 +14,90 @@ const Navegacion = ({ children }) => {
       navigate("/"); 
     }, 100); 
   };
+  
+  const renderNavItems = () => {
+    const navItems = [
+      {
+        title: "Usuarios",
+        icon: "fas fa-users",
+        roles: ["Administrador"],
+        links: [
+          { to: "/RegistrarUsu", title: "Registrar"},
+          { to: "/ConsultarUsu", title: "Consultar"},
+        ],
+      },
+      {
+        title: "Proveedores",
+        icon: "fas fa-truck",
+        roles: ["Administrador", "Inventarista"],
+        links: [
+          { to: "/RegistrarProve", title: "Registrar" },
+          { to: "/ConsultarProve", title: "Consultar"},
+        ],
+      },
+      {
+        title: "Solicitudes",
+        icon: "fas fa-file-alt",
+        roles: ["Administrador", "Inventarista"],
+        links: [
+          { to: "/RegistrarSoli", title: "Registrar" },
+          { to: "/ConsultarSoli", title: "Consultar"},
+        ],
+      },
+      {
+        title: "Productos",
+        icon: "fas fa-box",
+        roles: ["Administrador", "Inventarista"],
+        links: [
+          { to: "/RegistrarProd", title: "Registrar"},
+          { to: "/ConsultarProd", title: "Consultar"},
+          { to: "/RegistrarCate", title: "Registrar Categoría"},
+          { to: "/ConsultarCate", title: "Consultar Categoría"},
+        ],
+      },
+      {
+        title: "Ventas",
+        icon: "fas fa-shopping-cart",
+        roles: ["Administrador", "Cajero"],
+        links: [
+          { to: "/RegistrarVent", title: "Registrar"},
+          { to: "/ConsultarVent", title: "Consultar"},
+        ],
+      },
+    ];
+
+    return navItems.map(item => {
+      if (item.roles.includes(rol)) {
+        return (
+          <li className="nav-item" key={item.title}>
+            <Link to="#" className="nav-link">
+              <i className={`${item.icon} nav-icon`} /> 
+              <p>{item.title}<i className="right fas fa-angle-left" /></p>
+            </Link>
+            <ul className="nav nav-treeview">
+              {item.links.map(link => (
+                <li className="nav-item" key={link.to}>
+                  <Link to={link.to} className="nav-link">
+                    <p>{link.title}</p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </li>
+        );
+      }
+      return null;
+    });
+  };
 
   return (
     <div className="wrapper">
       <nav className="main-header navbar navbar-expand navbar-dark">
         <ul className="navbar-nav">
           <li className="nav-item">
-            <Link className="nav-link" data-widget="pushmenu" role="button"><i className="fas fa-bars" /></Link>
+            <Link className="nav-link" data-widget="pushmenu" to="#" role="button">
+              <i className="fas fa-bars" />
+            </Link>
           </li>
           <li className="nav-item d-none d-sm-inline-block">
             <Link to="/Index" className="nav-link">Inicio</Link>
@@ -30,7 +106,7 @@ const Navegacion = ({ children }) => {
             <Link to="#" className="nav-link">SuperAlimento</Link>
           </li>
         </ul>
-        <ul className="navbar-nav ml-auto ">
+        <ul className="navbar-nav ml-auto">
           <li className="nav-item dropdown">
             <Link className="nav-link" data-toggle="dropdown" to="#">
               <p>Opciones</p>
@@ -53,7 +129,7 @@ const Navegacion = ({ children }) => {
           </li>
         </ul>
       </nav>
-      <aside className="main-sidebar sidebar-dark-primary elevation-4"  >
+      <aside className="main-sidebar sidebar-dark-primary elevation-4">
         <Link to="/Index" className="brand-link">
           <img src="../../dist/img/SuperAlimento.png" className="brand-image img-circle elevation-3" alt="superalimento.logo" style={{ opacity: '.8' }} />
           <span className="brand-text font-weight-light">SuperAlimento</span>
@@ -61,128 +137,7 @@ const Navegacion = ({ children }) => {
         <div className="sidebar">
           <nav className="mt-2">
             <ul className="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-              {/* Gestión de Usuario */}
-              {(rol === 'Administrador') && (
-                <li className="nav-item">
-                  <Link to="#" className="nav-link">
-                    <p>Gestión de Usuario<i className="right fas fa-angle-left" /></p>
-                  </Link>
-                  <ul className="nav nav-treeview">
-                    <li className="nav-item">
-                      <Link to="/RegistrarUsu" className="nav-link">
-                        <i className="far fa-circle nav-icon" />
-                        <p>Registrar</p>
-                      </Link>
-                    </li>
-                    <li className="nav-item">
-                      <Link to="/ConsultarUsu" className="nav-link">
-                        <i className="far fa-circle nav-icon" />
-                        <p>Consultar</p>
-                      </Link>
-                    </li>
-                  </ul>
-                </li>
-              )}
-              {/* Gestión de Proveedor */}
-              {(rol === 'Administrador' || rol === 'Inventarista') && (
-                <li className="nav-item">
-                  <Link to="#" className="nav-link">
-                    <p>Gestión de Proveedor<i className="right fas fa-angle-left" /></p>
-                  </Link>
-                  <ul className="nav nav-treeview">
-                    <li className="nav-item">
-                      <Link to="/RegistrarProve" className="nav-link">
-                        <i className="far fa-circle nav-icon" />
-                        <p>Registrar</p>
-                      </Link>
-                    </li>
-                    <li className="nav-item">
-                      <Link to="/ConsultarProve" className="nav-link">
-                        <i className="far fa-circle nav-icon" />
-                        <p>Consultar</p>
-                      </Link>
-                    </li>
-                  </ul>
-                </li>
-              )}
-              {/* Gestión de Solicitud */}
-              {(rol === 'Administrador' || rol === 'Inventarista') && (
-                <li className="nav-item">
-                  <Link to="#" className="nav-link">
-                    <p>Gestión de Solicitud<i className="fas fa-angle-left right" /></p>
-                  </Link>
-                  <ul className="nav nav-treeview">
-                    <li className="nav-item">
-                      <Link to="/RegistrarSoli" className="nav-link" id="RegistrarSoli">
-                        <i className="far fa-circle nav-icon" />
-                        <p>Registrar</p>
-                      </Link>
-                    </li>
-                    <li className="nav-item">
-                      <Link to="/ConsultarSoli" className="nav-link">
-                        <i className="far fa-circle nav-icon" />
-                        <p>Consultar</p>
-                      </Link>
-                    </li>
-                  </ul>
-                </li>
-              )}
-              {/* Gestión de Producto */}
-              {(rol === 'Administrador' || rol === 'Inventarista') && (
-                <li className="nav-item">
-                  <Link to="#" className="nav-link">
-                    <p>Gestión de Producto<i className="fas fa-angle-left right" /></p>
-                  </Link>
-                  <ul className="nav nav-treeview">
-                    <li className="nav-item">
-                      <Link to="/RegistrarProd" className="nav-link">
-                        <i className="far fa-circle nav-icon" />
-                        <p>Registrar</p>
-                      </Link>
-                    </li>
-                    <li className="nav-item">
-                      <Link to="/ConsultarProd" className="nav-link">
-                        <i className="far fa-circle nav-icon" />
-                        <p>Consultar</p>
-                      </Link>
-                    </li>
-                    <li className="nav-item">
-                      <Link to="/RegistrarCate" className="nav-link">
-                        <i className="far fa-circle nav-icon" />
-                        <p>Registrar Categoría</p>
-                      </Link>
-                    </li>
-                    <li className="nav-item">
-                      <Link to="/ConsultarCate" className="nav-link">
-                        <i className="far fa-circle nav-icon" />
-                        <p>Consultar Categoría</p>
-                      </Link>
-                    </li>
-                  </ul>
-                </li>
-              )}
-              {/* Gestión de Venta */}
-              {(rol === 'Administrador' || rol === 'Cajero') && (
-                <li className="nav-item">
-                  <Link to="#" className="nav-link">
-                    <p>Gestión de Venta<i className="fas fa-angle-left right" /></p>
-                  </Link>
-                  <ul className="nav nav-treeview">
-                    <li className="nav-item">
-                      <Link to="/RegistrarVent" className="nav-link">
-                        <i className="far fa-circle nav-icon" />
-                        <p>Registrar</p>
-                      </Link>
-                    </li>
-                    <li className="nav-item">
-                      <Link to="/ConsultarVent" className="nav-link">
-                        <i className="far fa-circle nav-icon" />
-                        <p>Consultar</p>
-                      </Link>
-                    </li>
-                  </ul>
-                </li>
-              )}
+              {renderNavItems()}
             </ul>
           </nav>
         </div>
@@ -197,6 +152,6 @@ const Navegacion = ({ children }) => {
       </aside>
     </div>
   );
-}
+};
 
 export default Navegacion;

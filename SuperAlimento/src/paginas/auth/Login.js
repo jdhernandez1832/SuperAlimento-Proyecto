@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2"; // Importa SweetAlert2
 import "../../componentes/css/Login.css"; // Importa el archivo CSS
 
 const Login = () => {
@@ -30,15 +31,32 @@ const Login = () => {
         localStorage.setItem("Rol", data.rol);
         localStorage.setItem("numero_documento", data.numero_documento);
 
+        // Alerta de éxito con SweetAlert2
+        Swal.fire({
+          icon: "success",
+          title: "¡Inicio de sesión exitoso!",
+          text: `Bienvenido, ${data.numero_documento}`,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+
         if (data.rol === "Administrador" || data.rol === "Cajero" || data.rol === "Inventarista") {
-          navigate("/Index");
+          setTimeout(() => {
+            navigate("/Index");
+          }, 1500);
         }
       } else {
         throw new Error("Credenciales incorrectas");
       }
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
-      alert("Credenciales incorrectas, por favor intente nuevamente.");
+      // Alerta de error con SweetAlert2
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Credenciales incorrectas, por favor intente nuevamente.",
+        confirmButtonColor: '#28a745',
+      });
     }
   };
 

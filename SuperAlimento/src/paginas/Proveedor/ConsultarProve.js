@@ -3,6 +3,7 @@ import Navegacion from "../../componentes/componentes/navegacion";
 import "../../componentes/css/Login.css";
 import { Link } from "react-router-dom";
 import useDataTable from '../../hooks/useDataTable';
+import Swal from 'sweetalert2'; // Importación de SweetAlert
 
 const ConsultarProve = () => {
     const tableRef = useRef(null);
@@ -49,17 +50,33 @@ const ConsultarProve = () => {
               'Authorization': `Bearer ${token}`,
               'X-Rol': rol,
             },
-            body: JSON.stringify({ estado: 'Desactivo' }), // Cambia el estado a 'Desactivo'
+            body: JSON.stringify({ estado: 'Desactivo' }), 
           });
     
           if (response.ok) {
             setProveedores(proveedores.filter(proveedor => proveedor.id_proveedor !== id_proveedor));
-            window.alert('Proveedor desactivado');
+            Swal.fire({
+              icon: 'success',
+              title: 'Proveedor desactivado',
+              text: 'El proveedor se ha desactivado exitosamente.',
+              confirmButtonColor: '#28a745', 
+            });
           } else {
-            console.error('Error al cambiar el estado del proveedor');
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Error al cambiar el estado del proveedor.',
+              confirmButtonColor: '#28a745',
+            });
           }
         } catch (error) {
           console.error('Error en la solicitud:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error en la solicitud',
+            text: error.message,
+            confirmButtonColor: '#28a745', 
+          });
         }
     };
 

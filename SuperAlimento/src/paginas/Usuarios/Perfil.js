@@ -3,6 +3,7 @@ import Navegacion from "../../componentes/componentes/navegacion";
 import "../../componentes/css/Login.css";
 import { Link } from "react-router-dom";
 import { useParams, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2'; // Importar SweetAlert
 
 const Perfil = () => {
     const { numero_documento } = useParams();
@@ -30,10 +31,21 @@ const Perfil = () => {
             const data = await response.json();
             setFormData(data);
           } else {
-            console.error('Error al obtener el usuario');
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Error al obtener el usuario',
+              confirmButtonColor: '#28a745', // Color verde
+            });
           }
         } catch (error) {
           console.error('Error en la solicitud:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: `Error en la solicitud: ${error}`,
+            confirmButtonColor: '#28a745', // Color verde
+          });
         }
       };
   
@@ -64,12 +76,30 @@ const Perfil = () => {
         if (response.ok) {
           const result = await response.json();
           console.log('Usuario actualizado:', result);
-          navigate('/ConsultarUsu');
+          Swal.fire({
+            icon: 'success',
+            title: 'Éxito',
+            text: 'Usuario actualizado correctamente',
+            confirmButtonColor: '#28a745', // Color verde
+          }).then(() => {
+            navigate('/Index'); // Redireccionar después de la alerta
+          });
         } else {
-          console.error('Error al actualizar usuario');
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Error al actualizar el usuario',
+            confirmButtonColor: '#28a745', // Color verde
+          });
         }
       } catch (error) {
         console.error('Error en la solicitud:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: `Error en la solicitud: ${error}`,
+          confirmButtonColor: '#28a745', // Color verde
+        });
       }
     };
   
@@ -156,7 +186,7 @@ const Perfil = () => {
                         required
                         disabled
                       >
-                        <option value="" >Seleccionar...</option>
+                        <option value="">Seleccionar...</option>
                         <option value="1">Administrador</option>
                         <option value="2">Inventarista</option>
                         <option value="3">Cajero</option>
@@ -184,5 +214,6 @@ const Perfil = () => {
         </Navegacion>
       </div>
     );
-  };
+};
+
 export default Perfil;

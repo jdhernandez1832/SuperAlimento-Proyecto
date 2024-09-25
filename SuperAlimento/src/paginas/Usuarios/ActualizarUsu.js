@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Navegacion from "../../componentes/componentes/navegacion";
 import "../../componentes/css/Login.css";
 import { Link } from "react-router-dom";
+import Swal from 'sweetalert2'; // Importar SweetAlert
 
 const ActualizarUsuario = () => {
   const { numero_documento } = useParams();
@@ -30,15 +31,26 @@ const ActualizarUsuario = () => {
           const data = await response.json();
           setFormData(data);
         } else {
-          console.error('Error al obtener el usuario');
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Error al obtener el usuario',
+            confirmButtonColor: '#28a745', // Color verde
+          });
         }
       } catch (error) {
         console.error('Error en la solicitud:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: `Error en la solicitud: ${error}`,
+          confirmButtonColor: '#28a745', // Color verde
+        });
       }
     };
 
     fetchUsuario();
-  }, [numero_documento, token, rol]); // Dependencias adecuadas
+  }, [numero_documento, token, rol]);
 
   const handleChange = (e) => {
     setFormData({
@@ -56,7 +68,7 @@ const ActualizarUsuario = () => {
         headers: {
           'Authorization': `Bearer ${token}`,
           'X-Rol': rol,
-          'Content-Type': 'application/json', // Asegúrate de agregar este encabezado
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
       });
@@ -64,12 +76,30 @@ const ActualizarUsuario = () => {
       if (response.ok) {
         const result = await response.json();
         console.log('Usuario actualizado:', result);
-        navigate('/ConsultarUsu');
+        Swal.fire({
+          icon: 'success',
+          title: 'Éxito',
+          text: 'Usuario actualizado con éxito',
+          confirmButtonColor: '#28a745', // Color verde
+        }).then(() => {
+          navigate('/ConsultarUsu');
+        });
       } else {
-        console.error('Error al actualizar usuario');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error al actualizar usuario',
+          confirmButtonColor: '#28a745', // Color verde
+        });
       }
     } catch (error) {
       console.error('Error en la solicitud:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: `Error en la solicitud: ${error}`,
+        confirmButtonColor: '#28a745', // Color verde
+      });
     }
   };
 

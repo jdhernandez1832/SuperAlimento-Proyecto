@@ -1,7 +1,9 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import Navegacion from "../../componentes/componentes/navegacion"; 
 import "../../componentes/css/Login.css";
 import { Link, useParams, useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2'; // Importa SweetAlert2
 
 const ActualizarCate = () => {
   const { id_categoria } = useParams();
@@ -11,23 +13,29 @@ const ActualizarCate = () => {
   });
   const token = localStorage.getItem('token');
   const rol = localStorage.getItem('Rol');
+
   useEffect(() => {
     const fetchCategoria = async () => {
       try {
         const response = await fetch(`http://localhost:3001/api/categoria/${id_categoria}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
-            'X-Rol': rol, // Agregar el token en los encabezados
+            'X-Rol': rol,
           },
         });
         if (response.ok) {
           const data = await response.json();
           setFormData(data); 
         } else {
-          console.error('Error al obtener la categoría');
+          Swal.fire({
+            title: 'Error',
+            text: 'Error al actualizar la categoria',
+            icon: 'Error',
+            confirmButtonColor: '#dc3545', // Cambia el color aquí
+          });
         }
       } catch (error) {
-        console.error('Error en la solicitud:', error);
+        Swal.fire('Error', 'Error en la solicitud', 'error');
       }
     };
 
@@ -57,13 +65,19 @@ const ActualizarCate = () => {
 
       if (response.ok) {
         const result = await response.json();
-        console.log('Categoría actualizada:', result);
-        navigate('/ConsultarCate');
+        Swal.fire({
+          title: 'Éxito',
+          text: 'Categoría actualizada exitosamente',
+          icon: 'success',
+          confirmButtonColor: '#28a745', // Cambia el color aquí
+        }).then(() => {
+          navigate('/ConsultarCate');
+        });
       } else {
-        console.error('Error al actualizar la categoría');
+        Swal.fire('Error', 'Error al actualizar la categoría', 'error');
       }
     } catch (error) {
-      console.error('Error en la solicitud:', error);
+      Swal.fire('Error', 'Error en la solicitud', 'error');
     }
   };
 
@@ -79,7 +93,7 @@ const ActualizarCate = () => {
               <form onSubmit={handleSubmit}>
                 <div className="card-body">
                   <div className="form-group">
-                    <label htmlFor="nombre">Id de la categoria</label>
+                    <label htmlFor="nombre">Id de la categoría</label>
                     <input
                       type="text"
                       className="form-control"

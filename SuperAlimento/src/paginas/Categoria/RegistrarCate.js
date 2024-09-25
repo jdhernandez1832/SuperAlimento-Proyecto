@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Navegacion from "../../componentes/componentes/navegacion"; // Importa el componente correctamente
 import "../../componentes/css/Login.css";
 import { Link, useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2'; // Asegúrate de tener SweetAlert2 instalado
 
 const RegistrarCate = () => {
     const [formData, setFormData] = useState({
@@ -35,16 +36,32 @@ const RegistrarCate = () => {
 
             if (response.ok) {
                 const result = await response.json();
-                window.alert('Categoría registrada:', result);
-                navigate('/ConsultarCate');
-                // Redirige o muestra mensaje de éxito
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Categoría registrada',
+                    text: `La categoría ${result.nombre} ha sido registrada exitosamente.`,
+                    confirmButtonColor: '#28a745',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    navigate('/ConsultarCate');
+                });
             } else {
-                window.alert('Error al registrar categoría');
-                // Manejo de error
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al registrar categoría',
+                    text: 'Hubo un problema al intentar registrar la categoría.',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK'
+                });
             }
         } catch (error) {
-            window.alert('Error en la solicitud:', error);
-            // Manejo de error
+            Swal.fire({
+                icon: 'error',
+                title: 'Error en la solicitud',
+                text: `Hubo un problema con la solicitud: ${error.message}`,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
         }
     };
 
@@ -82,6 +99,6 @@ const RegistrarCate = () => {
             </Navegacion>
         </div>
     );
-}
+};
 
 export default RegistrarCate;

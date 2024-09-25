@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navegacion from "../../componentes/componentes/navegacion"; // Importa el componente correctamente
 import "../../componentes/css/Login.css";
 import { Link, useParams, useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2'; // Importación de SweetAlert
 
 const ActualizarProve = () => {
     const { id_proveedor } = useParams();
@@ -22,17 +23,28 @@ const ActualizarProve = () => {
                 const response = await fetch(`http://localhost:3001/api/proveedor/${id_proveedor}`, {
                     headers: {
                       'Authorization': `Bearer ${token}`,
-                      'X-Rol': rol, // Agregar el token en los encabezados
+                      'X-Rol': rol, 
                     },
                   });
                 if (response.ok) {
                     const data = await response.json();
                     setFormData(data);
                 } else {
-                    console.error('Error al obtener el proveedor');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error al obtener el proveedor',
+                        confirmButtonColor: '#28a745' 
+                    });
                 }
             } catch (error) {
                 console.error('Error en la solicitud:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error en la solicitud: ' + error.message,
+                    confirmButtonColor: '#28a745' 
+                });
             }
         };
 
@@ -63,12 +75,29 @@ const ActualizarProve = () => {
             if (response.ok) {
                 const result = await response.json();
                 console.log('Proveedor actualizado:', result);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Proveedor actualizado',
+                    text: 'El proveedor se actualizó exitosamente',
+                    confirmButtonColor: '#28a745', // Color verde para el botón
+                });
                 navigate('/ConsultarProve');
             } else {
-                console.error('Error al actualizar el proveedor');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error al actualizar el proveedor',
+                    confirmButtonColor: '#28a745' // Color verde para el botón
+                });
             }
         } catch (error) {
             console.error('Error en la solicitud:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error en la solicitud',
+                text: error.message,
+                confirmButtonColor: '#28a745' // Color verde para el botón
+            });
         }
     };
 
@@ -86,14 +115,14 @@ const ActualizarProve = () => {
                                     <div className="form-group">
                                         <label htmlFor="nombre">Id del proveedor</label>
                                         <input
-                                        type="text"
-                                        className="form-control"
-                                        id="nombre"
-                                        value={formData.id_proveedor}
-                                        onChange={handleChange}
-                                        required
-                                        disabled
-                                        readOnly
+                                            type="text"
+                                            className="form-control"
+                                            id="nombre"
+                                            value={formData.id_proveedor}
+                                            onChange={handleChange}
+                                            required
+                                            disabled
+                                            readOnly
                                         />
                                     </div>
                                     <div className="form-group">
@@ -172,4 +201,3 @@ const ActualizarProve = () => {
 }
 
 export default ActualizarProve;
-

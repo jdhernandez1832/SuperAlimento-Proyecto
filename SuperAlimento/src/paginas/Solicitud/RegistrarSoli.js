@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Navegacion from "../../componentes/componentes/navegacion";
 import "../../componentes/css/Login.css";
 import { Link, useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2'; // Importar SweetAlert
 
 const RegistrarSoli = () => {
   const [formData, setFormData] = useState({
@@ -10,7 +11,7 @@ const RegistrarSoli = () => {
     PrecioSolicitud: '',
     ObservacionSolicitud: '',
     id_proveedor: '',
-    numero_documento: '',  // El número de documento debe estar aquí
+    numero_documento: '',
   });
 
   const [proveedores, setProveedores] = useState([]);
@@ -22,15 +23,13 @@ const RegistrarSoli = () => {
   const token = localStorage.getItem('token');
   const rol = localStorage.getItem('Rol');
 
-  
   useEffect(() => {
-
     const numero_documento = localStorage.getItem('numero_documento');
     setFormData(prevState => ({
       ...prevState,
-      numero_documento: numero_documento || ''  
+      numero_documento: numero_documento || ''
     }));
-  }, []);  
+  }, []);
 
   useEffect(() => {
     const fetchProveedores = async () => {
@@ -114,16 +113,20 @@ const RegistrarSoli = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!formData.id_proveedor || !formData.numero_documento) {
-      window.alert('Debe seleccionar un proveedor y un usuario');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Advertencia',
+        text: 'Debe seleccionar un proveedor y un usuario',
+        confirmButtonColor: '#28a745', // Color verde
+      });
       return;
     }
-  
+
     const precioTotal = cart.reduce((total, item) => total + item.precio_compra * item.quantity, 0);
-  
     const fechaActual = formData.FechaSolicitud || new Date().toISOString().split('T')[0];
-  
+
     const solicitudData = {
       fecha_entrada: fechaActual,
       estado_solicitud: formData.EstadoSolicitud,
@@ -136,7 +139,7 @@ const RegistrarSoli = () => {
         cantidad: item.quantity,
       })),
     };
-  
+
     try {
       const response = await fetch('http://localhost:3001/api/solicitud/registrar', {
         method: 'POST',
@@ -147,18 +150,34 @@ const RegistrarSoli = () => {
         },
         body: JSON.stringify(solicitudData)
       });
-  
+
       if (response.ok) {
-        window.alert('Solicitud registrada con éxito');
-        navigate('/ConsultarSoli');
+        Swal.fire({
+          icon: 'success',
+          title: 'Éxito',
+          text: 'Solicitud registrada con éxito',
+          confirmButtonColor: '#28a745', // Color verde
+        }).then(() => {
+          navigate('/ConsultarSoli');
+        });
       } else {
-        window.alert('Error al registrar solicitud');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error al registrar solicitud',
+          confirmButtonColor: '#28a745', // Color verde
+        });
       }
     } catch (error) {
-      window.alert('Error en el registro:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: `Error en el registro: ${error}`,
+        confirmButtonColor: '#28a745', // Color verde
+      });
     }
   };
-  
+
   const handleSearch = (e) => {
     setSearchTerm(e.target.value || '');
   };

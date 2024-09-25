@@ -3,6 +3,7 @@ import Navegacion from "../../componentes/componentes/navegacion";
 import "../../componentes/css/Login.css";
 import { Link } from "react-router-dom";
 import useDataTable from '../../hooks/useDataTable';
+import Swal from 'sweetalert2'; // Importar SweetAlert
 
 const ConsultarUsu = () => {
     const tableRef1 = useRef(null);
@@ -17,7 +18,6 @@ const ConsultarUsu = () => {
           const token = localStorage.getItem('token');
           const rol = localStorage.getItem('Rol');
 
-
           const response = await fetch('http://localhost:3001/api/usuario/todos', {
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -29,10 +29,21 @@ const ConsultarUsu = () => {
             const data = await response.json();
             setUsuarios(data);
           } else {
-            console.error('Error al obtener los usuarios');
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Error al obtener los usuarios',
+              confirmButtonColor: '#28a745', // Color verde
+            });
           }
         } catch (error) {
           console.error('Error en la solicitud:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: `Error en la solicitud: ${error}`,
+            confirmButtonColor: '#28a745', // Color verde
+          });
         }
       };
 
@@ -60,12 +71,28 @@ const ConsultarUsu = () => {
           setUsuarios(usuarios.filter(usuario => 
             usuario.numero_documento !== numero_documento
           ));
-          window.alert('Usuario Eliminado:');
+          Swal.fire({
+            icon: 'success',
+            title: 'Éxito',
+            text: 'Usuario Eliminado',
+            confirmButtonColor: '#28a745', // Color verde
+          });
         } else {
-          console.error('Error al cambiar el estado del usuario');
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Error al cambiar el estado del usuario',
+            confirmButtonColor: '#28a745', // Color verde
+          });
         }
       } catch (error) {
         console.error('Error en la solicitud:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: `Error en la solicitud: ${error}`,
+          confirmButtonColor: '#28a745', // Color verde
+        });
       }
     };
   

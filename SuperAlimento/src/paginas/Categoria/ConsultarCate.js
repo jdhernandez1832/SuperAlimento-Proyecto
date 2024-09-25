@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Navegacion from "../../componentes/componentes/navegacion";
 import "../../componentes/css/Login.css";
 import { Link } from "react-router-dom";
+import Swal from 'sweetalert2'; // Importa SweetAlert2
 
 const ConsultarCate = () => {
     const tableRef = useRef(null);
@@ -26,40 +27,57 @@ const ConsultarCate = () => {
             const data = await response.json();
             setCategorias(data);
           } else {
-            console.error('Error al obtener las categorías');
+            Swal.fire('Error', 'Error al obtener las categorías', 'error');
           }
         } catch (error) {
-          console.error('Error en la solicitud:', error);
+          Swal.fire('Error', 'Error en la solicitud', 'error');
         }
       };
   
       fetchCategorias();
     }, [rol, token]);
+
     const handleEstado = async (id_categoria) => {
-        try {
-          const response = await fetch(`http://localhost:3001/api/categoria/estado/${id_categoria}`, {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-              'X-Rol': rol, 
-            },
-            body: JSON.stringify({ estado: 'Desactivo' }), // Cambia el estado a 'Desactivo'
-          });
-      
-          if (response.ok) {
-            // eslint-disable-next-line no-unused-vars
-            const categoriaActualizado = await response.json();
-            setCategorias(categorias.filter(categoria => 
-                categoria.id_categoria !== id_categoria
-            ));
-            window.alert('Categoria eliminada:');
-          } else {
-            console.error('Error al cambiar el estado de la categoria');
+        Swal.fire({
+          title: '¿Estás seguro?',
+          text: "No podrás revertir este cambio",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Sí, eliminarla',
+          cancelButtonText: 'Cancelar'
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            try {
+              const response = await fetch(`http://localhost:3001/api/categoria/estado/${id_categoria}`, {
+                method: 'PATCH',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`,
+                  'X-Rol': rol, 
+                },
+                body: JSON.stringify({ estado: 'Desactivo' }), 
+              });
+          
+              if (response.ok) {
+                setCategorias(categorias.filter(categoria => 
+                    categoria.id_categoria !== id_categoria
+                ));
+                Swal.fire({
+                  title: '¡Eliminada!',
+                  text: 'La categoría ha sido eliminada.',
+                  icon: 'success',
+                  confirmButtonColor: '#28a745', 
+                });
+              } else {
+                Swal.fire('Error', 'Error al cambiar el estado de la categoría', 'error');
+              }
+            } catch (error) {
+              Swal.fire('Error', 'Error en la solicitud', 'error');
+            }
           }
-        } catch (error) {
-          console.error('Error en la solicitud:', error);
-        }
+        });
       };
 
     return (

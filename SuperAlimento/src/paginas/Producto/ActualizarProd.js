@@ -1,7 +1,9 @@
+/* eslint-disable no-unused-vars */
 import Navegacion from "../../componentes/componentes/navegacion";
 import "../../componentes/css/Login.css";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import React, { useState, useEffect } from "react";
+import Swal from 'sweetalert2';
 
 const ActualizarProd = () => {
     const { id_producto } = useParams();
@@ -38,10 +40,21 @@ const ActualizarProd = () => {
                     const data = await response.json();
                     setFormData(data);
                 } else {
-                    console.error('Error al obtener el producto', await response.text());
+                    const errorText = await response.text();
+                    Swal.fire({
+                        title: 'Error',
+                        text: `Error al obtener el producto: ${errorText}`,
+                        icon: 'error',
+                        confirmButtonColor: '#4caf50',
+                    });
                 }
             } catch (error) {
-                console.error('Error en la solicitud:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: `Error en la solicitud: ${error}`,
+                    icon: 'error',
+                    confirmButtonColor: '#4caf50',
+                });
             }
         };
 
@@ -57,10 +70,21 @@ const ActualizarProd = () => {
                     const data = await response.json();
                     setCategorias(data);
                 } else {
-                    console.error('Error al obtener categorías:', await response.text());
+                    const errorText = await response.text();
+                    Swal.fire({
+                        title: 'Error',
+                        text: `Error al obtener categorías: ${errorText}`,
+                        icon: 'error',
+                        confirmButtonColor: '#4caf50',
+                    });
                 }
             } catch (error) {
-                console.error('Error en la solicitud:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: `Error en la solicitud: ${error}`,
+                    icon: 'error',
+                    confirmButtonColor: '#4caf50',
+                });
             }
         };
 
@@ -76,10 +100,21 @@ const ActualizarProd = () => {
                     const data = await response.json();
                     setUsuarios(data);
                 } else {
-                    console.error('Error al obtener usuarios:', await response.text());
+                    const errorText = await response.text();
+                    Swal.fire({
+                        title: 'Error',
+                        text: `Error al obtener usuarios: ${errorText}`,
+                        icon: 'error',
+                        confirmButtonColor: '#4caf50',
+                    });
                 }
             } catch (error) {
-                console.error('Error en la solicitud:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: `Error en la solicitud: ${error}`,
+                    icon: 'error',
+                    confirmButtonColor: '#4caf50',
+                });
             }
         };
 
@@ -95,10 +130,21 @@ const ActualizarProd = () => {
                     const data = await response.json();
                     setProveedores(data);
                 } else {
-                    console.error('Error al obtener proveedores:', await response.text());
+                    const errorText = await response.text();
+                    Swal.fire({
+                        title: 'Error',
+                        text: `Error al obtener proveedores: ${errorText}`,
+                        icon: 'error',
+                        confirmButtonColor: '#4caf50',
+                    });
                 }
             } catch (error) {
-                console.error('Error en la solicitud:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: `Error en la solicitud: ${error}`,
+                    icon: 'error',
+                    confirmButtonColor: '#4caf50',
+                });
             }
         };
 
@@ -142,13 +188,30 @@ const ActualizarProd = () => {
 
             if (response.ok) {
                 const result = await response.json();
-                console.log('Producto actualizado:', result);
-                navigate('/ConsultarProd');
+                Swal.fire({
+                    title: 'Éxito',
+                    text: 'Producto actualizado correctamente',
+                    icon: 'success',
+                    confirmButtonColor: '#4caf50',
+                }).then(() => {
+                    navigate('/ConsultarProd');
+                });
             } else {
-                console.error('Error al actualizar producto', await response.text());
+                const errorText = await response.text();
+                Swal.fire({
+                    title: 'Error',
+                    text: `Error al actualizar producto: ${errorText}`,
+                    icon: 'error',
+                    confirmButtonColor: '#4caf50',
+                });
             }
         } catch (error) {
-            console.error('Error en la solicitud:', error);
+            Swal.fire({
+                title: 'Error',
+                text: `Error en la solicitud: ${error}`,
+                icon: 'error',
+                confirmButtonColor: '#4caf50',
+            });
         }
     };
 
@@ -254,9 +317,8 @@ const ActualizarProd = () => {
                                             onChange={handleChange}
                                             required
                                         >
-                                            <option value="">Selecciona un estado</option>
                                             <option value="1">Activo</option>
-                                            <option value="0">Desactivo</option>
+                                            <option value="0">Inactivo</option>
                                         </select>
                                     </div>
                                     <div className="form-group">
@@ -281,48 +343,23 @@ const ActualizarProd = () => {
                                         </select>
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="numero_documento">Usuario</label>
+                                        <label htmlFor="id_proveedor">Proveedor</label>
                                         <select
                                             className="custom-select form-control-border border-width-2"
-                                            id="numero_documento"
-                                            value={formData.numero_documento}
+                                            id="id_proveedor"
+                                            value={formData.id_proveedor}
                                             onChange={handleChange}
                                             required
                                         >
-                                            <option value="">Selecciona un usuario</option>
-                                            {usuarios.length > 0 ? (
-                                                usuarios.map(usuario => (
-                                                    <option key={usuario.numero_documento} value={usuario.numero_documento}>
-                                                        {usuario.nombre_usuario}
-                                                    </option>
-                                                ))
-                                            ) : (
-                                                <option>Cargando usuarios...</option>
-                                            )}
+                                            {proveedores.map((proveedor) => (
+                                                <option key={proveedor.id_proveedor} value={proveedor.id_proveedor}>
+                                                    {proveedor.nombre_proveedor}
+                                                </option>
+                                            ))}
                                         </select>
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="id_proveedor">Proveedor</label>
-                                        <select 
-                                            className="custom-select form-control-border border-width-2" 
-                                            id="id_proveedor" 
-                                            value={formData.id_proveedor} 
-                                            onChange={handleChange} 
-                                        >
-                                            <option value="">Seleccione un proveedor</option>
-                                            {proveedores.length > 0 ? (
-                                                proveedores.map(proveedor => (
-                                                    <option key={proveedor.id_proveedor} value={proveedor.id_proveedor}>
-                                                        {proveedor.nombre_proveedor}
-                                                    </option>
-                                                ))
-                                            ) : (
-                                                <option>Cargando proveedores...</option>
-                                            )}
-                                        </select>
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="imagen">Subir imagen</label>
+                                        <label htmlFor="imagen">Imagen</label>
                                         <input
                                             type="file"
                                             className="form-control"
@@ -330,10 +367,10 @@ const ActualizarProd = () => {
                                             onChange={handleFileChange}
                                         />
                                     </div>
-                                    <div className="card-footer">
-                                        <Link to="/ConsultarProd" className="btn btn-secondary mr-2">Volver</Link>
-                                        <button type="submit" className="btn btn-secondary">Actualizar</button>
-                                    </div>
+                                </div>
+                                <div className="card-footer">
+                                    <Link to="/ConsultarProd" className="btn btn-secondary mr-2">Volver</Link>
+                                    <button type="submit" className="btn btn-secondary">Actualizar</button>
                                 </div>
                             </form>
                         </div>
@@ -342,6 +379,6 @@ const ActualizarProd = () => {
             </Navegacion>
         </div>
     );
-}
+};
 
 export default ActualizarProd;

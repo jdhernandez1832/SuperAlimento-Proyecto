@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Navegacion from "../../componentes/componentes/navegacion";
 import useDataTable from '../../hooks/useDataTable';
 import "../../componentes/css/Login.css";
+import Swal from 'sweetalert2'; 
 
 const ConsultarSoli = () => {
     const [solicitudes, setSolicitudes] = useState([]);
@@ -16,10 +17,10 @@ const ConsultarSoli = () => {
             try {
                 const response = await fetch('http://localhost:3001/api/solicitud/todos', {
                     headers: {
-                      'Authorization': `Bearer ${token}`,
-                      'X-Rol': rol, // Agregar el token en los encabezados
+                        'Authorization': `Bearer ${token}`,
+                        'X-Rol': rol, 
                     },
-                  });
+                });
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Datos obtenidos:', data);
@@ -42,12 +43,17 @@ const ConsultarSoli = () => {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
-                    'X-Rol': rol, // Agregar el token en los encabezados
-                  },
+                    'X-Rol': rol, 
+                },
             });
             if (response.ok) {
-                alert('Entrega aceptada y productos actualizados');
-                // Actualiza el estado local después de aceptar la entrega
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Entrega Aceptada',
+                    text: 'Los productos han sido actualizados exitosamente.',
+                    confirmButtonColor: '#28a745', 
+                });
+
                 setSolicitudes(prevSolicitudes =>
                     prevSolicitudes.map(solicitud =>
                         solicitud.id_solicitud === id
@@ -56,10 +62,20 @@ const ConsultarSoli = () => {
                     )
                 );
             } else {
-                console.error('Error al aceptar la entrega');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error al aceptar la entrega.',
+                    confirmButtonColor: '#28a745', 
+                });
             }
         } catch (error) {
-            console.error('Error en la solicitud:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error en la solicitud',
+                text: error.message,
+                confirmButtonColor: '#28a745',
+            });
         }
     };
 
@@ -114,9 +130,9 @@ const ConsultarSoli = () => {
                                                                 <td>
                                                                     <Link to={`/DetallesSolicitud/${solicitud.id_solicitud}`}>
                                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" className="bi bi-eye" viewBox="0 0 16 16">
-                                                                            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C3.885 5.21 5.833 4 8 4c2.167 0 4.115 1.21 5.168 1.957A13.133 13.133 0 0 1 14.828 8a13.133 13.133 0 0 1-1.66 2.043C12.115 10.79 10.167 12 8 12c-2.167 0-4.115-1.21-5.168-1.957A13.133 13.133 0 0 1 1.172 8z"/>
-                                                                            <path d="M8 5a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>
-                                                                            <path d="M8 7a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                                                                            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C3.885 5.21 5.833 4 8 4c2.167 0 4.115 1.21 5.168 1.957A13.133 13.133 0 0 1 14.828 8a13.133 13.133 0 0 1-1.66 2.043C12.115 10.79 10.167 12 8 12c-2.167 0-4.115-1.21-5.168-1.957A13.133 13.133 0 0 1 1.172 8z" />
+                                                                            <path d="M8 5a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" />
+                                                                            <path d="M8 7a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
                                                                         </svg>
                                                                     </Link>
                                                                 </td>

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import Navegacion from "../../componentes/componentes/navegacion";
 import "../../componentes/css/Login.css";
-import { Link } from "react-router-dom";
-import {useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2';
 
 const RegistrarUsu = () => {
   const [formData, setFormData] = useState({
@@ -15,8 +15,8 @@ const RegistrarUsu = () => {
     id_rol: '',
   });
   const navigate = useNavigate();
+
   const handleChange = (e) => {
-    
     setFormData({
       ...formData,
       [e.target.id]: e.target.value,
@@ -40,17 +40,34 @@ const RegistrarUsu = () => {
       });
 
       if (response.ok) {
+        // eslint-disable-next-line no-unused-vars
         const result = await response.json();
-        window.alert('Usuario registrado:', result);
-        navigate('/ConsultarUsu');
-        // Redirige o muestra mensaje de éxito
+        Swal.fire({
+          title: 'Éxito',
+          text: 'Usuario registrado con éxito',
+          icon: 'success',
+          confirmButtonColor: '#4CAF50', // Color verde
+          confirmButtonText: 'Aceptar',
+        }).then(() => {
+          navigate('/ConsultarUsu'); // Redirige a ConsultarUsu
+        });
       } else {
-        window.alert('Error al registrar usuario');
-        // Manejo de error
+        Swal.fire({
+          title: 'Error',
+          text: 'Error al registrar usuario',
+          icon: 'error',
+          confirmButtonColor: '#4CAF50', // Color verde
+          confirmButtonText: 'Aceptar',
+        });
       }
     } catch (error) {
-        window.alert('Error en la solicitud:', error);
-      // Manejo de error
+      Swal.fire({
+        title: 'Error',
+        text: `Error en la solicitud: ${error.message}`,
+        icon: 'error',
+        confirmButtonColor: '#4CAF50', // Color verde
+        confirmButtonText: 'Aceptar',
+      });
     }
   };
 
@@ -152,19 +169,6 @@ const RegistrarUsu = () => {
                     />
                   </div>
                 </div>
-                <div className="form-group" hidden>
-                    <label htmlFor="id_rol">Estado</label>
-                    <select
-                      className="custom-select form-control-border border-width-2"
-                      id="id_rol"
-                      value={formData.estado}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="1">Activado</option>
-                      <option value="2">Desactivado</option>
-                    </select>
-                  </div>
                 <div className="card-footer">
                   <Link to="/ConsultarUsu" className="btn btn-secondary mr-2">Volver</Link>
                   <button type="submit" className="btn btn-secondary">Registrar</button>

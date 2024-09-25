@@ -3,6 +3,7 @@ import "../../componentes/css/Login.css";
 import { Link } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2'; // Importación de SweetAlert
 
 const RegistrarProd = () => {
     const [formData, setFormData] = useState({
@@ -19,19 +20,18 @@ const RegistrarProd = () => {
         imagen: null,
     });
     const [categorias, setCategorias] = useState([]);
-    const [setUsuarios] = useState([]);
+    // eslint-disable-next-line no-unused-vars
+    const [usuarios, setUsuarios] = useState([]);
     const [proveedores, setProveedores] = useState([]);
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
     const rol = localStorage.getItem('Rol');
 
-    
     useEffect(() => {
-        // Obtener el numero_documento del localStorage y actualizar el estado
         const numero_documento = localStorage.getItem('numero_documento');
         setFormData(prevState => ({
-        ...prevState,
-        numero_documento: numero_documento || ''  // Establecer el valor en el estado
+            ...prevState,
+            numero_documento: numero_documento || ''  
         }));
     }, []); 
 
@@ -41,9 +41,9 @@ const RegistrarProd = () => {
                 const response = await fetch('http://localhost:3001/api/categoria/todos', {
                     headers: {
                       'Authorization': `Bearer ${token}`,
-                      'X-Rol': rol, // Agregar el token en los encabezados
+                      'X-Rol': rol, 
                     },
-                  });
+                });
                 if (response.ok) {
                     const data = await response.json();
                     setCategorias(data);
@@ -60,7 +60,7 @@ const RegistrarProd = () => {
                 const response = await fetch('http://localhost:3001/api/usuario/todos', {
                     headers: {
                       'Authorization': `Bearer ${token}`,
-                      'X-Rol': rol, // Agregar el token en los encabezados
+                      'X-Rol': rol, 
                     },
                 });
                 if (response.ok) {
@@ -74,29 +74,30 @@ const RegistrarProd = () => {
             }
         };
 
-            const fetchProveedores = async () => {
-              try {
+        const fetchProveedores = async () => {
+            try {
                 const response = await fetch('http://localhost:3001/api/proveedor/todos', {
                     headers: {
                       'Authorization': `Bearer ${token}`,
-                      'X-Rol': rol, // Agregar el token en los encabezados
+                      'X-Rol': rol, 
                     },
                 });
                 if (response.ok) {
-                  const data = await response.json();
-                  console.log('Proveedores obtenidos:', data);
-                  setProveedores(data);
+                    const data = await response.json();
+                    console.log('Proveedores obtenidos:', data);
+                    setProveedores(data);
                 } else {
-                  console.error('Error al obtener proveedores:', response.statusText);
+                    console.error('Error al obtener proveedores:', response.statusText);
                 }
-              } catch (error) {
+            } catch (error) {
                 console.error("Error al obtener los proveedores:", error);
-              }
-            };
+            }
+        };
+
         fetchCategorias();
         fetchUsuarios();
         fetchProveedores();
-    }, [rol, setUsuarios, token]);
+    }, [rol, token]);
 
     const handleChange = (e) => {
         setFormData({
@@ -108,7 +109,7 @@ const RegistrarProd = () => {
     const handleFileChange = (e) => {
         setFormData({
             ...formData,
-            imagen: e.target.files[0], // Almacena el archivo de la imagen
+            imagen: e.target.files[0],
         });
     };
 
@@ -123,21 +124,34 @@ const RegistrarProd = () => {
         try {
             const response = await fetch('http://localhost:3001/api/producto/registrar', {
                 method: 'POST',
-                body: data, // No incluimos headers para que el navegador use multipart/form-data automáticamente
+                body: data,
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    'X-Rol': rol, // Agregar el token en los encabezados
+                    'X-Rol': rol,
                 },
             });
 
             if (response.ok) {
-                window.alert('Producto registrado exitosamente');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Producto registrado exitosamente',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
                 navigate('/ConsultarProd');
             } else {
-                window.alert('Error al registrar producto');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al registrar producto',
+                    text: 'Hubo un problema al registrar el producto.',
+                });
             }
         } catch (error) {
-            window.alert('Error en la solicitud:', error.message);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error en la solicitud',
+                text: error.message,
+            });
         }
     };
 
@@ -259,8 +273,7 @@ const RegistrarProd = () => {
                                             required
                                             value={formData.numero_documento}
                                             readOnly
-                                        >
-                                        </input>
+                                        />
                                     </div>
                                     <div className="form-group">
                                         <label htmlFor="id_proveedor">Proveedor</label>
@@ -300,6 +313,6 @@ const RegistrarProd = () => {
             </Navegacion>
         </div>
     );
-}
+};
 
 export default RegistrarProd;
