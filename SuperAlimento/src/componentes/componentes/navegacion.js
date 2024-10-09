@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2'; // Asegúrate de que SweetAlert esté importado
 
 const Navegacion = ({ children }) => {
+  const [nombreUsuario, setNombreUsuario] = useState(''); // Estado para almacenar el nombre del usuario
   const numeroDocumento = localStorage.getItem('numero_documento');
   const rol = localStorage.getItem('Rol'); 
+  const token = localStorage.getItem('token'); // Asegúrate de obtener el token
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -14,7 +17,48 @@ const Navegacion = ({ children }) => {
       navigate("/"); 
     }, 100); 
   };
-  
+
+  // Función para obtener el nombre del usuario
+  const fetchUsuario = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/usuario/${numeroDocumento}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'X-Rol': rol,
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setNombreUsuario(data.nombre_usuario); // Guardar el nombre del usuario en el estado
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error al obtener el usuario',
+          confirmButtonColor: '#28a745', // Color verde
+        });
+      }
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: `Error en la solicitud: ${error}`,
+        confirmButtonColor: '#28a745', // Color verde
+      });
+    }
+  };
+
+  // Cargar los datos del usuario al montar el componente
+  useEffect(() => {
+    if (numeroDocumento && token && rol) {
+      fetchUsuario();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [numeroDocumento, token, rol]);
+
+  // Función para renderizar los items de navegación
   const renderNavItems = () => {
     const navItems = [
       {
@@ -65,13 +109,12 @@ const Navegacion = ({ children }) => {
         ],
       },
     ];
-
     return navItems.map(item => {
       if (item.roles.includes(rol)) {
         return (
           <li className="nav-item" key={item.title}>
             <Link to="#" className="nav-link">
-              <i className={`${item.icon} nav-icon`} /> 
+              <i className={`${item.icon} nav-icon`} />
               <p>{item.title}<i className="right fas fa-angle-left" /></p>
             </Link>
             <ul className="nav nav-treeview">
@@ -102,8 +145,11 @@ const Navegacion = ({ children }) => {
           <li className="nav-item d-none d-sm-inline-block">
             <Link to="/Index" className="nav-link">Inicio</Link>
           </li>
+          {/* Mostrar nombre del usuario y su rol */}
           <li className="nav-item d-none d-sm-inline-block">
-            <Link to="#" className="nav-link">SuperAlimento</Link>
+            <Link to="#" className="nav-link">
+              Usuario: {nombreUsuario || numeroDocumento} | Rol: {rol}
+            </Link>
           </li>
         </ul>
         <ul className="navbar-nav ml-auto">

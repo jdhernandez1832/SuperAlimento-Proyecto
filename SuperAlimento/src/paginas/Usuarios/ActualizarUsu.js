@@ -185,10 +185,10 @@ const ActualizarUsuario = () => {
                       onChange={handleChange}
                       required
                     >
-                      <option value="">Seleccionar...</option>
-                      <option value="1">Administrador</option>
-                      <option value="2">Inventarista</option>
-                      <option value="3">Cajero</option>
+                        <option value="">Seleccionar...</option>
+                        <option value="1">Administrador</option>
+                        <option value="2">Cajero</option>
+                        <option value="3">Inventarista</option>
                     </select>
                   </div>
                   <div className="form-group">
