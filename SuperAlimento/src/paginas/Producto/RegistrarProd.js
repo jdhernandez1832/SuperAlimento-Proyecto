@@ -55,6 +55,7 @@ const RegistrarProd = () => {
             }
         };
 
+        
         const fetchUsuarios = async () => {
             try {
                 const response = await fetch('http://localhost:3001/api/usuario/todos', {
@@ -107,9 +108,24 @@ const RegistrarProd = () => {
     };
 
     const handleFileChange = (e) => {
+        const file = e.target.files[0];
+
+        // Validar si el archivo es una imagen comprobando su tipo MIME
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif']; // Tipos de imágenes permitidos
+        if (file && !allowedTypes.includes(file.type)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Tipo de archivo no permitido',
+                text: 'Por favor, sube un archivo de imagen (JPEG, PNG, GIF).',
+            });
+            // Limpia el campo de archivo
+            e.target.value = null;
+            return;
+        }
+
         setFormData({
             ...formData,
-            imagen: e.target.files[0],
+            imagen: file,
         });
     };
 
@@ -297,6 +313,7 @@ const RegistrarProd = () => {
                                             type="file"
                                             className="form-control"
                                             id="imagen"
+                                            accept="image/*"
                                             onChange={handleFileChange}
                                             required
                                         />

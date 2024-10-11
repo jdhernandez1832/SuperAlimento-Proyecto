@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
-import Swal from 'sweetalert2'; // Asegúrate de que SweetAlert esté importado
+import Swal from 'sweetalert2';
 
 const Navegacion = ({ children }) => {
-  const [nombreUsuario, setNombreUsuario] = useState(''); // Estado para almacenar el nombre del usuario
+  const [nombreUsuario, setNombreUsuario] = useState('');
+  const [openSections, setOpenSections] = useState({});
   const numeroDocumento = localStorage.getItem('numero_documento');
-  const rol = localStorage.getItem('Rol'); 
-  const token = localStorage.getItem('token'); // Asegúrate de obtener el token
+  const rol = localStorage.getItem('Rol');
+  const token = localStorage.getItem('token');
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -14,11 +15,10 @@ const Navegacion = ({ children }) => {
     localStorage.removeItem("Rol");
     localStorage.removeItem("numero_documento");
     setTimeout(() => {
-      navigate("/"); 
-    }, 100); 
+      navigate("/");
+    }, 100);
   };
 
-  // Función para obtener el nombre del usuario
   const fetchUsuario = async () => {
     try {
       const response = await fetch(`http://localhost:3001/api/usuario/${numeroDocumento}`, {
@@ -27,16 +27,16 @@ const Navegacion = ({ children }) => {
           'X-Rol': rol,
         },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
-        setNombreUsuario(data.nombre_usuario); // Guardar el nombre del usuario en el estado
+        setNombreUsuario(data.nombre_usuario);
       } else {
         Swal.fire({
           icon: 'error',
           title: 'Error',
           text: 'Error al obtener el usuario',
-          confirmButtonColor: '#28a745', // Color verde
+          confirmButtonColor: '#28a745',
         });
       }
     } catch (error) {
@@ -45,12 +45,11 @@ const Navegacion = ({ children }) => {
         icon: 'error',
         title: 'Error',
         text: `Error en la solicitud: ${error}`,
-        confirmButtonColor: '#28a745', // Color verde
+        confirmButtonColor: '#28a745',
       });
     }
   };
 
-  // Cargar los datos del usuario al montar el componente
   useEffect(() => {
     if (numeroDocumento && token && rol) {
       fetchUsuario();
@@ -58,7 +57,14 @@ const Navegacion = ({ children }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [numeroDocumento, token, rol]);
 
-  // Función para renderizar los items de navegación
+  // Función para manejar el despliegue de secciones
+  const toggleSection = (sectionTitle) => {
+    setOpenSections(prevState => ({
+      ...prevState,
+      [sectionTitle]: !prevState[sectionTitle]
+    }));
+  };
+
   const renderNavItems = () => {
     const navItems = [
       {
@@ -66,8 +72,8 @@ const Navegacion = ({ children }) => {
         icon: "fas fa-users",
         roles: ["Administrador"],
         links: [
-          { to: "/RegistrarUsu", title: "Registrar"},
-          { to: "/ConsultarUsu", title: "Consultar"},
+          { to: "/RegistrarUsu", title: "Registrar" },
+          { to: "/ConsultarUsu", title: "Consultar" },
         ],
       },
       {
@@ -76,7 +82,7 @@ const Navegacion = ({ children }) => {
         roles: ["Administrador", "Inventarista"],
         links: [
           { to: "/RegistrarProve", title: "Registrar" },
-          { to: "/ConsultarProve", title: "Consultar"},
+          { to: "/ConsultarProve", title: "Consultar" },
         ],
       },
       {
@@ -85,7 +91,7 @@ const Navegacion = ({ children }) => {
         roles: ["Administrador", "Inventarista"],
         links: [
           { to: "/RegistrarSoli", title: "Registrar" },
-          { to: "/ConsultarSoli", title: "Consultar"},
+          { to: "/ConsultarSoli", title: "Consultar" },
         ],
       },
       {
@@ -93,10 +99,10 @@ const Navegacion = ({ children }) => {
         icon: "fas fa-box",
         roles: ["Administrador", "Inventarista"],
         links: [
-          { to: "/RegistrarProd", title: "Registrar"},
-          { to: "/ConsultarProd", title: "Consultar"},
-          { to: "/RegistrarCate", title: "Registrar Categoría"},
-          { to: "/ConsultarCate", title: "Consultar Categoría"},
+          { to: "/RegistrarProd", title: "Registrar" },
+          { to: "/ConsultarProd", title: "Consultar" },
+          { to: "/RegistrarCate", title: "Registrar Categoría" },
+          { to: "/ConsultarCate", title: "Consultar Categoría" },
         ],
       },
       {
@@ -104,20 +110,21 @@ const Navegacion = ({ children }) => {
         icon: "fas fa-shopping-cart",
         roles: ["Administrador", "Cajero"],
         links: [
-          { to: "/RegistrarVent", title: "Registrar"},
-          { to: "/ConsultarVent", title: "Consultar"},
+          { to: "/RegistrarVent", title: "Registrar" },
+          { to: "/ConsultarVent", title: "Consultar" },
         ],
       },
     ];
+
     return navItems.map(item => {
       if (item.roles.includes(rol)) {
         return (
           <li className="nav-item" key={item.title}>
-            <Link to="#" className="nav-link">
+            <Link to="#" className="nav-link" onClick={() => toggleSection(item.title)}>
               <i className={`${item.icon} nav-icon`} />
               <p>{item.title}<i className="right fas fa-angle-left" /></p>
             </Link>
-            <ul className="nav nav-treeview">
+            <ul className="nav nav-treeview" style={{ display: openSections[item.title] ? 'block' : 'none' }}>
               {item.links.map(link => (
                 <li className="nav-item" key={link.to}>
                   <Link to={link.to} className="nav-link">
@@ -145,7 +152,6 @@ const Navegacion = ({ children }) => {
           <li className="nav-item d-none d-sm-inline-block">
             <Link to="/Index" className="nav-link">Inicio</Link>
           </li>
-          {/* Mostrar nombre del usuario y su rol */}
           <li className="nav-item d-none d-sm-inline-block">
             <Link to="#" className="nav-link">
               Usuario: {nombreUsuario || numeroDocumento} | Rol: {rol}
@@ -188,7 +194,7 @@ const Navegacion = ({ children }) => {
           </nav>
         </div>
       </aside>
-      <div className="content-wrapper colorFondo">
+      <div className="content-wrapper colorFondo overflow-auto ">
         {children}
       </div>
       <footer className="main-footer dark-mode">

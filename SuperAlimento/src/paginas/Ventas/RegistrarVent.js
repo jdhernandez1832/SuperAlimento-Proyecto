@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Navegacion from "../../componentes/componentes/navegacion";
 import "../../componentes/css/Login.css";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2'; // Importa SweetAlert
 
 const RegistrarVenta = () => {
@@ -161,18 +161,36 @@ const RegistrarVenta = () => {
   };
 
   const handleAddToCart = (product) => {
-    const quantity = parseInt(prompt('Ingrese la cantidad:'), 10);
-    if (isNaN(quantity) || quantity <= 0) {
-      setError('La cantidad debe ser un número mayor a 0.');
-      return;
-    }
-    if (quantity > product.cantidad) {
-      setError('La cantidad ingresada supera el stock disponible.');
-      return;
-    }
-    setError('');
-    setCart([...cart, { ...product, quantity }]);
+    Swal.fire({
+      title: product.nombre_producto,
+      html: `
+        <div>
+          <img src="${product.imagen ? `http://localhost:3001/uploads/${product.imagen}` : 'default-product-image.png'}" alt="${product.nombre_producto}" width="200" />
+          <p>Precio: $${product.precio_venta.toLocaleString()}</p>
+          <p>Cantidad disponible: ${product.cantidad}</p>
+          <input id="quantityInput" type="number" min="1" max="${product.cantidad}" placeholder="Cantidad" class="swal2-input" style="width: 80%;" />
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Agregar a la venta',
+      confirmButtonColor: '#4caf50',
+      cancelButtonText: 'Cancelar',
+      preConfirm: () => {
+        const quantity = parseInt(document.getElementById('quantityInput').value, 10);
+        if (isNaN(quantity) || quantity <= 0 || quantity > product.cantidad) {
+          Swal.showValidationMessage('Por favor, ingrese una cantidad válida.');
+          return false;
+        }
+        return quantity;
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const quantity = result.value;
+        setCart([...cart, { ...product, quantity }]);
+      }
+    });
   };
+  
 
   const filteredProducts = productos.filter(
     (product) =>
@@ -183,7 +201,7 @@ const RegistrarVenta = () => {
   return (
     <div>
       <Navegacion>
-        <div className="card card-secondary" style={{ height: "88vh" }}>
+        <div className="colorFondo" style={{ height: "100%" }}>
           <div className="card-body">
             <div className="container-fluid">
               <div className="row">
@@ -193,7 +211,7 @@ const RegistrarVenta = () => {
                       type="text"
                       name="table_search"
                       className="form-control float-right"
-                      placeholder="Digita o escanea el producto a buscar"
+                      placeholder="Digita el producto a buscar"
                       value={searchTerm}
                       onChange={handleSearch}
                     />
@@ -301,7 +319,7 @@ const RegistrarVenta = () => {
                       </div>
                       <div className="card-footer">
                         <button type="submit" className="btn btn-secondary mr-2">Registrar Venta</button>
-                        <Link to="/ConsultarVent" className="btn btn-secondary mr-2">Cancelar</Link>
+                        <button type="button" onClick={() => window.location.reload()} className="btn btn-secondary mr-2">Cancelar</button>
                       </div>
                     </form>
                   </div>

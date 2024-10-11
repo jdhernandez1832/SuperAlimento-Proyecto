@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Navegacion from "../../componentes/componentes/navegacion";
 import "../../componentes/css/Login.css";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2'; // Importar SweetAlert
 
 const RegistrarSoli = () => {
@@ -183,10 +183,36 @@ const RegistrarSoli = () => {
   };
 
   const handleAddToCart = (product) => {
-    const quantity = parseInt(prompt('Ingrese la cantidad:'), 10);
-    if (!isNaN(quantity) && quantity > 0) {
-      setCart([...cart, { ...product, quantity }]);
-    }
+    Swal.fire({
+      title: `<strong>${product.nombre_producto}</strong>`,
+      html: `
+        <img src="${product.imagen ? `http://localhost:3001/uploads/${product.imagen}` : 'default-product-image.png'}" alt="${product.nombre_producto}" width="200" /><br/>
+        <strong>Precio: </strong> $${product.precio_compra.toLocaleString()}<br/>
+        <strong>Disponibilidad: </strong> ${product.cantidad} unidades<br/><br/>
+        <label for="cantidad">Cantidad a agregar:</label>
+        <input type="number" id="cantidad" class="swal2-input" min="1" max="${product.cantidad}" placeholder="Cantidad" />`,
+      showCancelButton: true,
+      confirmButtonText: 'Agregar a la solicitud',
+      confirmButtonColor: '#4caf50',
+      cancelButtonText: 'Cancelar',
+      preConfirm: () => {
+        const cantidad = Swal.getPopup().querySelector('#cantidad').value;
+        if (!cantidad || isNaN(cantidad) || cantidad <= 0) {
+          Swal.showValidationMessage('Por favor ingrese una cantidad válida');
+        }
+        return { cantidad: parseInt(cantidad, 10) };
+      }
+    }).then((result) => {
+      if (result.isConfirmed && result.value.cantidad > 0) {
+        setCart([...cart, { ...product, quantity: result.value.cantidad }]);
+        Swal.fire({
+          icon: 'success',
+          title: 'Producto agregado',
+          text: `${result.value.cantidad} unidades de ${product.nombre_producto} han sido agregadas a la solicitud.`,
+          confirmButtonColor: '#28a745'
+        });
+      }
+    });
   };
 
   const filteredProducts = productos.filter(
@@ -198,7 +224,7 @@ const RegistrarSoli = () => {
   return (
     <div>
       <Navegacion>
-        <div className="card card-secondary" style={{ height: "88vh" }}>
+        <div className="colorFondo" style={{ height: "100%" }}>
           <div className="card-body">
             <div className="container-fluid">
               <div className="row">
@@ -208,7 +234,7 @@ const RegistrarSoli = () => {
                       type="text"
                       name="table_search"
                       className="form-control float-right"
-                      placeholder="Digita o escanea el producto a buscar"
+                      placeholder="Digita el producto a buscar"
                       value={searchTerm}
                       onChange={handleSearch}
                     />
@@ -328,7 +354,7 @@ const RegistrarSoli = () => {
                       </div>
                       <div className="card-footer">
                         <button type="submit" className="btn btn-secondary mr-2">Registrar Solicitud</button>
-                        <Link to="/ConsultarSoli" className="btn btn-secondary mr-2">Cancelar</Link>
+                        <button type="button" onClick={() => window.location.reload()} className="btn btn-secondary mr-2">Cancelar</button>
                       </div>
                     </form>
                   </div>

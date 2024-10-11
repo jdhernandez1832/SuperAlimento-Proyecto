@@ -50,7 +50,7 @@ function App() {
           <Route path="/ConsultarSoli" element={<PrivateRoute element={ConsultarSoli} roles="Administrador, Inventarista" />} />
           <Route path="/ConsultarCate" element={<PrivateRoute element={ConsultarCate} roles="Administrador, Inventarista" />} />
           <Route path="/ConsultarVent" element={<PrivateRoute element={ConsultarVent} roles="Administrador, Cajero" />} />
-          <Route path="/ActualizarUsu/:numero_documento" element={<PrivateRoute element={ActualizarUsu} roles="Administrador, Inventarista" />} />
+          <Route path="/ActualizarUsu/:numero_documento" element={<PrivateRoute element={ActualizarUsu} roles="Administrador" />} />
           <Route path="/ActualizarProve/:id_proveedor" element={<PrivateRoute element={ActualizarProve} roles="Administrador, Inventarista" />} />
           <Route path="/ActualizarCate/:id_categoria" element={<PrivateRoute element={ActualizarCate} roles="Administrador, Inventarista" />} />
           <Route path="/ActualizarProd/:id_producto" element={<PrivateRoute element={ActualizarProd} roles="Administrador, Inventarista" />} />
