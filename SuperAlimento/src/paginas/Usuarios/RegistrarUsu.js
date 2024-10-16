@@ -16,6 +16,16 @@ const RegistrarUsu = () => {
   });
   const navigate = useNavigate();
 
+  // Función para generar una clave aleatoria
+  const generarClaveAleatoria = () => {
+    const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let claveGenerada = '';
+    for (let i = 0; i < 10; i++) {
+      claveGenerada += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+    }
+    return claveGenerada;
+  };
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -23,11 +33,16 @@ const RegistrarUsu = () => {
     });
   };
 
+  // Al cargar el formulario, generar la clave automática
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     const token = localStorage.getItem('token');
     const rol = localStorage.getItem('Rol');
-    
+
+    // Generar la clave aleatoria
+    const claveGenerada = generarClaveAleatoria();
+
     try {
       const response = await fetch('http://localhost:3001/api/usuario/registrar', {
         method: 'POST',
@@ -36,27 +51,42 @@ const RegistrarUsu = () => {
           'Authorization': `Bearer ${token}`,
           'X-Rol': rol, 
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, clave: claveGenerada }), // Enviar la clave generada
       });
 
       if (response.ok) {
-        // eslint-disable-next-line no-unused-vars
         const result = await response.json();
+        console.log(result);
+        // Enviar la clave generada por correo
+        await fetch('http://localhost:3001/api/usuario/correo', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'X-Rol': rol, 
+          },
+          body: JSON.stringify({
+            email: formData.correo_usuario,
+            clave: claveGenerada,
+            numero_documento: formData.numero_documento,
+          }),
+        });
+
         Swal.fire({
           title: 'Éxito',
-          text: 'Usuario registrado con éxito',
+          text: 'Usuario registrado con éxito y clave enviada por correo',
           icon: 'success',
-          confirmButtonColor: '#4CAF50', // Color verde
+          confirmButtonColor: '#4CAF50',
           confirmButtonText: 'Aceptar',
         }).then(() => {
-          navigate('/ConsultarUsu'); // Redirige a ConsultarUsu
+          navigate('/ConsultarUsu');
         });
       } else {
         Swal.fire({
           title: 'Error',
           text: 'Error al registrar usuario',
           icon: 'error',
-          confirmButtonColor: '#4CAF50', // Color verde
+          confirmButtonColor: '#4CAF50',
           confirmButtonText: 'Aceptar',
         });
       }
@@ -65,7 +95,7 @@ const RegistrarUsu = () => {
         title: 'Error',
         text: `Error en la solicitud: ${error.message}`,
         icon: 'error',
-        confirmButtonColor: '#4CAF50', // Color verde
+        confirmButtonColor: '#4CAF50',
         confirmButtonText: 'Aceptar',
       });
     }
@@ -158,12 +188,12 @@ const RegistrarUsu = () => {
                         <option value="3">Inventarista</option>
                     </select>
                   </div>
-                  <div className="form-group">
+                  <div className="form-group" hidden>
                     <label htmlFor="clave">Contraseña</label>
                     <input
                       className="form-control"
                       id="clave"
-                      value={formData.clave}
+                      value={formData.clave || generarClaveAleatoria()}
                       onChange={handleChange}
                       required
                     />

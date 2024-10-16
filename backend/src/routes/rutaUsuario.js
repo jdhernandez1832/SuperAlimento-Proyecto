@@ -4,6 +4,61 @@ const express = require('express');
 const router = express.Router();
 const { Usuario,  Rol } = require('../models'); 
 
+const nodemailer = require('nodemailer');  
+
+
+router.post('/correo', async (req, res) => {
+  const { email, clave, numero_documento } = req.body;
+
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'supermercadosuperalimento@gmail.com', // Tu correo
+      pass: 'ejzzqaisipfojrzr', // Tu contraseña
+    },
+  });
+
+  const mailOptions = {
+    from: 'supermercadosuperalimento@gmail.com',
+    to: email,
+    subject: 'Registro Exitoso - Su Contraseña',
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; border-radius: 5px;">
+        <h2 style="color: #333;">¡Registro Exitoso!</h2>
+        <p style="color: #555;">
+          Su registro fue exitoso. A continuación, encontrará su información de inicio de sesión:
+        </p>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 10px; border: 1px solid #ccc;">Usuario:</td>
+            <td style="padding: 10px; border: 1px solid #ccc;">${numero_documento}</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border: 1px solid #ccc;">Contraseña:</td>
+            <td style="padding: 10px; border: 1px solid #ccc;">${clave}</td>
+          </tr>
+        </table>
+        <p style="color: #555; margin-top: 20px;">
+          Por favor, mantenga esta información en un lugar seguro y no la comparta con nadie.
+        </p>
+        <p style="color: #555;">¡Gracias por registrarse!</p>
+        <footer style="margin-top: 30px; font-size: 0.8em; color: #777;">
+          <p>Este es un correo automático, por favor no responda.</p>
+          <p>Supermercado Super Alimento</p>
+        </footer>
+      </div>
+    `,
+  };
+  
+  try {
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: 'Correo enviado exitosamente' });
+  } catch (error) {
+    console.error('Error al enviar el correo: ', error);
+    res.status(500).json({ message: 'Error al enviar el correo' });
+  }
+});
 
 router.post('/registrar', async (req, res) => {
   try {

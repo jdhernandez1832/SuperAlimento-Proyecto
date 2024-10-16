@@ -182,7 +182,7 @@ const Navegacion = ({ children }) => {
         </ul>
       </nav>
       <aside className="main-sidebar sidebar-dark-primary elevation-4">
-        <Link to="/Index" className="brand-link">
+        <Link className="brand-link" data-widget="pushmenu" to="#" role="button">
           <img src="../../dist/img/SuperAlimento.png" className="brand-image img-circle elevation-3" alt="superalimento.logo" style={{ opacity: '.8' }} />
           <span className="brand-text font-weight-light">SuperAlimento</span>
         </Link>

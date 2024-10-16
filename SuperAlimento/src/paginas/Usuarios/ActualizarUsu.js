@@ -191,7 +191,7 @@ const ActualizarUsuario = () => {
                         <option value="3">Inventarista</option>
                     </select>
                   </div>
-                  <div className="form-group">
+                  <div className="form-group" hidden>
                     <label htmlFor="clave">Contraseña</label>
                     <input
                       className="form-control"
