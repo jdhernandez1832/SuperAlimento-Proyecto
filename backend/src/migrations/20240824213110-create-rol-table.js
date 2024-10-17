@@ -28,6 +28,7 @@ module.exports = {
       correo_usuario: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: true, // Se agrega la restricción de unicidad
       },
       telefono_usuario: {
         type: Sequelize.BIGINT,

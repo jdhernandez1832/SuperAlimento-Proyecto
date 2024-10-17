@@ -21,3 +21,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Ignorar todo el contenido de la carpeta uploads
+/uploads/*

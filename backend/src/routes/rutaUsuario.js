@@ -14,8 +14,8 @@ router.post('/correo', async (req, res) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'supermercadosuperalimento@gmail.com', // Tu correo
-      pass: 'ejzzqaisipfojrzr', // Tu contraseña
+      user: 'supermercadosuperalimento@gmail.com', 
+      pass: 'ejzzqaisipfojrzr', 
     },
   });
 
@@ -45,7 +45,7 @@ router.post('/correo', async (req, res) => {
         <p style="color: #555;">¡Gracias por registrarse!</p>
         <footer style="margin-top: 30px; font-size: 0.8em; color: #777;">
           <p>Este es un correo automático, por favor no responda.</p>
-          <p>Supermercado Super Alimento</p>
+          <p>Supermercado SuperAlimento</p>
         </footer>
       </div>
     `,

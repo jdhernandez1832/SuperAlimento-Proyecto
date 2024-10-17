@@ -9,6 +9,7 @@ const productoRoutes = require('./src/routes/rutaProducto');
 const solicitudRoutes = require('./src/routes/rutaSolicitud');
 const ventaRoutes = require('./src/routes/rutaVenta');
 const loginRoutes= require('./src/routes/rutaLogin');
+const olvidoRoutes= require('./src/routes/rutaOlvido');
 
 const app = express();
 
@@ -18,12 +19,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads'));
 
 app.use('/api/login', loginRoutes);
+app.use('/api/olvido', olvidoRoutes);
 app.use('/api/usuario', verifyToken, permitRole('Administrador', 'Inventarista', 'Cajero' ), usuarioRoutes);
 app.use('/api/categoria', verifyToken, permitRole('Administrador', 'Inventarista', 'Cajero' ), categoriaRoutes);
 app.use('/api/proveedor', verifyToken, permitRole('Administrador', 'Inventarista', 'Cajero' ), proveedorRoutes);
 app.use('/api/producto', verifyToken, permitRole('Administrador', 'Inventarista', 'Cajero' ), productoRoutes);
 app.use('/api/solicitud', verifyToken, permitRole('Administrador', 'Inventarista', 'Cajero' ), solicitudRoutes);
 app.use('/api/venta', verifyToken, permitRole('Administrador', 'Inventarista', 'Cajero' ), ventaRoutes);
+
 
 const port = process.env.PORT || 3001;
 app.listen(port, () => {

@@ -110,7 +110,7 @@ const Perfil = () => {
             <div className="card-body colorFondo">
               <div className="card card-secondary">
                 <div className="card-header">
-                  <h3 className="card-title">Actualizar Usuario</h3>
+                  <h3 className="card-title">Actualizar Perfil</h3>
                 </div>
                 <form onSubmit={handleSubmit}>
                   <div className="card-body">
@@ -176,7 +176,7 @@ const Perfil = () => {
                         required
                       />
                     </div>
-                    <div className="form-group">
+                    <div className="form-group" hidden>
                       <label htmlFor="id_rol">Rol</label>
                       <select
                         className="custom-select form-control-border border-width-2"
