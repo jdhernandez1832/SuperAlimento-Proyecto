@@ -120,12 +120,18 @@ const ConsultarSoli = () => {
                                                                 <td>{solicitud.id_proveedor}</td>
                                                                 <td>{solicitud.numero_documento}</td>
                                                                 <td>
-                                                                    <button
-                                                                        onClick={() => handleAceptarEntrega(solicitud.id_solicitud)}
-                                                                        className="btn btn-success"
-                                                                    >
-                                                                        Aceptar Entrega
-                                                                    </button>
+                                                                    {solicitud.estado_solicitud === 'Aprobada' ? (
+                                                                        <button className="btn btn-success" disabled>
+                                                                            Entrega Aceptada   
+                                                                        </button>
+                                                                    ) : (
+                                                                        <button
+                                                                            onClick={() => handleAceptarEntrega(solicitud.id_solicitud)}
+                                                                            className="btn btn-success"
+                                                                        >
+                                                                            Aceptar Entrega
+                                                                        </button>
+                                                                    )}
                                                                 </td>
                                                                 <td>
                                                                     <Link to={`/DetallesSolicitud/${solicitud.id_solicitud}`}>

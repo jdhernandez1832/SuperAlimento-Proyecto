@@ -4,6 +4,9 @@ import Navegacion from "../../componentes/componentes/navegacion"; // Importa el
 import "../../componentes/css/Login.css";
 import { Link } from "react-router-dom";
 import Swal from 'sweetalert2';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable'; 
+
 
 const ConsultarProd = () => {
   const tableRef1 = useRef(null);
@@ -82,7 +85,65 @@ const ConsultarProd = () => {
       });
     }
   };
+  const generarReporte = () => {
+    const doc = new jsPDF('p', 'pt', 'a4');
 
+    const logo = new Image();
+    logo.src = '../../dist/img/SuperAlimento.png';
+
+    logo.onload = () => {
+
+        doc.addImage(logo, 'PNG', 40, 30, 50, 50); 
+        doc.setFontSize(18);
+        doc.text('SuperAlimento', 150, 60); 
+
+
+        doc.setFontSize(14);
+        doc.text('Reporte de Productos', 40, 100);
+
+        const headers = [['Imagen', 'Nombre', 'Código de Barras', 'Precio Compra', 'Precio Venta', 'Cantidad']];
+
+        const data = productos.map((producto) => [
+            '', 
+            producto.nombre_producto,
+            producto.codigo_barras,
+            producto.precio_compra.toFixed(2),
+            producto.precio_venta.toFixed(2),
+            producto.cantidad
+        ]);
+
+
+        doc.autoTable({
+            head: headers,
+            body: data,
+            startY: 120, 
+            styles: { fontSize: 8 }, 
+            headStyles: {
+                fillColor: [34, 139, 34], 
+                textColor: [255, 255, 255], 
+            },
+            didDrawCell: (data) => {
+                if (data.column.index === 0 && data.cell.section === 'body') {
+                    const imgUrl = `http://localhost:3001/uploads/${productos[data.row.index].imagen}`;
+                    const img = new Image();
+                    img.src = imgUrl;
+
+                    img.onload = () => {
+                        doc.addImage(img, 'JPEG', data.cell.x + 2, data.cell.y + 2, 30, 30); 
+                        if (data.row.index === productos.length - 1) {
+                            doc.save('reporte_productos.pdf'); 
+                        }
+                    };
+                }
+            },
+        });
+        if (productos.every(p => !p.imagen)) {
+            doc.save('reporte_productos.pdf');
+        }
+    };
+};
+
+  
   return (
     <div>
       <Navegacion>
@@ -149,8 +210,7 @@ const ConsultarProd = () => {
                     )}
                   </div>
                   <div className="card-header">
-                    <Link to="#" className="btn btn-secondary mr-2">Generar reporte de productos</Link>
-                    <Link to="#" className="btn btn-secondary">Generar reporte productos próximos de caducidad</Link>
+                    <button onClick={generarReporte} className="btn btn-secondary mr-2">Generar reporte de productos</button>
                   </div>
                 </div>
               </div>
@@ -163,3 +223,4 @@ const ConsultarProd = () => {
 }
 
 export default ConsultarProd;
+

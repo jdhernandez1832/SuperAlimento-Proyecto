@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import Navegacion from "../../componentes/componentes/navegacion";
 import "../../componentes/css/Login.css";
 import { useNavigate } from "react-router-dom";
-import Swal from 'sweetalert2'; // Importar SweetAlert
+import Swal from 'sweetalert2';
+import Select from 'react-select'; 
 
 const RegistrarSoli = () => {
   const [formData, setFormData] = useState({
@@ -109,6 +110,13 @@ const RegistrarSoli = () => {
       ...prevState,
       [id]: value
     }));
+  };
+  const handleSelectChange = (selectedOption, actionMeta) => {
+    const { name } = actionMeta;
+    setFormData({
+        ...formData,
+        [name]: selectedOption ? selectedOption.value : '',
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -304,19 +312,17 @@ const RegistrarSoli = () => {
                         </div>
                         <div className="form-group">
                           <label htmlFor="id_proveedor">Proveedor</label>
-                          <select
-                            className="custom-select form-control-border border-width-2"
-                            id="id_proveedor"
-                            value={formData.id_proveedor}
-                            onChange={handleChange}
-                          >
-                            <option value="">Seleccione un proveedor</option>
-                            {proveedores.map(proveedor => (
-                              <option key={proveedor.id_proveedor} value={proveedor.id_proveedor}>
-                                {proveedor.nombre_proveedor}
-                              </option>
-                            ))}
-                          </select>
+                          <Select
+                            name="id_proveedor"
+                            options={proveedores.map(proveedor => ({
+                              value: proveedor.id_proveedor,
+                              label: proveedor.nombre_proveedor,
+                            }))}
+                            onChange={handleSelectChange}
+                            placeholder="Seleccione un proveedor"
+                            isClearable
+                            isSearchable={true}
+                          />
                         </div>
                         <div className="form-group">
                           <label htmlFor="numero_documento">Usuario</label>

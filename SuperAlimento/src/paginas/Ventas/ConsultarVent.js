@@ -83,11 +83,6 @@ const ConsultarVent = () => {
                                             </table>
                                         )}
                                     </div>
-                                    <div className="card-header">
-                                        <Link to="#" className="btn btn-secondary">
-                                            Generar reporte de ventas
-                                        </Link>
-                                    </div>
                                 </div>
                             </div>
                         </div>

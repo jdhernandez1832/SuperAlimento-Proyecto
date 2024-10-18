@@ -3,7 +3,8 @@ import "../../componentes/css/Login.css";
 import { Link } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2'; // Importación de SweetAlert
+import Swal from 'sweetalert2'; 
+import Select from 'react-select'; 
 
 const RegistrarProd = () => {
     const [formData, setFormData] = useState({
@@ -20,8 +21,6 @@ const RegistrarProd = () => {
         imagen: null,
     });
     const [categorias, setCategorias] = useState([]);
-    // eslint-disable-next-line no-unused-vars
-    const [usuarios, setUsuarios] = useState([]);
     const [proveedores, setProveedores] = useState([]);
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
@@ -55,26 +54,6 @@ const RegistrarProd = () => {
             }
         };
 
-        
-        const fetchUsuarios = async () => {
-            try {
-                const response = await fetch('http://localhost:3001/api/usuario/todos', {
-                    headers: {
-                      'Authorization': `Bearer ${token}`,
-                      'X-Rol': rol, 
-                    },
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    setUsuarios(data);
-                } else {
-                    console.error('Error al obtener usuarios:', response.statusText);
-                }
-            } catch (error) {
-                console.error('Error en la solicitud:', error);
-            }
-        };
-
         const fetchProveedores = async () => {
             try {
                 const response = await fetch('http://localhost:3001/api/proveedor/todos', {
@@ -85,7 +64,6 @@ const RegistrarProd = () => {
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('Proveedores obtenidos:', data);
                     setProveedores(data);
                 } else {
                     console.error('Error al obtener proveedores:', response.statusText);
@@ -96,7 +74,6 @@ const RegistrarProd = () => {
         };
 
         fetchCategorias();
-        fetchUsuarios();
         fetchProveedores();
     }, [rol, token]);
 
@@ -107,18 +84,24 @@ const RegistrarProd = () => {
         });
     };
 
+    const handleSelectChange = (selectedOption, actionMeta) => {
+        const { name } = actionMeta;
+        setFormData({
+            ...formData,
+            [name]: selectedOption ? selectedOption.value : '',
+        });
+    };
+
     const handleFileChange = (e) => {
         const file = e.target.files[0];
 
-        // Validar si el archivo es una imagen comprobando su tipo MIME
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif']; // Tipos de imágenes permitidos
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
         if (file && !allowedTypes.includes(file.type)) {
             Swal.fire({
                 icon: 'error',
                 title: 'Tipo de archivo no permitido',
                 text: 'Por favor, sube un archivo de imagen (JPEG, PNG, GIF).',
             });
-            // Limpia el campo de archivo
             e.target.value = null;
             return;
         }
@@ -169,6 +152,53 @@ const RegistrarProd = () => {
                 text: error.message,
             });
         }
+    };
+
+    // Función para abrir la alerta y registrar la nueva categoría
+    const handleAddCategoria = () => {
+        Swal.fire({
+            title: 'Agregar nueva categoría',
+            input: 'text',
+            inputPlaceholder: 'Nombre de la nueva categoría',
+            showCancelButton: true,
+            confirmButtonText: 'Registrar',
+            showLoaderOnConfirm: true,
+            preConfirm: async (nombreCategoria) => {
+                try {
+                    const response = await fetch('http://localhost:3001/api/categoria/registrar', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                            'X-Rol': rol,
+                        },
+                        body: JSON.stringify({ nombre: nombreCategoria }),
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        setCategorias((prevCategorias) => [
+                            ...prevCategorias,
+                            result
+                        ]);
+                        return result;
+                    } else {
+                        throw new Error('Error al registrar la categoría');
+                    }
+                } catch (error) {
+                    Swal.showValidationMessage(`Error: ${error.message}`);
+                }
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    icon: 'success',
+                    title: `Categoría ${result.value.nombre} registrada correctamente`,
+                    confirmButtonColor: '#28a745',
+                });
+            }
+        });
     };
 
     return (
@@ -251,71 +281,50 @@ const RegistrarProd = () => {
                                             required
                                         />
                                     </div>
-                                    <div className="form-group" hidden>
-                                        <label htmlFor="estado">Estado</label>
-                                        <select
-                                            className="form-control"
-                                            id="estado"
-                                            value={formData.estado}
-                                            onChange={handleChange}
-                                            required
-                                        >
-                                            <option value={1}>Activo</option>
-                                            <option value={0}>Inactivo</option>
-                                        </select>
-                                    </div>
                                     <div className="form-group">
                                         <label htmlFor="id_categoria">Categoría</label>
-                                        <select
-                                            className="form-control"
-                                            id="id_categoria"
-                                            value={formData.id_categoria}
-                                            onChange={handleChange}
-                                            required
-                                        >
-                                            <option value="">Seleccione una categoría</option>
-                                            {categorias.map((categoria) => (
-                                                <option key={categoria.id_categoria} value={categoria.id_categoria}>
-                                                    {categoria.nombre}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="numero_documento">Usuario</label>
-                                        <input
-                                            className="form-control"
-                                            id="numero_documento"
-                                            required
-                                            value={formData.numero_documento}
-                                            readOnly
-                                        />
+                                        <div className="d-flex align-items-center">
+                                            <Select
+                                                name="id_categoria"
+                                                options={categorias.map(categoria => ({
+                                                    value: categoria.id_categoria,
+                                                    label: categoria.nombre,
+                                                }))}
+                                                onChange={handleSelectChange}
+                                                placeholder="Seleccione una categoría"
+                                                isClearable
+                                            />
+                                            <button
+                                                type="button"
+                                                className="btn btn-secondary ml-2"
+                                                onClick={handleAddCategoria}
+                                            >
+                                                +
+                                            </button>
+                                        </div>
                                     </div>
                                     <div className="form-group">
                                         <label htmlFor="id_proveedor">Proveedor</label>
-                                        <select 
-                                            className="custom-select form-control-border border-width-2" 
-                                            id="id_proveedor" 
-                                            value={formData.id_proveedor} 
-                                            onChange={handleChange} 
-                                        >
-                                            <option value="">Seleccione un proveedor</option>
-                                            {proveedores.map(proveedor => (
-                                            <option key={proveedor.id_proveedor} value={proveedor.id_proveedor}>
-                                                {proveedor.nombre_proveedor}
-                                            </option>
-                                            ))}
-                                        </select>
+                                        <Select
+                                            name="id_proveedor"
+                                            options={proveedores.map(proveedor => ({
+                                                value: proveedor.id_proveedor,
+                                                label: proveedor.nombre_proveedor,
+                                            }))}
+                                            onChange={handleSelectChange}
+                                            placeholder="Seleccione un proveedor"
+                                            isClearable
+                                            isSearchable={true}
+                                        />
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="imagen">Imagen del producto</label>
+                                        <label htmlFor="imagen">Imagen</label>
                                         <input
                                             type="file"
                                             className="form-control"
                                             id="imagen"
                                             accept="image/*"
                                             onChange={handleFileChange}
-                                            required
                                         />
                                     </div>
                                 </div>

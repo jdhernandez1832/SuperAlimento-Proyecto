@@ -1,31 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navegacion from "../../componentes/componentes/navegacion";
+import jsPDF from 'jspdf'; // Importa jsPDF
+import 'jspdf-autotable'; // Importa autoTable para generar tablas
 import "../../componentes/css/Login.css";
 
 const DetallesVenta = () => {
-    const { id_venta } = useParams(); // Obtener el ID de la venta de la URL
+    const { id_venta } = useParams();
     const [venta, setVenta] = useState(null);
     const [productos, setProductos] = useState([]);
     const [productosExistentes, setProductosExistentes] = useState([]);
-    const [loading, setLoading] = useState(true); // Estado de carga
+    const [loading, setLoading] = useState(true);
     const [usuarios, setUsuarios] = useState([]);
-    const [setTotal] = useState(0); // Estado para el valor total
+    const [setTotal] = useState(0);
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
     const rol = localStorage.getItem('Rol');
+
     useEffect(() => {
         const fetchVenta = async () => {
             try {
                 const response = await fetch(`http://localhost:3001/api/venta/detalles/${id_venta}`, {
                     headers: {
                       'Authorization': `Bearer ${token}`,
-                      'X-Rol': rol, // Agregar el token en los encabezados
+                      'X-Rol': rol,
                     },
-                  });
+                });
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('Datos de venta:', data); // Depuración
+                    console.log('Datos de venta:', data);
                     setVenta(data.venta);
                     setProductos(data.productos);
                     calcularTotal(data.productos, productosExistentes);
@@ -35,7 +38,7 @@ const DetallesVenta = () => {
             } catch (error) {
                 console.error('Error en la solicitud:', error);
             } finally {
-                setLoading(false); // Finaliza el estado de carga
+                setLoading(false);
             }
         };
 
@@ -44,7 +47,7 @@ const DetallesVenta = () => {
                 const response = await fetch('http://localhost:3001/api/usuario/todos', {
                     headers: {
                       'Authorization': `Bearer ${token}`,
-                      'X-Rol': rol, // Agregar el token en los encabezados
+                      'X-Rol': rol,
                     },
                 });
                 if (response.ok) {
@@ -63,12 +66,12 @@ const DetallesVenta = () => {
                 const response = await fetch('http://localhost:3001/api/producto/todos', {
                     headers: {
                       'Authorization': `Bearer ${token}`,
-                      'X-Rol': rol, // Agregar el token en los encabezados
+                      'X-Rol': rol,
                     },
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('Productos existentes:', data); // Depuración
+                    console.log('Productos existentes:', data);
                     setProductosExistentes(data);
                 } else {
                     console.error('Error al obtener productos:', response.statusText);
@@ -81,7 +84,7 @@ const DetallesVenta = () => {
         fetchVenta();
         fetchUsuarios();
         fetchProductos();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const calcularTotal = (productos, productosExistentes) => {
@@ -97,6 +100,68 @@ const DetallesVenta = () => {
         const opciones = { year: 'numeric', month: '2-digit', day: '2-digit' };
         return new Date(fecha).toLocaleDateString(undefined, opciones);
     };
+    const generarPDF = () => {
+        const doc = new jsPDF();
+    
+        const logo = new Image();
+        logo.src = '../../dist/img/SuperAlimento.png';
+    
+        logo.onload = () => {
+
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const logoWidth = 40;
+            const logoHeight = 40;
+            const logoX = (pageWidth - logoWidth) / 2; 
+            doc.addImage(logo, 'PNG', logoX, 20, logoWidth, logoHeight);
+    
+
+            doc.setFontSize(20);
+            doc.setFont('helvetica', 'bold');
+            const nombreSupermercado = 'SuperAlimento';
+            const textWidth = doc.getTextWidth(nombreSupermercado);
+            const textX = (pageWidth - textWidth) / 2; 
+    
+            doc.text(nombreSupermercado, textX, 80); 
+    
+
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Detalles de la Venta', 20, 100); 
+            doc.setFontSize(12);
+            doc.text(`Fecha de Venta: ${formatearFecha(venta?.fecha_venta)}`, 20, 120);
+            doc.text(`Método de Pago: ${venta?.metodo_pago}`, 20, 135);
+            doc.text(`Usuario: ${usuarios.find(usuario => usuario.numero_documento === venta?.numero_documento)?.nombre_usuario || 'No disponible'}`, 20, 150);
+    
+     
+            const productosTabla = productos.map((prod) => {
+                const productoExistente = productosExistentes.find(p => p.id_producto === prod.id_producto);
+                return [
+                    productoExistente?.nombre_producto || 'Desconocido',
+                    prod.cantidad,
+                    `$${(productoExistente?.precio_venta * prod.cantidad || 0).toFixed(2)}`
+                ];
+            });
+    
+  
+            doc.autoTable({
+                head: [['Producto', 'Cantidad', 'Precio']],
+                body: productosTabla,
+                startY: 170, 
+                headStyles: {
+                    fillColor: [34, 139, 34], 
+                    textColor: [255, 255, 255], 
+                },
+            });
+    
+   
+            doc.setFontSize(12);
+            doc.text(`Total: $${venta?.total_venta}`, 20, doc.autoTable.previous.finalY + 20);
+    
+  
+            doc.save('detalles_venta.pdf');
+        }
+    };
+    
 
     if (loading) {
         return <div>Cargando detalles de la venta...</div>;
@@ -170,7 +235,7 @@ const DetallesVenta = () => {
                                             </tbody>
                                         </table>
                                         <div className="form-group">
-                                            <h4>Total: ${venta.total_venta}</h4>
+                                            <h4>Total: ${venta?.total_venta}</h4>
                                         </div>
                                         <button onClick={() => navigate('/ConsultarVent')} className="btn btn-secondary mr-2">
                                             Volver
@@ -178,6 +243,7 @@ const DetallesVenta = () => {
                                         <button onClick={() => navigate('/RegistrarVent')} className="btn btn-secondary">
                                             Registrar otra venta
                                         </button>
+                                        <button onClick={generarPDF} className="btn btn-secondary ml-2">Generar PDF</button> 
                                     </div>
                                 </div>
                             </div>
