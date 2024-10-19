@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"; 
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import "../../componentes/css/Login.css";
@@ -7,6 +7,7 @@ const Login = () => {
   const [numeroDocumento, setNumeroDocumento] = useState("");
   const [clave, setClave] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
   // Verifica si el usuario ya está logueado
@@ -17,8 +18,30 @@ const Login = () => {
     }
   }, [navigate]);
 
+  const validateFields = () => {
+    let errors = {};
+
+    // Validar número de identificación (solo números)
+    const regexNumber = /^[0-9]+$/;
+    if (!regexNumber.test(numeroDocumento)) {
+      errors.numeroDocumento = "El número de identificación solo debe contener números.";
+    }
+
+    // Validar campo de contraseña (no vacío)
+    if (clave.trim() === "") {
+      errors.clave = "La contraseña no puede estar vacía.";
+    }
+
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleLogin = async (event) => {
     event.preventDefault();
+
+    if (!validateFields()) {
+      return; // Si hay errores, detener el proceso de inicio de sesión
+    }
 
     try {
       const response = await fetch("http://localhost:3001/api/login/ingreso", {
@@ -33,7 +56,6 @@ const Login = () => {
       });
 
       const data = await response.json();
-      console.log(data);
       if (data.token) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("Rol", data.rol);
@@ -54,7 +76,6 @@ const Login = () => {
         throw new Error("Credenciales incorrectas");
       }
     } catch (error) {
-      console.error("Error al iniciar sesión:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -66,6 +87,42 @@ const Login = () => {
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  // Validación en tiempo real
+  const handleNumeroDocumentoChange = (e) => {
+    const value = e.target.value;
+    setNumeroDocumento(value);
+
+    const regexNumber = /^[0-9]+$/;
+    if (!regexNumber.test(value)) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        numeroDocumento: "El número de identificación solo debe contener números.",
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        numeroDocumento: null,
+      }));
+    }
+  };
+
+  const handleClaveChange = (e) => {
+    const value = e.target.value;
+    setClave(value);
+
+    if (value.trim() === "") {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        clave: "La contraseña no puede estar vacía.",
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        clave: null,
+      }));
+    }
   };
 
   return (
@@ -110,11 +167,11 @@ const Login = () => {
               <div className="input-group mb-3">
                 <input
                   type="number"
-                  className="form-control"
-                  min="0"
+                  className={`form-control ${errors.numeroDocumento ? 'is-invalid' : ''}`}
                   value={numeroDocumento}
-                  onChange={(e) => setNumeroDocumento(e.target.value)}
+                  onChange={handleNumeroDocumentoChange}
                   required
+                  min={1}
                 />
                 <div className="input-group-append">
                   <div className="input-group-text">
@@ -131,13 +188,17 @@ const Login = () => {
                   </div>
                 </div>
               </div>
+              {errors.numeroDocumento && (
+                <div className="invalid-feedback">{errors.numeroDocumento}</div>
+              )}
+
               <p>Contraseña</p>
               <div className="input-group mb-3">
                 <input
                   type={showPassword ? "text" : "password"}
-                  className="form-control"
+                  className={`form-control ${errors.clave ? 'is-invalid' : ''}`}
                   value={clave}
-                  onChange={(e) => setClave(e.target.value)}
+                  onChange={handleClaveChange}
                   required
                 />
                 <div className="input-group-append">
@@ -150,6 +211,10 @@ const Login = () => {
                   </button>
                 </div>
               </div>
+              {errors.clave && (
+                <div className="invalid-feedback">{errors.clave}</div>
+              )}
+
               <div className="row">
                 <div className="col-8">
                   <div className="icheck-primary">
@@ -158,7 +223,9 @@ const Login = () => {
                   </div>
                 </div>
                 <div className="col-4">
-                  <button type="submit" className="custom-button">Ingresar</button>
+                  <button type="submit" className="custom-button">
+                    Ingresar
+                  </button>
                 </div>
               </div>
             </form>

@@ -15,6 +15,7 @@ const RegistrarUsu = () => {
     id_rol: '',
   });
   const navigate = useNavigate();
+  const [errors, setErrors] = useState({});
 
   // Función para generar una clave aleatoria
   const generarClaveAleatoria = () => {
@@ -27,16 +28,69 @@ const RegistrarUsu = () => {
   };
 
   const handleChange = (e) => {
+    const { id, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.id]: e.target.value,
+      [id]: value,
+    });
+    validateField(id, value); // Validar el campo en tiempo real
+  };
+
+  // Validaciones para cada campo
+  const validateField = (id, value) => {
+    let error = '';
+  
+    switch (id) {
+      case 'nombre_usuario':
+        if (!/^[a-zA-Z\s]+$/.test(value)) {
+          error = 'El nombre solo debe contener letras.';
+        }
+        break;
+  
+      case 'correo_usuario':
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          error = 'Ingrese un correo electrónico válido.';
+        }
+        break;
+  
+      case 'telefono_usuario':
+        if (!/^\d+$/.test(value)) {
+          error = 'El teléfono solo debe contener números.';
+        }
+        break;
+  
+      case 'numero_documento':
+        if (!/^\d+$/.test(value)) {
+          error = 'El número de documento solo debe contener números.';
+        } else if (value.length < 6) {
+          error = 'El número de documento debe tener al menos 6 dígitos.';
+        }
+        break;
+  
+      default:
+        break;
+    }
+  
+    setErrors({
+      ...errors,
+      [id]: error,
     });
   };
 
-  // Al cargar el formulario, generar la clave automática
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
+     Object.keys(formData).forEach((field) => {
+      validateField(field, formData[field]);
+    });
+
+    const hasErrors = Object.values(errors).some(error => error !== '');
+    if (hasErrors) {
+      alert('Por favor, corrige los errores antes de enviar el formulario.');
+      return;
+    }
+
     const token = localStorage.getItem('token');
     const rol = localStorage.getItem('Rol');
 
@@ -112,29 +166,37 @@ const RegistrarUsu = () => {
               </div>
               <form onSubmit={handleSubmit}>
                 <div className="card-body">
-                  <div className="form-group">
-                    <label htmlFor="numero_documento">Número de documento</label>
-                    <input
-                      type="number"
-                      min={'1'}
-                      className="form-control"
-                      id="numero_documento"
-                      value={formData.numero_documento}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
+                    <div className="form-group">
+                        <label htmlFor="numero_documento">Número de documento</label>
+                        <input
+                          type="text" 
+                          className={`form-control ${errors.numero_documento ? 'is-invalid' : ''}`}
+                          id="numero_documento"
+                          value={formData.numero_documento}
+                          onChange={handleChange}
+                          required
+                          maxLength={20}
+                        />
+                        {errors.numero_documento && (
+                          <div className="invalid-feedback">{errors.numero_documento}</div>
+                        )}
+                      </div>
+                    <div className="form-group">
                     <label htmlFor="nombre_usuario">Nombre de usuario</label>
                     <input
                       type="text"
-                      className="form-control"
+                      className={`form-control ${errors.nombre_usuario ? 'is-invalid' : ''}`}
                       id="nombre_usuario"
                       value={formData.nombre_usuario}
                       onChange={handleChange}
                       required
+                      maxLength={50}
                     />
+                    {errors.nombre_usuario && (
+                      <div className="invalid-feedback">{errors.nombre_usuario}</div>
+                    )}
                   </div>
+
                   <div className="form-group">
                     <label htmlFor="tipo_documento">Tipo de documento</label>
                     <select
@@ -150,29 +212,39 @@ const RegistrarUsu = () => {
                       <option value="3">Tarjeta de identidad</option>
                     </select>
                   </div>
+
                   <div className="form-group">
                     <label htmlFor="correo_usuario">Email</label>
                     <input
                       type="email"
-                      className="form-control"
+                      className={`form-control ${errors.correo_usuario ? 'is-invalid' : ''}`}
                       id="correo_usuario"
                       value={formData.correo_usuario}
                       onChange={handleChange}
                       required
+                      maxLength={100}
                     />
+                    {errors.correo_usuario && (
+                      <div className="invalid-feedback">{errors.correo_usuario}</div>
+                    )}
                   </div>
+
                   <div className="form-group">
                     <label htmlFor="telefono_usuario">Teléfono</label>
                     <input
-                      type="number"
-                      min={'1'}
-                      className="form-control"
+                      type="text"
+                      className={`form-control ${errors.telefono_usuario ? 'is-invalid' : ''}`}
                       id="telefono_usuario"
                       value={formData.telefono_usuario}
                       onChange={handleChange}
                       required
+                      maxLength={12}
                     />
+                    {errors.telefono_usuario && (
+                      <div className="invalid-feedback">{errors.telefono_usuario}</div>
+                    )}
                   </div>
+
                   <div className="form-group">
                     <label htmlFor="id_rol">Rol</label>
                     <select
@@ -182,21 +254,11 @@ const RegistrarUsu = () => {
                       onChange={handleChange}
                       required
                     >
-                        <option value="">Seleccionar...</option>
-                        <option value="1">Administrador</option>
-                        <option value="2">Cajero</option>
-                        <option value="3">Inventarista</option>
+                      <option value="">Seleccionar...</option>
+                      <option value="1">Administrador</option>
+                      <option value="2">Cajero</option>
+                      <option value="3">Inventarista</option>
                     </select>
-                  </div>
-                  <div className="form-group" hidden>
-                    <label htmlFor="clave">Contraseña</label>
-                    <input
-                      className="form-control"
-                      id="clave"
-                      value={formData.clave || generarClaveAleatoria()}
-                      onChange={handleChange}
-                      required
-                    />
                   </div>
                 </div>
                 <div className="card-footer">
