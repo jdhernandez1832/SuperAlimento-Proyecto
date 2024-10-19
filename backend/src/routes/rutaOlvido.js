@@ -35,10 +35,7 @@ router.post('/recuperar-password', async (req, res) => {
             return res.status(404).json({ message: 'Correo no registrado' });
         }
 
-
         const newPassword = generatePassword();
-
-
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
         usuario.clave = hashedPassword;

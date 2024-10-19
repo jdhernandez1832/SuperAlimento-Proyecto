@@ -79,6 +79,42 @@ const RegistrarVenta = () => {
 
   const handleChange = (e) => {
     const { id, value } = e.target;
+
+    // Validación para el campo Caja
+    if (id === 'Caja') {
+      // Permitir el campo vacío
+      if (value === '') {
+        setFormData(prevState => ({
+          ...prevState,
+          [id]: value
+        }));
+        return; // Salir sin mostrar la alerta
+      }
+
+      // Validar que solo se ingresen números
+      if (!/^\d+$/.test(value)) { // Asegura que se permitan solo números
+        Swal.fire({
+          icon: 'error',
+          title: 'Entrada no válida',
+          text: 'Solo se permiten números en el campo de Caja.',
+          confirmButtonColor: '#28a745', // Color verde
+        });
+        return;
+      }
+      
+      // Validar el rango permitido
+      const numericValue = parseInt(value, 10);
+      if (numericValue < 1 || numericValue > 4) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Entrada no válida',
+          text: 'El valor debe estar entre 1 y 4.',
+          confirmButtonColor: '#28a745', // Color verde
+        });
+        return;
+      }
+    }
+
     setFormData(prevState => ({
       ...prevState,
       [id]: value
@@ -273,9 +309,7 @@ const RegistrarVenta = () => {
                         <div className="form-group">
                           <label htmlFor="Caja">Caja</label>
                           <input
-                            type="number"
-                            min={'1'}
-                            max={'4'}
+                            type="text" // Cambiar a tipo text
                             className="form-control"
                             id="Caja"
                             required

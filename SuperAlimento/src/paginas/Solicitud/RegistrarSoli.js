@@ -106,6 +106,16 @@ const RegistrarSoli = () => {
 
   const handleChange = (e) => {
     const { id, value } = e.target;
+    
+    if (id === 'ObservacionSolicitud' && !/^[a-zA-Z0-9 ]*$/.test(value)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Entrada no válida',
+        text: 'Solo se permiten letras y números en el campo de observaciones.',
+        confirmButtonColor: '#28a745', // Color verde
+      });
+      return;
+    }
     setFormData(prevState => ({
       ...prevState,
       [id]: value

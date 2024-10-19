@@ -25,6 +25,7 @@ const RegistrarProd = () => {
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
     const rol = localStorage.getItem('Rol');
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         const numero_documento = localStorage.getItem('numero_documento');
@@ -78,10 +79,39 @@ const RegistrarProd = () => {
     }, [rol, token]);
 
     const handleChange = (e) => {
+        const { id, value } = e.target;
+        const error = validateField(id, value);
+        
         setFormData({
             ...formData,
-            [e.target.id]: e.target.value,
+            [id]: value,
         });
+
+        setErrors({
+            ...errors,
+            [id]: error,
+        });
+    };
+
+    const validateField = (name, value) => {
+        let error = '';
+
+        if (name === 'nombre_producto' || name === 'descripcion_producto') {
+            // Permitir solo letras y números
+            const regex = /^[A-Za-z0-9\s]+$/;
+            if (!regex.test(value)) {
+                error = 'Solo se permiten letras y números.';
+            } else if (value.length > 50) {
+                error = 'El campo no puede superar los 50 caracteres.';
+            }
+        } else if (['codigo_barras', 'precio_compra', 'precio_venta', 'cantidad'].includes(name)) {
+            // Validar solo números
+            const regex = /^\d+$/;
+            if (!regex.test(value)) {
+                error = 'Solo se permiten números.';
+            }
+        }
+        return error;
     };
 
     const handleSelectChange = (selectedOption, actionMeta) => {
@@ -114,7 +144,30 @@ const RegistrarProd = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        let isValid = true;
+        let newErrors = {};
 
+        // Validar todos los campos antes de enviar
+        Object.keys(formData).forEach(key => {
+            const error = validateField(key, formData[key]);
+            if (error) {
+                newErrors[key] = error;
+                isValid = false;
+            }
+        });
+
+        if (!isValid) {
+            setErrors(newErrors);
+            Swal.fire({
+                title: 'Error',
+                text: 'Por favor corrige los errores en el formulario.',
+                icon: 'error',
+                confirmButtonColor: '#4caf50',
+            });
+            return;
+        }
+
+        // Si es válido, envía los datos
         const data = new FormData();
         Object.keys(formData).forEach(key => {
             data.append(key, formData[key]);
@@ -202,7 +255,7 @@ const RegistrarProd = () => {
     };
 
     return (
-        <div>
+          <div>
             <Navegacion>
                 <div className="card card-secondary">
                     <div className="card-body colorFondo">
@@ -213,73 +266,77 @@ const RegistrarProd = () => {
                             <form onSubmit={handleSubmit} encType="multipart/form-data">
                                 <div className="card-body">
                                     <div className="form-group">
-                                        <label htmlFor="nombre_producto">Nombre del producto</label>
+                                        <label htmlFor="nombre_producto">Nombre de producto</label>
                                         <input
                                             type="text"
-                                            className="form-control"
+                                            className={`form-control ${errors.nombre_producto ? 'is-invalid' : ''}`}
                                             id="nombre_producto"
                                             value={formData.nombre_producto}
                                             onChange={handleChange}
                                             required
                                         />
+                                        {errors.nombre_producto && <span className="text-danger">{errors.nombre_producto}</span>}
                                     </div>
                                     <div className="form-group">
                                         <label htmlFor="codigo_barras">Código de barras</label>
                                         <input
-                                            type="number"
-                                            min={'1'}
-                                            className="form-control"
+                                            type="text"
+                                            className={`form-control ${errors.codigo_barras ? 'is-invalid' : ''}`}
                                             id="codigo_barras"
                                             value={formData.codigo_barras}
                                             onChange={handleChange}
                                             required
+                                            maxLength={13}
                                         />
+                                        {errors.codigo_barras && <span className="text-danger">{errors.codigo_barras}</span>}
                                     </div>
                                     <div className="form-group">
                                         <label htmlFor="precio_compra">Precio de compra</label>
                                         <input
-                                            type="number"
-                                            min={'50'}
-                                            className="form-control"
+                                            type="text"
+                                            className={`form-control ${errors.precio_compra ? 'is-invalid' : ''}`}
                                             id="precio_compra"
                                             value={formData.precio_compra}
                                             onChange={handleChange}
                                             required
                                         />
+                                        {errors.precio_compra && <span className="text-danger">{errors.precio_compra}</span>}
                                     </div>
                                     <div className="form-group">
                                         <label htmlFor="precio_venta">Precio de venta</label>
                                         <input
-                                            type="number"
-                                            min={'50'}
-                                            className="form-control"
+                                            type="text"
+                                            className={`form-control ${errors.precio_venta ? 'is-invalid' : ''}`}
                                             id="precio_venta"
                                             value={formData.precio_venta}
                                             onChange={handleChange}
                                             required
                                         />
+                                        {errors.precio_venta && <span className="text-danger">{errors.precio_venta}</span>}
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="descripcion_producto">Descripción del producto</label>
-                                        <textarea
-                                            className="form-control"
+                                        <label htmlFor="descripcion_producto">Descripción</label>
+                                        <input
+                                            type="text"
+                                            className={`form-control ${errors.descripcion_producto ? 'is-invalid' : ''}`}
                                             id="descripcion_producto"
                                             value={formData.descripcion_producto}
                                             onChange={handleChange}
                                             required
-                                        ></textarea>
+                                        />
+                                        {errors.descripcion_producto && <span className="text-danger">{errors.descripcion_producto}</span>}
                                     </div>
                                     <div className="form-group">
                                         <label htmlFor="cantidad">Cantidad</label>
                                         <input
-                                            type="number"
-                                            min={'1'}
-                                            className="form-control"
+                                            type="text"
+                                            className={`form-control ${errors.cantidad ? 'is-invalid' : ''}`}
                                             id="cantidad"
                                             value={formData.cantidad}
                                             onChange={handleChange}
                                             required
                                         />
+                                        {errors.cantidad && <span className="text-danger">{errors.cantidad}</span>}
                                     </div>
                                     <div className="form-group">
                                         <label htmlFor="id_categoria">Categoría</label>

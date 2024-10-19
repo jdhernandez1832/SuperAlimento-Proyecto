@@ -1,27 +1,66 @@
 import React, { useState } from "react";
-import Navegacion from "../../componentes/componentes/navegacion"; // Importa el componente correctamente
+import Navegacion from "../../componentes/componentes/navegacion";
 import "../../componentes/css/Login.css";
 import { Link, useNavigate } from "react-router-dom";
-import Swal from 'sweetalert2'; // Asegúrate de tener SweetAlert2 instalado
+import Swal from 'sweetalert2';
 
 const RegistrarCate = () => {
     const [formData, setFormData] = useState({
         nombre: '',
     });
+
+    const [errors, setErrors] = useState({}); // Estado para los errores de validación
     const navigate = useNavigate();
-
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.id]: e.target.value,
-        });
-    };
-
     const token = localStorage.getItem('token');
     const rol = localStorage.getItem('Rol');
 
+    // Validación de texto: solo letras y espacios
+    const validateText = (value) => /^[a-zA-Z\s]*$/.test(value);
+
+    // Manejo del cambio de los campos con validación en tiempo real
+    const handleChange = (e) => {
+        const { id, value } = e.target;
+
+        if (id === 'nombre') {
+            if (validateText(value)) {
+                setErrors((prev) => ({ ...prev, nombre: '' }));
+            } else {
+                setErrors((prev) => ({ ...prev, nombre: 'Solo se permiten letras y espacios' }));
+            }
+        }
+
+        setFormData({
+            ...formData,
+            [id]: value,
+        });
+    };
+
+    // Validación completa del formulario antes de enviar
+    const validateForm = () => {
+        const newErrors = {};
+
+        // Validación del campo nombre
+        if (!validateText(formData.nombre)) {
+            newErrors.nombre = 'Solo se permiten letras y espacios';
+        }
+
+        // Validación de longitud máxima para el nombre (50 caracteres como ejemplo)
+        if (formData.nombre.length > 50) {
+            newErrors.nombre = 'El nombre no puede exceder los 50 caracteres';
+        }
+
+        setErrors(newErrors);
+
+        return Object.keys(newErrors).length === 0; // Si no hay errores, devuelve true
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validateForm()) {
+            Swal.fire('Error', 'Por favor corrige los errores del formulario', 'error');
+            return;
+        }
 
         try {
             const response = await fetch('http://localhost:3001/api/categoria/registrar', {
@@ -29,7 +68,7 @@ const RegistrarCate = () => {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
-                    'X-Rol': rol, //
+                    'X-Rol': rol,
                 },
                 body: JSON.stringify(formData),
             });
@@ -80,12 +119,14 @@ const RegistrarCate = () => {
                                         <label htmlFor="nombre">Nombre de la categoría</label>
                                         <input
                                             type="text"
-                                            className="form-control"
+                                            className={`form-control ${errors.nombre ? 'is-invalid' : ''}`}
                                             id="nombre"
                                             value={formData.nombre}
                                             onChange={handleChange}
                                             required
+                                            maxLength="50"
                                         />
+                                        {errors.nombre && <div className="invalid-feedback">{errors.nombre}</div>}
                                     </div>
                                 </div>
                                 <div className="card-footer">

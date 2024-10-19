@@ -1,9 +1,8 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import Navegacion from "../../componentes/componentes/navegacion"; 
 import "../../componentes/css/Login.css";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import Swal from 'sweetalert2'; // Importa SweetAlert2
+import Swal from 'sweetalert2';
 
 const ActualizarCate = () => {
   const { id_categoria } = useParams();
@@ -11,6 +10,7 @@ const ActualizarCate = () => {
   const [formData, setFormData] = useState({
     nombre: '',
   });
+  const [errors, setErrors] = useState({}); // Para manejar errores de validación
   const token = localStorage.getItem('token');
   const rol = localStorage.getItem('Rol');
 
@@ -31,7 +31,7 @@ const ActualizarCate = () => {
             title: 'Error',
             text: 'Error al actualizar la categoria',
             icon: 'Error',
-            confirmButtonColor: '#dc3545', // Cambia el color aquí
+            confirmButtonColor: '#dc3545',
           });
         }
       } catch (error) {
@@ -42,15 +42,54 @@ const ActualizarCate = () => {
     fetchCategoria();
   }, [id_categoria, rol, token]);
 
+  // Validaciones específicas para el campo nombre (solo letras)
+  const validateText = (value) => /^[a-zA-Z\s]*$/.test(value);
+
+  // Maneja el cambio de los campos
   const handleChange = (e) => {
+    const { id, value } = e.target;
+
+    // Validación en tiempo real
+    if (id === 'nombre') {
+      if (validateText(value)) {
+        setErrors((prev) => ({ ...prev, nombre: '' }));
+      } else {
+        setErrors((prev) => ({ ...prev, nombre: 'Solo se permiten letras y espacios' }));
+      }
+    }
+
     setFormData({
       ...formData,
-      [e.target.id]: e.target.value,
+      [id]: value,
     });
+  };
+
+  // Validación antes de enviar el formulario
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Valida el campo nombre
+    if (!validateText(formData.nombre)) {
+      newErrors.nombre = 'Solo se permiten letras y espacios';
+    }
+
+    // Valida la longitud máxima (ejemplo 50 caracteres)
+    if (formData.nombre.length > 50) {
+      newErrors.nombre = 'El nombre no puede exceder los 50 caracteres';
+    }
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0; // Devuelve true si no hay errores
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      Swal.fire('Error', 'Por favor corrige los errores del formulario', 'error');
+      return;
+    }
 
     try {
       const response = await fetch(`http://localhost:3001/api/categoria/actualizar/${id_categoria}`, {
@@ -64,12 +103,11 @@ const ActualizarCate = () => {
       });
 
       if (response.ok) {
-        const result = await response.json();
         Swal.fire({
           title: 'Éxito',
           text: 'Categoría actualizada exitosamente',
           icon: 'success',
-          confirmButtonColor: '#28a745', // Cambia el color aquí
+          confirmButtonColor: '#28a745',
         }).then(() => {
           navigate('/ConsultarCate');
         });
@@ -93,14 +131,12 @@ const ActualizarCate = () => {
               <form onSubmit={handleSubmit}>
                 <div className="card-body">
                   <div className="form-group">
-                    <label htmlFor="nombre">Id de la categoría</label>
+                    <label htmlFor="id_categoria">Id de la categoría</label>
                     <input
                       type="text"
                       className="form-control"
-                      id="nombre"
+                      id="id_categoria"
                       value={formData.id_categoria}
-                      onChange={handleChange}
-                      required
                       disabled
                     />
                   </div>
@@ -108,12 +144,14 @@ const ActualizarCate = () => {
                     <label htmlFor="nombre">Nombre de la categoría</label>
                     <input
                       type="text"
-                      className="form-control"
+                      className={`form-control ${errors.nombre ? 'is-invalid' : ''}`}
                       id="nombre"
                       value={formData.nombre}
                       onChange={handleChange}
                       required
+                      maxLength="50"
                     />
+                    {errors.nombre && <div className="invalid-feedback">{errors.nombre}</div>}
                   </div>
                 </div>
                 <div className="card-footer">
