@@ -1,17 +1,17 @@
-import useDataTable from '../../hooks/useDataTable';
+import useDataTable from '../../hooks/useDataTable'; 
 import React, { useState, useEffect, useRef } from 'react';
-import Navegacion from "../../componentes/componentes/navegacion"; // Importa el componente correctamente
+import Navegacion from "../../componentes/componentes/navegacion"; 
 import "../../componentes/css/Login.css";
 import { Link } from "react-router-dom";
 import Swal from 'sweetalert2';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable'; 
 
-
 const ConsultarProd = () => {
   const tableRef1 = useRef(null);
   const [productos, setProducto] = useState([]);
-  useDataTable(tableRef1, productos); // Pasar los datos al hook
+  const [mostrarInactivos, setMostrarInactivos] = useState(false); // Estado para alternar entre activos/inactivos
+  useDataTable(tableRef1, productos); 
   const token = localStorage.getItem('token');
   const rol = localStorage.getItem('Rol');
 
@@ -48,7 +48,9 @@ const ConsultarProd = () => {
     fetchProducto();
   }, [rol, token]);
 
-  const handleEstado = async (id_producto) => {
+  // Modificación de la función handleEstado para alternar entre Activo y Desactivo
+  const handleEstado = async (id_producto, estado_actual) => {
+    const nuevoEstado = estado_actual === 'Activo' ? 'Desactivo' : 'Activo';
     try {
       const response = await fetch(`http://localhost:3001/api/producto/estado/${id_producto}`, {
         method: 'PATCH',
@@ -57,17 +59,16 @@ const ConsultarProd = () => {
           'Authorization': `Bearer ${token}`,
           'X-Rol': rol,
         },
-        body: JSON.stringify({ estado: 'Desactivo' }),
+        body: JSON.stringify({ estado: nuevoEstado }),
       });
 
       if (response.ok) {
-        setProducto(productos.filter(producto => producto.id_producto !== id_producto));
         Swal.fire({
           title: 'Éxito',
-          text: 'Producto desactivado correctamente',
+          text: `Producto ${nuevoEstado === 'Activo' ? 'activado' : 'desactivado'} correctamente`,
           icon: 'success',
           confirmButtonColor: '#4caf50',
-        });
+        }).then(() => window.location.reload()); // Refrescar la página después de cambiar el estado
       } else {
         Swal.fire({
           title: 'Error',
@@ -85,6 +86,7 @@ const ConsultarProd = () => {
       });
     }
   };
+
   const generarReporte = () => {
     const doc = new jsPDF('p', 'pt', 'a4');
 
@@ -92,18 +94,20 @@ const ConsultarProd = () => {
     logo.src = '../../dist/img/SuperAlimento.png';
 
     logo.onload = () => {
-
         doc.addImage(logo, 'PNG', 40, 30, 50, 50); 
         doc.setFontSize(18);
         doc.text('SuperAlimento', 150, 60); 
-
 
         doc.setFontSize(14);
         doc.text('Reporte de Productos', 40, 100);
 
         const headers = [['Imagen', 'Nombre', 'Código de Barras', 'Precio Compra', 'Precio Venta', 'Cantidad']];
 
-        const data = productos.map((producto) => [
+        // Filtra los productos que están activos
+        const productosActivos = productos.filter(producto => producto.estado === 'Activo');
+
+        // Mapea solo los productos activos
+        const data = productosActivos.map((producto) => [
             '', 
             producto.nombre_producto,
             producto.codigo_barras,
@@ -111,7 +115,6 @@ const ConsultarProd = () => {
             producto.precio_venta.toFixed(2),
             producto.cantidad
         ]);
-
 
         doc.autoTable({
             head: headers,
@@ -124,26 +127,25 @@ const ConsultarProd = () => {
             },
             didDrawCell: (data) => {
                 if (data.column.index === 0 && data.cell.section === 'body') {
-                    const imgUrl = `http://localhost:3001/uploads/${productos[data.row.index].imagen}`;
+                    const imgUrl = `http://localhost:3001/uploads/${productosActivos[data.row.index].imagen}`;
                     const img = new Image();
                     img.src = imgUrl;
 
                     img.onload = () => {
                         doc.addImage(img, 'JPEG', data.cell.x + 2, data.cell.y + 2, 30, 30); 
-                        if (data.row.index === productos.length - 1) {
+                        if (data.row.index === productosActivos.length - 1) {
                             doc.save('reporte_productos.pdf'); 
                         }
                     };
                 }
             },
         });
-        if (productos.every(p => !p.imagen)) {
+        if (productosActivos.every(p => !p.imagen)) {
             doc.save('reporte_productos.pdf');
         }
     };
-};
 
-  
+  }
   return (
     <div>
       <Navegacion>
@@ -154,6 +156,12 @@ const ConsultarProd = () => {
                 <div className="card">
                   <div className="card-header">
                     <h3 className="card-title">Productos</h3>
+                    <button 
+                      onClick={() => setMostrarInactivos(!mostrarInactivos)} 
+                      className="btn btn-info float-right"
+                    >
+                      {mostrarInactivos ? 'Mostrar Activos' : 'Mostrar Inactivos'}
+                    </button>
                   </div>
                   <div className="card-body table-responsive p-0">
                     {productos.length === 0 ? (
@@ -171,12 +179,13 @@ const ConsultarProd = () => {
                             <th>Descripción</th>
                             <th>Cantidad</th>
                             <th>Actualizar</th>
-                            <th>Eliminar</th>
+                            <th>Estado</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {productos.map((producto) => (
-                            producto.estado !== 'Desactivo' && (
+                          {productos
+                            .filter(producto => mostrarInactivos ? producto.estado === 'Desactivo' : producto.estado === 'Activo')
+                            .map((producto) => (
                               <tr key={producto.id_producto}>
                                 <td>
                                   <img
@@ -196,15 +205,15 @@ const ConsultarProd = () => {
                                 <td><Link to={`/ActualizarProd/${producto.id_producto}`} className="btn btn-warning">Actualizar</Link></td>
                                 <td>
                                   <button 
-                                    className="btn btn-danger"
-                                    onClick={() => handleEstado(producto.id_producto)}
+                                    className={`btn ${producto.estado === 'Activo' ? 'btn-danger' : 'btn-success'}`}
+                                    onClick={() => handleEstado(producto.id_producto, producto.estado)}
                                   >
-                                    Eliminar
+                                    {producto.estado === 'Activo' ? 'Desactivar' : 'Activar'}
                                   </button>
                                 </td>
                               </tr>
-                            )
-                          ))}
+                            ))
+                          }
                         </tbody>
                       </table>
                     )}
@@ -223,4 +232,3 @@ const ConsultarProd = () => {
 }
 
 export default ConsultarProd;
-

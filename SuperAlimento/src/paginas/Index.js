@@ -91,10 +91,11 @@ const VentaList = () => {
         });
         const data = await response.json();
     
-
-        const productosFiltrados = data.filter(producto => producto.cantidad <= 10);
-
-
+        // Filtrar productos bajo stock y que estén activos
+        const productosFiltrados = data.filter(producto => 
+          producto.cantidad <= 10 && producto.estado === 'Activo'
+        );
+    
         const productosOrdenados = productosFiltrados.sort((a, b) => a.cantidad - b.cantidad);
         const productosLimitados = productosOrdenados.slice(0, 5);
     

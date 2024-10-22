@@ -70,7 +70,8 @@ const ActualizarProd = () => {
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    setCategorias(data);
+                    const categoriasActivas = data.filter(categoria => categoria.estado !== 'Desactivo');
+                    setCategorias(categoriasActivas);
                 } else {
                     const errorText = await response.text();
                     Swal.fire({
@@ -130,7 +131,8 @@ const ActualizarProd = () => {
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    setProveedores(data);
+                    const proveedoresActivos = data.filter(proveedor => proveedor.estado !== 'Desactivo');
+                    setProveedores(proveedoresActivos);
                 } else {
                     const errorText = await response.text();
                     Swal.fire({
@@ -435,7 +437,7 @@ const ActualizarProd = () => {
                                         />
                                         {errors.cantidad && <span className="text-danger">{errors.cantidad}</span>}
                                     </div>
-                                    <div className="form-group">
+                                    <div className="form-group" hidden>
                                         <label htmlFor="estado">Estado</label>
                                         <select
                                             className="custom-select form-control-border border-width-2"

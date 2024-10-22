@@ -8,8 +8,8 @@ import Swal from 'sweetalert2'; // Importa SweetAlert2
 const ConsultarCate = () => {
     const tableRef = useRef(null);
     const [categorias, setCategorias] = useState([]);
+    const [mostrarInactivas, setMostrarInactivas] = useState(false); // Estado para alternar entre activas e inactivas
     
-    // Aplicar el hook de tabla solo después de que los datos se hayan cargado
     useDataTable(tableRef, categorias); 
     const token = localStorage.getItem('token');
     const rol = localStorage.getItem('Rol');
@@ -20,7 +20,7 @@ const ConsultarCate = () => {
           const response = await fetch('http://localhost:3001/api/categoria/todos', {
             headers: {
               'Authorization': `Bearer ${token}`,
-              'X-Rol': rol, // Agregar el token en los encabezados
+              'X-Rol': rol,
             },
           });
           if (response.ok) {
@@ -37,15 +37,16 @@ const ConsultarCate = () => {
       fetchCategorias();
     }, [rol, token]);
 
-    const handleEstado = async (id_categoria) => {
+    const handleEstado = async (id_categoria, estadoActual) => {
+        const nuevoEstado = estadoActual === 'Activo' ? 'Desactivo' : 'Activo';
         Swal.fire({
-          title: '¿Estás seguro?',
+          title: `¿Estás seguro de cambiar el estado a ${nuevoEstado}?`,
           text: "No podrás revertir este cambio",
           icon: 'warning',
           showCancelButton: true,
           confirmButtonColor: '#3085d6',
           cancelButtonColor: '#d33',
-          confirmButtonText: 'Sí, eliminarla',
+          confirmButtonText: `Sí, cambiar a ${nuevoEstado}`,
           cancelButtonText: 'Cancelar'
         }).then(async (result) => {
           if (result.isConfirmed) {
@@ -57,19 +58,19 @@ const ConsultarCate = () => {
                   'Authorization': `Bearer ${token}`,
                   'X-Rol': rol, 
                 },
-                body: JSON.stringify({ estado: 'Desactivo' }), 
+                body: JSON.stringify({ estado: nuevoEstado }), 
               });
           
               if (response.ok) {
-                setCategorias(categorias.filter(categoria => 
-                    categoria.id_categoria !== id_categoria
+                setCategorias(categorias.map(categoria => 
+                  categoria.id_categoria === id_categoria ? { ...categoria, estado: nuevoEstado } : categoria
                 ));
                 Swal.fire({
-                  title: '¡Eliminada!',
-                  text: 'La categoría ha sido eliminada.',
+                  title: '¡Estado cambiado!',
+                  text: `La categoría ha sido cambiada a ${nuevoEstado}.`,
                   icon: 'success',
                   confirmButtonColor: '#28a745', 
-                });
+                }).then(() => window.location.reload()); 
               } else {
                 Swal.fire('Error', 'Error al cambiar el estado de la categoría', 'error');
               }
@@ -79,6 +80,10 @@ const ConsultarCate = () => {
           }
         });
       };
+
+    const toggleInactivas = () => {
+        setMostrarInactivas(!mostrarInactivas);
+    };
 
     return (
         <div>
@@ -90,6 +95,9 @@ const ConsultarCate = () => {
                                 <div className="card">
                                     <div className="card-header">
                                         <h3 className="card-title">Categorías</h3>
+                                        <button onClick={toggleInactivas} className="btn btn-info float-right">
+                                            {mostrarInactivas ? "Mostrar Activas" : "Mostrar Inactivas"}
+                                        </button>
                                     </div>
                                     <div className="card-body table-responsive p-0">
                                     {categorias.length === 0 ? (
@@ -102,12 +110,13 @@ const ConsultarCate = () => {
                                                     <th>Nombre de Categoría</th>
                                                     <th>Estado</th>
                                                     <th>Actualizar</th>
-                                                    <th>Eliminar</th>
+                                                    <th>Cambiar Estado</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                            {categorias.map((categoria) => (
-                                                categoria.estado !== 'Desactivo' && (
+                                            {categorias
+                                                .filter(categoria => mostrarInactivas ? categoria.estado === 'Desactivo' : categoria.estado === 'Activo')
+                                                .map((categoria) => (
                                                     <tr key={categoria.id_categoria}>
                                                     <td>{categoria.id_categoria}</td>
                                                     <td>{categoria.nombre}</td>
@@ -119,15 +128,14 @@ const ConsultarCate = () => {
                                                     </td>
                                                     <td>
                                                         <button 
-                                                        className="btn btn-danger"
-                                                        onClick={() => handleEstado(categoria.id_categoria)}
+                                                        className={`btn ${categoria.estado === 'Activo' ? 'btn-danger' : 'btn-success'}`}
+                                                        onClick={() => handleEstado(categoria.id_categoria, categoria.estado)}
                                                         >
-                                                        Eliminar
+                                                        {categoria.estado === 'Activo' ? 'Desactivar' : 'Activar'}
                                                         </button>
                                                     </td>
                                                     </tr>
-                                                )
-                                            ))}
+                                                ))}
                                             </tbody>
                                         </table>
                                     )}

@@ -43,7 +43,9 @@ const RegistrarSoli = () => {
         });
         if (response.ok) {
           const data = await response.json();
-          setProveedores(data);
+          // Filtrar proveedores activos
+          const proveedoresActivos = data.filter(proveedor => proveedor.estado !== 'Desactivo');
+          setProveedores(proveedoresActivos);
         } else {
           console.error('Error al obtener proveedores:', response.statusText);
         }
@@ -235,8 +237,11 @@ const RegistrarSoli = () => {
 
   const filteredProducts = productos.filter(
     (product) =>
-      (product.nombre_producto && product.nombre_producto.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (product.codigo_barras && product.codigo_barras.toString().includes(searchTerm))
+      product.estado === 'Activo' && // Filtra solo productos con estado "activo"
+      (
+        (product.nombre_producto && product.nombre_producto.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (product.codigo_barras && product.codigo_barras.toString().includes(searchTerm))
+      )
   );
 
   return (
@@ -323,12 +328,12 @@ const RegistrarSoli = () => {
                         <div className="form-group">
                           <label htmlFor="id_proveedor">Proveedor</label>
                           <Select
-                            name="id_proveedor"
                             options={proveedores.map(proveedor => ({
                               value: proveedor.id_proveedor,
                               label: proveedor.nombre_proveedor,
                             }))}
                             onChange={handleSelectChange}
+                            name="id_proveedor"
                             placeholder="Seleccione un proveedor"
                             isClearable
                             isSearchable={true}

@@ -38,11 +38,11 @@ const Login = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault();
-
+  
     if (!validateFields()) {
       return; // Si hay errores, detener el proceso de inicio de sesión
     }
-
+  
     try {
       const response = await fetch("http://localhost:3001/api/login/ingreso", {
         method: "POST",
@@ -54,13 +54,45 @@ const Login = () => {
           clave: clave,
         }),
       });
-
+  
       const data = await response.json();
+  
+      // Comprobamos primero el estado del usuario en la respuesta
+      if (data.estado === "Desactivo") {
+        Swal.fire({
+          icon: "error",
+          title: "Usuario desactivado",
+          text: "Tu cuenta ha sido desactivada. Por favor contacta al administrador.",
+          confirmButtonColor: "#d33",
+        });
+        return; // No permitir el acceso si el usuario está desactivado
+      }
+  
+      // Si la respuesta no es exitosa (código HTTP fuera de rango 200-299)
+      if (!response.ok) {
+        if (response.status === 401) {
+          Swal.fire({
+            icon: "error",
+            title: "Credenciales incorrectas",
+            text: "El número de documento o la contraseña son incorrectos.",
+            confirmButtonColor: "#28a745",
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Ocurrió un error al iniciar sesión. Intente nuevamente. Puede que su cuenta este inactiva",
+            confirmButtonColor: "#28a745",
+          });
+        }
+        return; // Detener la ejecución si hay un error
+      }
+  
       if (data.token) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("Rol", data.rol);
         localStorage.setItem("numero_documento", data.numero_documento);
-
+  
         Swal.fire({
           icon: "success",
           title: "¡Inicio de sesión exitoso!",
@@ -68,22 +100,25 @@ const Login = () => {
           showConfirmButton: false,
           timer: 1500,
         });
-
+  
         setTimeout(() => {
           navigate("/Index");
         }, 1500);
-      } else {
-        throw new Error("Credenciales incorrectas");
       }
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Credenciales incorrectas, por favor intente nuevamente.",
+        text: "No se pudo conectar con el servidor. Intente nuevamente.",
         confirmButtonColor: "#28a745",
       });
     }
   };
+  
+  
+  
+  
+  
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);

@@ -46,7 +46,9 @@ const RegistrarProd = () => {
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    setCategorias(data);
+                    // Filtrar categorías activas
+                    const categoriasActivas = data.filter(categoria => categoria.estado !== 'Desactivo');
+                    setCategorias(categoriasActivas);
                 } else {
                     console.error('Error al obtener categorías:', response.statusText);
                 }
@@ -57,22 +59,24 @@ const RegistrarProd = () => {
 
         const fetchProveedores = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/proveedor/todos', {
-                    headers: {
-                      'Authorization': `Bearer ${token}`,
-                      'X-Rol': rol, 
-                    },
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    setProveedores(data);
-                } else {
-                    console.error('Error al obtener proveedores:', response.statusText);
-                }
+              const response = await fetch('http://localhost:3001/api/proveedor/todos', {
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'X-Rol': rol,
+                },
+              });
+              if (response.ok) {
+                const data = await response.json();
+                // Filtrar proveedores activos
+                const proveedoresActivos = data.filter(proveedor => proveedor.estado !== 'Desactivo');
+                setProveedores(proveedoresActivos);
+              } else {
+                console.error('Error al obtener proveedores:', response.statusText);
+              }
             } catch (error) {
-                console.error("Error al obtener los proveedores:", error);
+              console.error("Error al obtener los proveedores:", error);
             }
-        };
+          };
 
         fetchCategorias();
         fetchProveedores();
@@ -363,12 +367,12 @@ const RegistrarProd = () => {
                                     <div className="form-group">
                                         <label htmlFor="id_proveedor">Proveedor</label>
                                         <Select
-                                            name="id_proveedor"
                                             options={proveedores.map(proveedor => ({
-                                                value: proveedor.id_proveedor,
-                                                label: proveedor.nombre_proveedor,
+                                            value: proveedor.id_proveedor,
+                                            label: proveedor.nombre_proveedor,
                                             }))}
                                             onChange={handleSelectChange}
+                                            name="id_proveedor"
                                             placeholder="Seleccione un proveedor"
                                             isClearable
                                             isSearchable={true}

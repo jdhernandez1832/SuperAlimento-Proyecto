@@ -230,8 +230,11 @@ const RegistrarVenta = () => {
 
   const filteredProducts = productos.filter(
     (product) =>
-      (product.nombre_producto && product.nombre_producto.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (product.codigo_barras && product.codigo_barras.toString().includes(searchTerm))
+      product.estado === 'Activo' && // Filtra solo productos con estado "activo"
+      (
+        (product.nombre_producto && product.nombre_producto.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (product.codigo_barras && product.codigo_barras.toString().includes(searchTerm))
+      )
   );
 
   return (
