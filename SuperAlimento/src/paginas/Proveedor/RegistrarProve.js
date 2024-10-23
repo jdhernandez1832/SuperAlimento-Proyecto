@@ -224,7 +224,7 @@ const RegistrarProve = () => {
                                 </div>
                                 <div className="card-footer">
                                     <Link to="/ConsultarProve" className="btn btn-secondary mr-2">Volver</Link>
-                                    <button type="submit" className="btn btn-secondary">Actualizar</button>
+                                    <button type="submit" className="btn btn-secondary">Registrar</button>
                                 </div>
                             </form>
                         </div>

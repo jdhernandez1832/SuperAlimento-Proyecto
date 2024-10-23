@@ -16,6 +16,12 @@ const ConsultarUsu = () => {
   const token = localStorage.getItem('token');
   const rol = localStorage.getItem('Rol');
 
+  const roles = {
+    1: 'Administrador',
+    2: 'Cajero',
+    3: 'Inventarista'
+  };
+
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
@@ -181,7 +187,8 @@ const ConsultarUsu = () => {
                                 <td>{usuario.tipo_documento}</td>
                                 <td>{usuario.correo_usuario}</td>
                                 <td>{usuario.telefono_usuario}</td>
-                                <td>{usuario.id_rol}</td>
+                                {/* Muestra el rol basado en el ID del rol */}
+                                <td>{roles[usuario.id_rol]}</td>
                                 <td>{usuario.estado}</td>
                                 <td>
                                   <Link to={`/ActualizarUsu/${usuario.numero_documento}`} className="btn btn-warning">

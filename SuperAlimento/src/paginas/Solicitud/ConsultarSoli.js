@@ -155,7 +155,6 @@ const ConsultarSoli = () => {
                                                             Precio Total {orden.campo === 'precio_total' && (orden.direccion === 'asc' ? '▲' : '▼')}
                                                         </th>
                                                         <th>Observación</th>
-                                                        <th>Proveedor</th>
                                                         <th>Registrado por</th>
                                                         <th>Aceptar Entrega</th>
                                                         <th>Ver Detalles</th>
@@ -169,7 +168,6 @@ const ConsultarSoli = () => {
                                                             <td>{solicitud.estado_solicitud}</td>
                                                             <td>{solicitud.precio_total}</td>
                                                             <td>{solicitud.observacion}</td>
-                                                            <td>{solicitud.id_proveedor}</td>
                                                             <td>{solicitud.numero_documento}</td>
                                                             <td>
                                                                 <button
