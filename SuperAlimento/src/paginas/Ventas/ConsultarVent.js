@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Navegacion from "../../componentes/componentes/navegacion";
 import "../../componentes/css/Login.css";
 import { Link } from "react-router-dom";
+import {useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 const ConsultarVent = () => {
@@ -10,6 +11,7 @@ const ConsultarVent = () => {
     const [busqueda, setBusqueda] = useState('');
     const [registrosPorPagina, setRegistrosPorPagina] = useState(5);
     const [paginaActual, setPaginaActual] = useState(1);
+    const navigate = useNavigate();
     const [orden, setOrden] = useState({ campo: 'id_venta', direccion: 'asc' });
 
     const token = localStorage.getItem('token');
@@ -177,6 +179,11 @@ const ConsultarVent = () => {
                                         </button>
                                     </div>
                                 </nav>
+                                <div className="card-header">
+                                    <button onClick={() => navigate('/RegistrarVent')} className="btn btn-secondary float-right">
+                                    Registrar otra venta
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

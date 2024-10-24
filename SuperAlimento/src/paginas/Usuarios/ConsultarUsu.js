@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Navegacion from "../../componentes/componentes/navegacion";
 import "../../componentes/css/Login.css";
 import { Link } from "react-router-dom";
+import {useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2'; 
 
 const ConsultarUsu = () => {
@@ -11,6 +12,7 @@ const ConsultarUsu = () => {
   const [busqueda, setBusqueda] = useState('');
   const [registrosPorPagina, setRegistrosPorPagina] = useState(5);
   const [paginaActual, setPaginaActual] = useState(1);
+  const navigate = useNavigate();
   const [orden, setOrden] = useState({ campo: 'numero_documento', direccion: 'asc' });
 
   const token = localStorage.getItem('token');
@@ -240,6 +242,11 @@ const ConsultarUsu = () => {
                       </button>
                     </div>
                   </nav>
+                  <div className="card-header">
+                      <button onClick={() => navigate('/RegistrarUsu')} className="btn btn-secondary float-right">
+                          Registrar otro usuario
+                     </button>
+                  </div>
                 </div>
               </div>
             </div>

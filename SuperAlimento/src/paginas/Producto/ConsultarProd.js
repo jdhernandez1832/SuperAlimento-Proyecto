@@ -1,22 +1,50 @@
 import React, { useState, useEffect, useRef } from 'react';
+import {useNavigate } from 'react-router-dom';
 import Navegacion from "../../componentes/componentes/navegacion"; 
 import "../../componentes/css/Login.css";
 import { Link } from "react-router-dom";
 import Swal from 'sweetalert2';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable'; 
+import Select from 'react-select'; 
 
 const ConsultarProd = () => {
   const tableRef = useRef(null);
   const [productos, setProductos] = useState([]);
   const [mostrarInactivos, setMostrarInactivos] = useState(false); 
   const [busqueda, setBusqueda] = useState('');
+  const [categorias, setCategorias] = useState([]); // Estado para las categorías
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('');
   const [registrosPorPagina, setRegistrosPorPagina] = useState(5);
   const [paginaActual, setPaginaActual] = useState(1);
+  const navigate = useNavigate();
   const [orden, setOrden] = useState({ campo: 'id_producto', direccion: 'asc' });
   
   const token = localStorage.getItem('token');
   const rol = localStorage.getItem('Rol');
+
+  useEffect(() => {
+    const fetchCategorias = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/api/categoria/todos', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'X-Rol': rol,
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          const categoriasActivas = data.filter(categoria => categoria.estado !== 'Desactivo');
+          setCategorias(categoriasActivas);
+        } else {
+          console.error('Error al obtener categorías:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error en la solicitud:', error);
+      }
+    };
+    fetchCategorias();
+  }, [token, rol]);
 
   useEffect(() => {
     const fetchProductos = async () => {
@@ -90,16 +118,18 @@ const ConsultarProd = () => {
   const productosFiltrados = productos.filter(producto => {
     const estadoProducto = mostrarInactivos ? 'Desactivo' : 'Activo';
     const esEstadoValido = producto.estado === estadoProducto;
-
-    const nombre = producto.nombre_producto; 
-    const id = producto.id_producto;
-
-    const busquedaValida = 
-        (nombre && nombre.toLowerCase().includes(busqueda.toLowerCase())) || 
-        (id && id.toString().includes(busqueda));
-    return esEstadoValido && busquedaValida;
-});
-
+    
+    // Verificamos si hay una categoría seleccionada y si coincide con la del producto
+    const coincideCategoria = categoriaSeleccionada 
+      ? producto.id_categoria === parseInt(categoriaSeleccionada) 
+      : true;
+  
+    const busquedaValida = producto.nombre_producto.toLowerCase().includes(busqueda.toLowerCase()) ||
+      producto.id_producto.toString().includes(busqueda);
+  
+    return esEstadoValido && busquedaValida && coincideCategoria;
+  });
+  
 
   const indiceUltimoRegistro = paginaActual * registrosPorPagina;
   const indicePrimerRegistro = indiceUltimoRegistro - registrosPorPagina;
@@ -131,20 +161,24 @@ const ConsultarProd = () => {
         doc.setFontSize(14);
         doc.text('Reporte de Productos', 40, 100);
 
-        const headers = [['Imagen', 'Nombre', 'Código de Barras', 'Precio Compra', 'Precio Venta', 'Cantidad']];
+        const headers = [['Imagen', 'Nombre', 'Código de Barras', 'Precio Compra', 'Precio Venta', 'Cantidad', 'Categoría']];
 
         // Filtra los productos que están activos
         const productosActivos = productos.filter(producto => producto.estado === 'Activo');
 
-        // Mapea solo los productos activos
-        const data = productosActivos.map((producto) => [
-            '', 
-            producto.nombre_producto,
-            producto.codigo_barras,
-            producto.precio_compra.toFixed(2),
-            producto.precio_venta.toFixed(2),
-            producto.cantidad
-        ]);
+        // Mapea solo los productos activos, agregando el nombre de la categoría
+        const data = productosActivos.map((producto) => {
+            const categoria = categorias.find(c => c.id_categoria === producto.id_categoria);
+            return [
+                '', 
+                producto.nombre_producto,
+                producto.codigo_barras,
+                producto.precio_compra.toFixed(2),
+                producto.precio_venta.toFixed(2),
+                producto.cantidad,
+                categoria ? categoria.nombre : 'Sin categoría'  // Muestra el nombre de la categoría o 'Sin categoría' si no se encuentra
+            ];
+        });
 
         doc.autoTable({
             head: headers,
@@ -170,11 +204,13 @@ const ConsultarProd = () => {
                 }
             },
         });
+        
         if (productosActivos.every(p => !p.imagen)) {
             doc.save('reporte_productos.pdf');
         }
     };
-  }
+};
+
   return (
     <div>
       <Navegacion>
@@ -213,6 +249,20 @@ const ConsultarProd = () => {
                         onChange={(e) => setBusqueda(e.target.value)}
                         style={{ width: '200px' }} 
                       />
+                      <Select
+                        options={categorias.map(categoria => ({
+                          value: categoria.id_categoria,
+                          label: categoria.nombre
+                        }))}
+                        value={categorias.find(categoria => categoria.id_categoria === categoriaSeleccionada) 
+                                ? { value: categoriaSeleccionada, label: categorias.find(categoria => categoria.id_categoria === categoriaSeleccionada).nombre } 
+                                : null}
+                        onChange={(seleccion) => setCategoriaSeleccionada(seleccion ? seleccion.value : null)}
+                        placeholder="Seleccione una categoría a buscar"
+                        isClearable
+                        classNamePrefix="select"
+                        className="ml-2 mr-2"
+                      />
                     </div>
                     {productosFiltrados.length === 0 ? (
                       <p>No hay datos en esta tabla</p>
@@ -229,6 +279,7 @@ const ConsultarProd = () => {
                               <th>Precio de compra</th>
                               <th>Precio de venta</th>
                               <th>Descripción</th>
+                              <th>Categoría</th>
                               <th>Cantidad</th>
                               <th>Actualizar</th>
                               <th>Cambiar Estado</th>
@@ -250,6 +301,7 @@ const ConsultarProd = () => {
                              <td>{producto.precio_compra}</td>
                              <td>{producto.precio_venta}</td>
                              <td>{producto.descripcion_producto}</td>
+                             <td>{categorias.find(c => c.id_categoria === producto.id_categoria)?.nombre|| 'Sin categoría'}</td>
                              <td>{producto.cantidad}</td>
                              <td><Link to={`/ActualizarProd/${producto.id_producto}`} className="btn btn-warning">Actualizar</Link></td>
                              <td>
@@ -300,6 +352,9 @@ const ConsultarProd = () => {
                 </nav>
                 <div className="card-header">
                     <button onClick={generarReporte} className="btn btn-secondary mr-2">Generar reporte de productos</button>
+                    <button onClick={() => navigate('/RegistrarProd')} className="btn btn-secondary float-right">
+                      Registrar otro producto
+                    </button>
                 </div>
               </div>
             </div>

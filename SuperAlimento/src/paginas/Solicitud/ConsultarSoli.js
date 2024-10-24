@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import {useNavigate } from 'react-router-dom';
 import Navegacion from "../../componentes/componentes/navegacion";
 import "../../componentes/css/Login.css";
 import Swal from 'sweetalert2';
@@ -10,6 +11,7 @@ const ConsultarSoli = () => {
     const [busqueda, setBusqueda] = useState('');
     const [registrosPorPagina, setRegistrosPorPagina] = useState(5);
     const [paginaActual, setPaginaActual] = useState(1);
+    const navigate = useNavigate();
     const [orden, setOrden] = useState({ campo: 'id_solicitud', direccion: 'asc' });
 
     const token = localStorage.getItem('token');
@@ -220,6 +222,11 @@ const ConsultarSoli = () => {
                                         </button>
                                     </div>
                                 </nav>
+                                <div className="card-header">
+                                    <button onClick={() => navigate('/RegistrarSoli')} className="btn btn-secondary float-right">
+                                    Registrar otra solicitud
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

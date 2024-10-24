@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Navegacion from "../../componentes/componentes/navegacion";
 import "../../componentes/css/Login.css";
 import { Link } from "react-router-dom";
+import {useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 const ConsultarCate = () => {
@@ -11,6 +12,7 @@ const ConsultarCate = () => {
     const [busqueda, setBusqueda] = useState('');
     const [registrosPorPagina, setRegistrosPorPagina] = useState(5); // Cambiado a 5
     const [paginaActual, setPaginaActual] = useState(1);
+    const navigate = useNavigate();
     const [orden, setOrden] = useState({ campo: 'id_categoria', direccion: 'asc' });
 
     const token = localStorage.getItem('token');
@@ -224,6 +226,11 @@ const ConsultarCate = () => {
                                         </button>
                                     </div>
                                 </nav>
+                                <div className="card-header">
+                                    <button onClick={() => navigate('/RegistrarCate')} className="btn btn-secondary float-right">
+                                    Registrar otra categoria
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
