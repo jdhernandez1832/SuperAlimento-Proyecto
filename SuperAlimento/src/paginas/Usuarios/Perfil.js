@@ -250,7 +250,7 @@ const Perfil = () => {
                     )}
                   </div>
 
-                  <div className="form-group">
+                  <div className="form-group" hidden>
                     <label htmlFor="id_rol">Rol</label>
                     <select
                       className="custom-select form-control-border border-width-2"
