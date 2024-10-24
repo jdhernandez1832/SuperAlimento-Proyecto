@@ -245,7 +245,6 @@ const ConsultarProd = () => {
                                  height="50"
                                />
                              </td>
-                             <td>{producto.id_producto}</td>
                              <td>{producto.nombre_producto}</td>
                              <td>{producto.codigo_barras}</td>
                              <td>{producto.precio_compra}</td>
