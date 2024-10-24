@@ -222,7 +222,6 @@ const ConsultarProd = () => {
                           <thead>
                             <tr>
                               <th>Imagen</th>
-                              <th>Código</th>
                               <th onClick={() => manejarOrden('nombre')}>
                                 Nombre de Producto {orden.campo === 'nombre' && (orden.direccion === 'asc' ? '▲' : '▼')}
                               </th>
