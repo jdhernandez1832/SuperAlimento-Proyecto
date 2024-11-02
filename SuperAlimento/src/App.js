@@ -26,6 +26,8 @@ import DetallesVenta from './paginas/Ventas/DetallesVent';
 import Principal from './paginas/Principal';
 import Error from './paginas/Error'
 import Olvido from './paginas/Olvido';
+import ConsultarInci from './paginas/Incidencia/ConsultarInci';
+import RegistrarInci from './paginas/Incidencia/RegistrarInci';
 
 function App() {
   return (
@@ -57,6 +59,8 @@ function App() {
           <Route path="/DetallesSolicitud/:id_solicitud" element={<PrivateRoute element={DetallesSolicitud} roles="Administrador, Inventarista" />} />
           <Route path="/DetallesVenta/:id_venta" element={<PrivateRoute element={DetallesVenta} roles="Administrador, Cajero" />} />
           <Route path="/Contacto" element={<PrivateRoute element={Contacto} roles="Administrador, Inventarista, Cajero" />} />
+          <Route path="/RegistrarInci" element={<PrivateRoute element={RegistrarInci} roles="Administrador, Inventarista" />} />
+          <Route path="/ConsultarInci" element={<PrivateRoute element={ConsultarInci} roles="Administrador, Inventarista" />} />
         </Routes>
       </Router>
     </Fragment>

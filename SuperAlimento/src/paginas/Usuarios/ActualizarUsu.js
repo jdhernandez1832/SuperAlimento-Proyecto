@@ -154,16 +154,17 @@ const ActualizarUsuario = () => {
 
   return (
     <div>
-      <Navegacion>
+  <Navegacion>
+    <div className="card card-secondary">
+      <div className="card-body colorFondo">
         <div className="card card-secondary">
-          <div className="card-body colorFondo">
-            <div className="card card-secondary">
-              <div className="card-header">
-                <h3 className="card-title">Actualizar Usuario</h3>
-              </div>
-              <form onSubmit={handleSubmit}>
-                <div className="card-body">
-                  
+          <div className="card-header">
+            <h3 className="card-title">Actualizar Usuario</h3>
+          </div>
+          <form onSubmit={handleSubmit}>
+            <div className="card-body">
+              <div className="row">
+                <div className="col-md-6">
                   <div className="form-group">
                     <label htmlFor="numero_documento">Número de documento</label>
                     <input
@@ -175,22 +176,6 @@ const ActualizarUsuario = () => {
                       required
                       disabled
                     />
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="nombre_usuario">Nombre de usuario</label>
-                    <input
-                      type="text"
-                      className={`form-control ${errors.nombre_usuario ? 'is-invalid' : ''}`}
-                      id="nombre_usuario"
-                      value={formData.nombre_usuario}
-                      onChange={handleChange}
-                      required
-                      maxLength={50}
-                    />
-                    {errors.nombre_usuario && (
-                      <div className="invalid-feedback">{errors.nombre_usuario}</div>
-                    )}
                   </div>
 
                   <div className="form-group">
@@ -210,22 +195,6 @@ const ActualizarUsuario = () => {
                   </div>
 
                   <div className="form-group">
-                    <label htmlFor="correo_usuario">Email</label>
-                    <input
-                      type="email"
-                      className={`form-control ${errors.correo_usuario ? 'is-invalid' : ''}`}
-                      id="correo_usuario"
-                      value={formData.correo_usuario}
-                      onChange={handleChange}
-                      required
-                      maxLength={100}
-                    />
-                    {errors.correo_usuario && (
-                      <div className="invalid-feedback">{errors.correo_usuario}</div>
-                    )}
-                  </div>
-
-                  <div className="form-group">
                     <label htmlFor="telefono_usuario">Teléfono</label>
                     <input
                       type="text"
@@ -238,6 +207,40 @@ const ActualizarUsuario = () => {
                     />
                     {errors.telefono_usuario && (
                       <div className="invalid-feedback">{errors.telefono_usuario}</div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="col-md-6">
+                  <div className="form-group">
+                    <label htmlFor="nombre_usuario">Nombre de usuario</label>
+                    <input
+                      type="text"
+                      className={`form-control ${errors.nombre_usuario ? 'is-invalid' : ''}`}
+                      id="nombre_usuario"
+                      value={formData.nombre_usuario}
+                      onChange={handleChange}
+                      required
+                      maxLength={50}
+                    />
+                    {errors.nombre_usuario && (
+                      <div className="invalid-feedback">{errors.nombre_usuario}</div>
+                    )}
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="correo_usuario">Email</label>
+                    <input
+                      type="email"
+                      className={`form-control ${errors.correo_usuario ? 'is-invalid' : ''}`}
+                      id="correo_usuario"
+                      value={formData.correo_usuario}
+                      onChange={handleChange}
+                      required
+                      maxLength={100}
+                    />
+                    {errors.correo_usuario && (
+                      <div className="invalid-feedback">{errors.correo_usuario}</div>
                     )}
                   </div>
 
@@ -256,18 +259,19 @@ const ActualizarUsuario = () => {
                       <option value="3">Inventarista</option>
                     </select>
                   </div>
-
                 </div>
-                <div className="card-footer">
-                  <Link to="/ConsultarUsu" className="btn btn-secondary mr-2">Volver</Link>
-                  <button type="submit" className="btn btn-secondary">Actualizar</button>
-                </div>
-              </form>
+              </div>
             </div>
-          </div>
+            <div className="card-footer">
+              <Link to="/ConsultarUsu" className="btn btn-secondary mr-2">Volver</Link>
+              <button type="submit" className="btn btn-secondary">Actualizar</button>
+            </div>
+          </form>
         </div>
-      </Navegacion>
+      </div>
     </div>
+  </Navegacion>
+</div>
   );
 };
 

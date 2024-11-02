@@ -114,6 +114,15 @@ const Navegacion = ({ children }) => {
           { to: "/ConsultarVent", title: "Consultar" },
         ],
       },
+      {
+      title: "Incidencias",
+      icon: "fas fa-book",
+      roles: ["Administrador", "Inventarista"],
+      links: [
+        { to: "/RegistrarInci", title: "Registrar" },
+        { to: "/ConsultarInci", title: "Consultar" },
+      ],
+    },
     ];
 
     return navItems.map(item => {
@@ -152,16 +161,11 @@ const Navegacion = ({ children }) => {
           <li className="nav-item d-none d-sm-inline-block">
             <Link to="/Index" className="nav-link">Inicio</Link>
           </li>
-          <li className="nav-item d-none d-sm-inline-block">
-            <Link to="#" className="nav-link">
-              Usuario: {nombreUsuario || numeroDocumento} | Rol: {rol}
-            </Link>
-          </li>
         </ul>
         <ul className="navbar-nav ml-auto">
           <li className="nav-item dropdown">
-            <Link className="nav-link" data-toggle="dropdown" to="#">
-              <p>Opciones</p>
+            <Link className="nav-link " data-toggle="dropdown" to="#">
+              <p>{nombreUsuario || numeroDocumento} |  {rol}</p>
             </Link>
             <div className="dropdown-menu dropdown-menu-lg dropdown-menu-right">
               <div className="dropdown-divider" />

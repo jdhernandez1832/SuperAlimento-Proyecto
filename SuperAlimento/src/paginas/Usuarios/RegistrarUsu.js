@@ -156,47 +156,34 @@ const RegistrarUsu = () => {
   };
 
   return (
-    <div>
-      <Navegacion>
+<div>
+  <Navegacion>
+    <div className="card card-secondary">
+      <div className="card-body colorFondo">
         <div className="card card-secondary">
-          <div className="card-body colorFondo">
-            <div className="card card-secondary">
-              <div className="card-header">
-                <h3 className="card-title">Registrar Usuario</h3>
-              </div>
-              <form onSubmit={handleSubmit}>
-                <div className="card-body">
-                    <div className="form-group">
-                        <label htmlFor="numero_documento">Número de documento</label>
-                        <input
-                          type="text" 
-                          className={`form-control ${errors.numero_documento ? 'is-invalid' : ''}`}
-                          id="numero_documento"
-                          value={formData.numero_documento}
-                          onChange={handleChange}
-                          required
-                          maxLength={20}
-                        />
-                        {errors.numero_documento && (
-                          <div className="invalid-feedback">{errors.numero_documento}</div>
-                        )}
-                      </div>
-                    <div className="form-group">
-                    <label htmlFor="nombre_usuario">Nombre de usuario</label>
+          <div className="card-header">
+            <h3 className="card-title">Registrar Usuario</h3>
+          </div>
+          <form onSubmit={handleSubmit}>
+            <div className="card-body">
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="form-group">
+                    <label htmlFor="numero_documento">Número de documento</label>
                     <input
-                      type="text"
-                      className={`form-control ${errors.nombre_usuario ? 'is-invalid' : ''}`}
-                      id="nombre_usuario"
-                      value={formData.nombre_usuario}
+                      type="text" 
+                      className={`form-control ${errors.numero_documento ? 'is-invalid' : ''}`}
+                      id="numero_documento"
+                      value={formData.numero_documento}
                       onChange={handleChange}
                       required
-                      maxLength={50}
+                      maxLength={20}
                     />
-                    {errors.nombre_usuario && (
-                      <div className="invalid-feedback">{errors.nombre_usuario}</div>
+                    {errors.numero_documento && (
+                      <div className="invalid-feedback">{errors.numero_documento}</div>
                     )}
                   </div>
-
+                  
                   <div className="form-group">
                     <label htmlFor="tipo_documento">Tipo de documento</label>
                     <select
@@ -212,23 +199,7 @@ const RegistrarUsu = () => {
                       <option value="3">Tarjeta de identidad</option>
                     </select>
                   </div>
-
-                  <div className="form-group">
-                    <label htmlFor="correo_usuario">Email</label>
-                    <input
-                      type="email"
-                      className={`form-control ${errors.correo_usuario ? 'is-invalid' : ''}`}
-                      id="correo_usuario"
-                      value={formData.correo_usuario}
-                      onChange={handleChange}
-                      required
-                      maxLength={100}
-                    />
-                    {errors.correo_usuario && (
-                      <div className="invalid-feedback">{errors.correo_usuario}</div>
-                    )}
-                  </div>
-
+                  
                   <div className="form-group">
                     <label htmlFor="telefono_usuario">Teléfono</label>
                     <input
@@ -244,7 +215,41 @@ const RegistrarUsu = () => {
                       <div className="invalid-feedback">{errors.telefono_usuario}</div>
                     )}
                   </div>
+                </div>
 
+                <div className="col-md-6">
+                  <div className="form-group">
+                    <label htmlFor="nombre_usuario">Nombre de usuario</label>
+                    <input
+                      type="text"
+                      className={`form-control ${errors.nombre_usuario ? 'is-invalid' : ''}`}
+                      id="nombre_usuario"
+                      value={formData.nombre_usuario}
+                      onChange={handleChange}
+                      required
+                      maxLength={50}
+                    />
+                    {errors.nombre_usuario && (
+                      <div className="invalid-feedback">{errors.nombre_usuario}</div>
+                    )}
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="correo_usuario">Email</label>
+                    <input
+                      type="email"
+                      className={`form-control ${errors.correo_usuario ? 'is-invalid' : ''}`}
+                      id="correo_usuario"
+                      value={formData.correo_usuario}
+                      onChange={handleChange}
+                      required
+                      maxLength={100}
+                    />
+                    {errors.correo_usuario && (
+                      <div className="invalid-feedback">{errors.correo_usuario}</div>
+                    )}
+                  </div>
+                  
                   <div className="form-group">
                     <label htmlFor="id_rol">Rol</label>
                     <select
@@ -261,16 +266,19 @@ const RegistrarUsu = () => {
                     </select>
                   </div>
                 </div>
-                <div className="card-footer">
-                  <Link to="/ConsultarUsu" className="btn btn-secondary mr-2">Volver</Link>
-                  <button type="submit" className="btn btn-secondary">Registrar</button>
-                </div>
-              </form>
+              </div>
             </div>
-          </div>
+
+            <div className="card-footer">
+              <Link to="/ConsultarUsu" className="btn btn-secondary mr-2">Volver</Link>
+              <button type="submit" className="btn btn-secondary">Registrar</button>
+            </div>
+          </form>
         </div>
-      </Navegacion>
+      </div>
     </div>
+  </Navegacion>
+</div>
   );
 };
 

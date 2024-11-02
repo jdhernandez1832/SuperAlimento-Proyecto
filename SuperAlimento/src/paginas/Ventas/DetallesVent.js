@@ -96,10 +96,9 @@ const DetallesVenta = () => {
     };
 
     const formatearFecha = (fecha) => {
-        if (!fecha) return '';
-        const opciones = { year: 'numeric', month: '2-digit', day: '2-digit' };
-        return new Date(fecha).toLocaleDateString(undefined, opciones);
+        return new Date(fecha).toISOString().split('T')[0];
     };
+    
     const generarPDF = () => {
         const doc = new jsPDF();
     

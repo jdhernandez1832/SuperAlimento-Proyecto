@@ -1,7 +1,7 @@
 // backend/routes/categoriaRoutes.js
 const express = require('express');
 const router = express.Router();
-const {Categoria} = require('../models'); // Ajusta la ruta según la estructura de tu proyecto
+const {Categoria} = require('../models'); 
 
 
 // Crear categoría

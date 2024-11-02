@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import 'admin-lte/dist/css/adminlte.min.css';
 import 'admin-lte/plugins/jquery/jquery.min.js';
+import { useParams, useNavigate } from 'react-router-dom';
 import 'chart.js/auto'; 
 import { Line } from 'react-chartjs-2';
 import 'admin-lte/dist/js/adminlte.min.js';
@@ -12,6 +13,7 @@ import "../componentes/css/Login.css";
 const VentaList = () => {
   const [ventas, setVentas] = useState([]);
   const [totalVentas, setTotalVentas] = useState(0);
+  const navigate = useNavigate();
   const [gananciasTotales, setGananciasTotales] = useState(0);
   const [solicitudes, setSolicitudes] = useState([]); 
   const [totalSolicitudes, setTotalSolicitudes] = useState(0); 
@@ -255,6 +257,11 @@ const VentaList = () => {
                         </tr>
                       )}
                     </tbody>
+                    <div className="card-header">
+                      <button onClick={() => navigate('/RegistrarSoli')} className="btn btn-secondary float-right">
+                        Registrar solicitud
+                      </button>
+                    </div>
                   </table>
                 </div>
               </div>
@@ -268,4 +275,3 @@ const VentaList = () => {
 };
 
 export default VentaList;
-

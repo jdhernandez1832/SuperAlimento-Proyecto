@@ -259,16 +259,18 @@ const RegistrarProd = () => {
     };
 
     return (
-          <div>
-            <Navegacion>
+<div>
+    <Navegacion>
+        <div className="card card-secondary">
+            <div className="card-body colorFondo">
                 <div className="card card-secondary">
-                    <div className="card-body colorFondo">
-                        <div className="card card-secondary">
-                            <div className="card-header">
-                                <h3 className="card-title">Registrar producto</h3>
-                            </div>
-                            <form onSubmit={handleSubmit} encType="multipart/form-data">
-                                <div className="card-body">
+                    <div className="card-header">
+                        <h3 className="card-title">Registrar producto</h3>
+                    </div>
+                    <form onSubmit={handleSubmit} encType="multipart/form-data">
+                        <div className="card-body">
+                            <div className="row">
+                                <div className="col-md-6">
                                     <div className="form-group">
                                         <label htmlFor="nombre_producto">Nombre de producto</label>
                                         <input
@@ -319,6 +321,24 @@ const RegistrarProd = () => {
                                         {errors.precio_venta && <span className="text-danger">{errors.precio_venta}</span>}
                                     </div>
                                     <div className="form-group">
+                                        <label htmlFor="imagen">Imagen</label>
+                                        <input
+                                            type="file"
+                                            className="form-control"
+                                            id="imagen"
+                                            accept="image/*"
+                                            onChange={handleFileChange}
+                                        />
+                                    </div>
+                                    {formData.imagen && (
+                                        <div className="form-group">
+                                            <label>Vista previa de la imagen:</label>
+                                            <img src={URL.createObjectURL(formData.imagen)} alt="Vista previa" style={{ width: '100%', maxHeight: '200px', objectFit: 'contain' }} />
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="col-md-6">
+                                    <div className="form-group">
                                         <label htmlFor="descripcion_producto">Descripción</label>
                                         <input
                                             type="text"
@@ -368,8 +388,8 @@ const RegistrarProd = () => {
                                         <label htmlFor="id_proveedor">Proveedor</label>
                                         <Select
                                             options={proveedores.map(proveedor => ({
-                                            value: proveedor.id_proveedor,
-                                            label: proveedor.nombre_proveedor,
+                                                value: proveedor.id_proveedor,
+                                                label: proveedor.nombre_proveedor,
                                             }))}
                                             onChange={handleSelectChange}
                                             name="id_proveedor"
@@ -378,27 +398,20 @@ const RegistrarProd = () => {
                                             isSearchable={true}
                                         />
                                     </div>
-                                    <div className="form-group">
-                                        <label htmlFor="imagen">Imagen</label>
-                                        <input
-                                            type="file"
-                                            className="form-control"
-                                            id="imagen"
-                                            accept="image/*"
-                                            onChange={handleFileChange}
-                                        />
-                                    </div>
                                 </div>
-                                <div className="card-footer">
-                                    <Link to="/ConsultarProd" className="btn btn-secondary mr-2">Volver</Link>
-                                    <button type="submit" className="btn btn-secondary">Registrar</button>
-                                </div>
-                            </form>
+                            </div>
                         </div>
-                    </div>
+                        <div className="card-footer">
+                            <Link to="/ConsultarProd" className="btn btn-secondary mr-2">Volver</Link>
+                            <button type="submit" className="btn btn-secondary">Registrar</button>
+                        </div>
+                    </form>
                 </div>
-            </Navegacion>
+            </div>
         </div>
+    </Navegacion>
+</div>
+
     );
 };
 

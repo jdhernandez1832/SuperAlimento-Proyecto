@@ -131,7 +131,7 @@ const ConsultarVent = () => {
                                                         {ventasMostradas.map((venta) => (
                                                             <tr key={venta.id_venta}>
                                                                 <td>{venta.id_venta}</td>
-                                                                <td>{new Date(venta.fecha_venta).toLocaleDateString()}</td>
+                                                                <td>{new Date(venta.fecha_venta).toISOString().split('T')[0]}</td>
                                                                 <td>{venta.metodo_pago}</td>
                                                                 <td>{venta.caja}</td>
                                                                 <td>{venta.total_venta}</td>

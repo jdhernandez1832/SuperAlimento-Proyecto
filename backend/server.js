@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { verifyToken, permitRole } = require('./src/middlewares/middlewares'); // Importa los middlewares
+const { verifyToken, permitRole } = require('./src/middlewares/middlewares'); 
 
 const usuarioRoutes = require('./src/routes/rutaUsuario');
 const categoriaRoutes = require('./src/routes/rutaCategoria');
@@ -10,6 +10,7 @@ const solicitudRoutes = require('./src/routes/rutaSolicitud');
 const ventaRoutes = require('./src/routes/rutaVenta');
 const loginRoutes= require('./src/routes/rutaLogin');
 const olvidoRoutes= require('./src/routes/rutaOlvido');
+const incidenciaRoutes=require('./src/routes/rutaIncidencia');
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use('/api/proveedor', verifyToken, permitRole('Administrador', 'Inventarista
 app.use('/api/producto', verifyToken, permitRole('Administrador', 'Inventarista', 'Cajero' ), productoRoutes);
 app.use('/api/solicitud', verifyToken, permitRole('Administrador', 'Inventarista', 'Cajero' ), solicitudRoutes);
 app.use('/api/venta', verifyToken, permitRole('Administrador', 'Inventarista', 'Cajero' ), ventaRoutes);
+app.use('/api/incidencia', verifyToken, permitRole('Administrador', 'Inventarista', 'Cajero'), incidenciaRoutes);
 
 
 const port = process.env.PORT || 3001;

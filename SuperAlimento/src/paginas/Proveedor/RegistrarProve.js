@@ -131,107 +131,117 @@ const RegistrarProve = () => {
     };
 
     return (
-        <div>
-            <Navegacion>
-                <div className="card card-secondary">
-                    <div className="card-body colorFondo">
-                        <div className="card card-secondary">
-                            <div className="card-header">
-                                <h3 className="card-title">Registrar proveedor</h3>
-                            </div>
-                            <form onSubmit={handleSubmit}>
-                                <div className="card-body">
-                                    <div className="form-group">
-                                        <label htmlFor="nombre_proveedor">Nombre de proveedor</label>
-                                        <input
-                                            type="text"
-                                            className={`form-control ${formErrors.nombre_proveedor ? 'is-invalid' : ''}`}
-                                            id="nombre_proveedor"
-                                            value={formData.nombre_proveedor}
-                                            onChange={handleChange}
-                                            required
-                                            maxLength={50}
-                                        />
-                                        {formErrors.nombre_proveedor && (
-                                            <div className="invalid-feedback">{formErrors.nombre_proveedor}</div>
-                                        )}
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="numero_documento">Número de documento</label>
-                                        <input
-                                            type="number"
-                                            min={'1'}
-                                            className={`form-control ${formErrors.numero_documento ? 'is-invalid' : ''}`}
-                                            id="numero_documento"
-                                            value={formData.numero_documento}
-                                            onChange={handleChange}
-                                            required
-                                            maxLength={20}
-                                        />
-                                        {formErrors.numero_documento && (
-                                            <div className="invalid-feedback">{formErrors.numero_documento}</div>
-                                        )}
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="tipo_documento">Tipo de documento</label>
-                                        <select
-                                            className={`custom-select form-control-border border-width-2 ${formErrors.tipo_documento ? 'is-invalid' : ''}`}
-                                            id="tipo_documento"
-                                            value={formData.tipo_documento}
-                                            onChange={handleChange}
-                                            required
-                                        >
-                                            <option value="">Selecciona un tipo</option>
-                                            <option value="Cédula">Cédula</option>
-                                            <option value="RUC">RUC</option>
-                                            <option value="Pasaporte">Pasaporte</option>
-                                        </select>
-                                        {formErrors.tipo_documento && (
-                                            <div className="invalid-feedback">{formErrors.tipo_documento}</div>
-                                        )}
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="telefono_proveedor">Teléfono</label>
-                                        <input
-                                            type="number"
-                                            min={'1'}
-                                            className={`form-control ${formErrors.telefono_proveedor ? 'is-invalid' : ''}`}
-                                            id="telefono_proveedor"
-                                            value={formData.telefono_proveedor}
-                                            onChange={handleChange}
-                                            required
-                                            maxLength={10}
-                                        />
-                                        {formErrors.telefono_proveedor && (
-                                            <div className="invalid-feedback">{formErrors.telefono_proveedor}</div>
-                                        )}
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="correo_proveedor">Correo electrónico</label>
-                                        <input
-                                            type="email"
-                                            className={`form-control ${formErrors.correo_proveedor ? 'is-invalid' : ''}`}
-                                            id="correo_proveedor"
-                                            value={formData.correo_proveedor}
-                                            onChange={handleChange}
-                                            required
-                                            maxLength={50}
-                                        />
-                                        {formErrors.correo_proveedor && (
-                                            <div className="invalid-feedback">{formErrors.correo_proveedor}</div>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="card-footer">
-                                    <Link to="/ConsultarProve" className="btn btn-secondary mr-2">Volver</Link>
-                                    <button type="submit" className="btn btn-secondary">Registrar</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+<div>
+  <Navegacion>
+    <div className="card card-secondary">
+      <div className="card-body colorFondo">
+        <div className="card card-secondary">
+          <div className="card-header">
+            <h3 className="card-title">Registrar proveedor</h3>
+          </div>
+          <form onSubmit={handleSubmit}>
+            <div className="card-body">
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="form-group">
+                    <label htmlFor="nombre_proveedor">Nombre de proveedor</label>
+                    <input
+                      type="text"
+                      className={`form-control ${formErrors.nombre_proveedor ? 'is-invalid' : ''}`}
+                      id="nombre_proveedor"
+                      value={formData.nombre_proveedor}
+                      onChange={handleChange}
+                      required
+                      maxLength={50}
+                    />
+                    {formErrors.nombre_proveedor && (
+                      <div className="invalid-feedback">{formErrors.nombre_proveedor}</div>
+                    )}
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="tipo_documento">Tipo de documento</label>
+                    <select
+                      className={`custom-select form-control-border border-width-2 ${formErrors.tipo_documento ? 'is-invalid' : ''}`}
+                      id="tipo_documento"
+                      value={formData.tipo_documento}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">Selecciona un tipo</option>
+                      <option value="Cédula">Cédula</option>
+                      <option value="RUC">RUC</option>
+                      <option value="Pasaporte">Pasaporte</option>
+                    </select>
+                    {formErrors.tipo_documento && (
+                      <div className="invalid-feedback">{formErrors.tipo_documento}</div>
+                    )}
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="correo_proveedor">Correo electrónico</label>
+                    <input
+                      type="email"
+                      className={`form-control ${formErrors.correo_proveedor ? 'is-invalid' : ''}`}
+                      id="correo_proveedor"
+                      value={formData.correo_proveedor}
+                      onChange={handleChange}
+                      required
+                      maxLength={50}
+                    />
+                    {formErrors.correo_proveedor && (
+                      <div className="invalid-feedback">{formErrors.correo_proveedor}</div>
+                    )}
+                  </div>
                 </div>
-            </Navegacion>
+                
+                <div className="col-md-6">
+                  <div className="form-group">
+                    <label htmlFor="numero_documento">Número de documento</label>
+                    <input
+                      type="number"
+                      min={'1'}
+                      className={`form-control ${formErrors.numero_documento ? 'is-invalid' : ''}`}
+                      id="numero_documento"
+                      value={formData.numero_documento}
+                      onChange={handleChange}
+                      required
+                      maxLength={20}
+                    />
+                    {formErrors.numero_documento && (
+                      <div className="invalid-feedback">{formErrors.numero_documento}</div>
+                    )}
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="telefono_proveedor">Teléfono</label>
+                    <input
+                      type="number"
+                      min={'1'}
+                      className={`form-control ${formErrors.telefono_proveedor ? 'is-invalid' : ''}`}
+                      id="telefono_proveedor"
+                      value={formData.telefono_proveedor}
+                      onChange={handleChange}
+                      required
+                      maxLength={10}
+                    />
+                    {formErrors.telefono_proveedor && (
+                      <div className="invalid-feedback">{formErrors.telefono_proveedor}</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="card-footer">
+              <Link to="/ConsultarProve" className="btn btn-secondary mr-2">Volver</Link>
+              <button type="submit" className="btn btn-secondary">Registrar</button>
+            </div>
+          </form>
         </div>
+      </div>
+    </div>
+  </Navegacion>
+</div>
     );
 };
 
