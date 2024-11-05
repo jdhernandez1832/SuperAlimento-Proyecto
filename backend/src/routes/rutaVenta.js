@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Venta, Detalle_Venta, sequelize } = require('../models');
+const { Venta, Detalle_Venta, sequelize, FechaVencimiento } = require('../models');
 const { Op } = require('sequelize'); 
 // Ruta para registrar una venta
 router.post('/registrar', async (req, res) => {
@@ -9,7 +9,21 @@ router.post('/registrar', async (req, res) => {
   try {
     const { fecha_venta, metodo_pago, caja, numero_documento, productos } = req.body;
 
-    // Registrar la venta
+
+    const productosConVencimiento = await FechaVencimiento.findAll({
+      where: {
+        id_producto: productos.map(p => p.id_producto),
+        cantidad: { [Op.gt]: 0 } 
+      },
+      order: [['fecha_vencimiento', 'ASC']], 
+      limit: productos.length 
+    });
+
+    if (productosConVencimiento.length < productos.length) {
+      return res.status(400).json({ message: 'No hay suficientes productos disponibles' });
+    }
+
+
     const nuevaVenta = await Venta.create({
       fecha_venta,
       metodo_pago,
@@ -18,13 +32,23 @@ router.post('/registrar', async (req, res) => {
       numero_documento,
     }, { transaction });
 
-    // Registrar los productos asociados a la venta
-    const detallesVenta = productos.map(producto => ({
-      id_producto: producto.id_producto,
-      id_venta: nuevaVenta.id_venta,
-      cantidad: producto.cantidad,
-      precio_total: producto.precio * producto.cantidad
-    }));
+
+    const detallesVenta = [];
+    for (const producto of productosConVencimiento) {
+
+      const cantidadDisponible = producto.cantidad; 
+      const cantidadAVender = Math.min(cantidadDisponible, productos.find(p => p.id_producto === producto.id_producto).cantidad); 
+
+      detallesVenta.push({
+        id_producto: producto.id_producto,
+        id_venta: nuevaVenta.id_venta,
+        cantidad: cantidadAVender,
+        precio_total: producto.precio * cantidadAVender 
+      });
+
+      producto.cantidad -= cantidadAVender; 
+      await producto.save({ transaction });
+    }
 
     await Detalle_Venta.bulkCreate(detallesVenta, { transaction });
 

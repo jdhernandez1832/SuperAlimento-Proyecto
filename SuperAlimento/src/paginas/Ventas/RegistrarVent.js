@@ -12,7 +12,8 @@ const RegistrarVenta = () => {
     NumeroDocumento: '',
   });
 
-  const [setUsuarios] = useState([]);
+  // eslint-disable-next-line no-unused-vars
+  const [usuarios, setUsuarios] = useState([]);
   const [productos, setProductos] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [cart, setCart] = useState([]);
@@ -63,7 +64,14 @@ const RegistrarVenta = () => {
         });
         if (response.ok) {
           const data = await response.json();
-          setProductos(data);
+          
+          // Obtener la cantidad para cada producto
+          const productosConCantidad = await Promise.all(data.map(async (producto) => {
+            const cantidadDisponible = await getProductQuantity(producto.id_producto);
+            return { ...producto, cantidad: cantidadDisponible };
+          }));
+  
+          setProductos(productosConCantidad);
         } else {
           console.error('Error al obtener productos:', response.statusText);
           setProductos([]); // Limpiar productos si ocurre un error
@@ -73,9 +81,12 @@ const RegistrarVenta = () => {
         setProductos([]); // Limpiar productos en caso de error
       }
     };
-
+  
     fetchProductos();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rol, token]);
+
+
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -123,14 +134,13 @@ const RegistrarVenta = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     // Validar el precio total
     const precioTotal = cart.reduce((total, item) => total + item.precio_venta * item.quantity, 0);
     if (precioTotal <= 0) {
       setError('El precio total debe ser mayor a 0.');
       return;
     }
-
+  
     const ventaData = {
       fecha_venta: formData.FechaVenta,
       metodo_pago: formData.MetodoPago,
@@ -143,7 +153,16 @@ const RegistrarVenta = () => {
         precio: item.precio_venta,
       })),
     };
-
+  
+    // Agrega un console.log para ver los datos antes de enviarlos
+    console.log('Datos de la venta a enviar:', ventaData);
+  
+    // Verifica que todos los productos tengan cantidades válidas
+    if (ventaData.productos.some(item => isNaN(item.cantidad))) {
+      console.error('Cantidad no válida en los productos:', ventaData.productos);
+      return; // O maneja el error de otra manera
+    }
+  
     try {
       const response = await fetch('http://localhost:3001/api/venta/registrar', {
         method: 'POST',
@@ -152,13 +171,13 @@ const RegistrarVenta = () => {
           'Authorization': `Bearer ${token}`,
           'X-Rol': rol,
         },
-        body: JSON.stringify(ventaData)
+        body: JSON.stringify(ventaData),
       });
-
+  
       if (response.ok) {
         const result = await response.json();
         const ventaId = result.id_venta;
-
+  
         // SweetAlert para éxito
         Swal.fire({
           title: '¡Éxito!',
@@ -191,20 +210,44 @@ const RegistrarVenta = () => {
       });
     }
   };
+  
+  const getProductQuantity = async (id_producto) => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/producto/cantidad/${id_producto}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'X-Rol': rol,
+        },
+      });
 
+      if (response.ok) {
+        const data = await response.json();
+        return data.cantidad; // Devuelve la cantidad total
+      } else {
+        console.error('Error al obtener la cantidad del producto:', response.statusText);
+        return 0; // Si hay error, devolver 0
+      }
+    } catch (error) {
+      console.error('Error en la solicitud de cantidad de producto:', error);
+      return 0; // Si hay un error, devolver 0
+    }
+  };
   const handleSearch = (e) => {
     setSearchTerm(e.target.value || '');
   };
 
-  const handleAddToCart = (product) => {
+  const handleAddToCart = async (product) => {
+    const cantidadDisponible = await getProductQuantity(product.id_producto); // Obtener cantidad del producto
+  
+    // Configura la alerta de SweetAlert para ingresar cantidad
     Swal.fire({
       title: product.nombre_producto,
       html: `
         <div>
           <img src="${product.imagen ? `http://localhost:3001/uploads/${product.imagen}` : 'default-product-image.png'}" alt="${product.nombre_producto}" width="200" />
           <p>Precio: $${product.precio_venta.toLocaleString()}</p>
-          <p>Cantidad disponible: ${product.cantidad}</p>
-          <input id="quantityInput" type="number" min="1" max="${product.cantidad}" placeholder="Cantidad" class="swal2-input" style="width: 80%;" />
+          <p>Cantidad disponible: ${cantidadDisponible}</p>
+          <input id="quantityInput" type="number" min="1" max="${cantidadDisponible}" placeholder="Cantidad" class="swal2-input" style="width: 80%;" />
         </div>
       `,
       showCancelButton: true,
@@ -212,22 +255,28 @@ const RegistrarVenta = () => {
       confirmButtonColor: '#4caf50',
       cancelButtonText: 'Cancelar',
       preConfirm: () => {
-        const quantity = parseInt(document.getElementById('quantityInput').value, 10);
-        if (isNaN(quantity) || quantity <= 0 || quantity > product.cantidad) {
+        const quantityInput = document.getElementById('quantityInput');
+        const quantity = parseInt(quantityInput.value, 10);
+        // Verifica que la cantidad sea un número válido y dentro de los límites
+        if (isNaN(quantity) || quantity <= 0 || quantity > cantidadDisponible) {
           Swal.showValidationMessage('Por favor, ingrese una cantidad válida.');
-          return false;
+          return false; // Detiene el flujo si la validación falla
         }
-        return quantity;
+        return quantity; // Devuelve la cantidad válida
       }
     }).then((result) => {
       if (result.isConfirmed) {
         const quantity = result.value;
-        setCart([...cart, { ...product, quantity }]);
+        // Verifica que quantity es un número válido antes de agregarlo al carrito
+        if (!isNaN(quantity) && quantity > 0) {
+          setCart([...cart, { ...product, quantity }]);
+        } else {
+          console.error('La cantidad es inválida:', quantity);
+        }
       }
     });
   };
   
-
   const filteredProducts = productos.filter(
     (product) =>
       product.estado === 'Activo' && // Filtra solo productos con estado "activo"
@@ -270,8 +319,8 @@ const RegistrarVenta = () => {
                         >
                           <img src={producto.imagen ? `http://localhost:3001/uploads/${producto.imagen}` : "default-product-image.png"} alt={producto.nombre_producto} width={'200'} />
                           <h4>{producto.nombre_producto}</h4>
-                          <p>{producto.cantidad}</p>
                           <p>${producto.precio_venta.toLocaleString()}</p>
+                          <p>Cantidad disponible: {producto.cantidad}</p>
                         </div>
                       ))
                     ) : (

@@ -43,7 +43,6 @@ module.exports = (sequelize, DataTypes) => {
     precio_compra: DataTypes.INTEGER,
     precio_venta: DataTypes.INTEGER,
     descripcion_producto: DataTypes.STRING,
-    cantidad: DataTypes.INTEGER,
     estado: DataTypes.ENUM('activo', 'inactivo'),
     imagen: DataTypes.STRING,
     id_categoria: {

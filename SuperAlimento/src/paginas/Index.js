@@ -8,6 +8,7 @@ import { Line } from 'react-chartjs-2';
 import 'admin-lte/dist/js/adminlte.min.js';
 import Navegacion from './../componentes/componentes/navegacion';
 import "../componentes/css/Login.css"; 
+import Swal from 'sweetalert2';
 
 
 const VentaList = () => {
@@ -26,7 +27,51 @@ const VentaList = () => {
 
   console.log('Ventas Semanal:', ventasSemanal);
   
-
+  useEffect(() => {
+    const fetchProductosBajoStock = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/api/producto/todos', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'X-Rol': rol,
+          },
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+  
+          // Para cada producto, obtenemos la cantidad
+          const productosConCantidad = await Promise.all(data.map(async (producto) => {
+            const cantidadResponse = await fetch(`http://localhost:3001/api/producto/cantidad/${producto.id_producto}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'X-Rol': rol,
+              },
+            });
+            const cantidadData = await cantidadResponse.json();
+            return { ...producto, cantidad: cantidadData.cantidad }; // Añadimos la cantidad al producto
+          }));
+  
+          // Filtrar productos bajo stock y que estén activos
+          const productosFiltrados = productosConCantidad.filter(producto => 
+            producto.cantidad <= 10 && producto.estado === 'Activo'
+          );
+  
+          const productosOrdenados = productosFiltrados.sort((a, b) => a.cantidad - b.cantidad);
+          const productosLimitados = productosOrdenados.slice(0, 5);
+  
+          setProductosBajoStock(productosLimitados);
+        } else {
+          Swal.fire('Error', 'Error al obtener los productos', 'error');
+        }
+      } catch (error) {
+        Swal.fire('Error', 'Error en la solicitud', 'error');
+      }
+    };
+  
+    fetchProductosBajoStock();
+  }, [rol, token]);
+  
   useEffect(() => {
     const fetchVentas = async () => {
       try {
@@ -82,31 +127,7 @@ const VentaList = () => {
         console.error('Error fetching ventas semanales:', error);
       }
     };
-    
-    const fetchProductosBajoStock = async () => {
-      try {
-        const response = await fetch('http://localhost:3001/api/producto/todos', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'X-Rol': rol,
-          },
-        });
-        const data = await response.json();
-    
-        // Filtrar productos bajo stock y que estén activos
-        const productosFiltrados = data.filter(producto => 
-          producto.cantidad <= 10 && producto.estado === 'Activo'
-        );
-    
-        const productosOrdenados = productosFiltrados.sort((a, b) => a.cantidad - b.cantidad);
-        const productosLimitados = productosOrdenados.slice(0, 5);
-    
-        setProductosBajoStock(productosLimitados);
-      } catch (error) {
-        console.error('Error fetching productos bajo stock:', error);
-      }
-    };
-    
+     
     const fetchSolicitudes = async () => {
       try {
         const response = await fetch('http://localhost:3001/api/solicitud/todos', {
@@ -133,7 +154,6 @@ const VentaList = () => {
     fetchVentas();
     fetchVentasSemanal()
     fetchSolicitudes();
-    fetchProductosBajoStock();
   }, [token, rol]);
 
   const chartData = {

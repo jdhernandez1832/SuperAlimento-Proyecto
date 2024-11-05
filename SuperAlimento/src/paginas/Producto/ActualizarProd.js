@@ -432,18 +432,6 @@ const ActualizarProd = () => {
                                         {errors.descripcion_producto && <span className="text-danger">{errors.descripcion_producto}</span>}
                                     </div>
                                     <div className="form-group">
-                                        <label htmlFor="cantidad">Cantidad</label>
-                                        <input
-                                            type="text"
-                                            className={`form-control ${errors.cantidad ? 'is-invalid' : ''}`}
-                                            id="cantidad"
-                                            value={formData.cantidad}
-                                            onChange={handleChange}
-                                            required
-                                        />
-                                        {errors.cantidad && <span className="text-danger">{errors.cantidad}</span>}
-                                    </div>
-                                    <div className="form-group">
                                         <label htmlFor="id_categoria">Categoría</label>
                                         <div className="d-flex align-items-center">
                                             <Select

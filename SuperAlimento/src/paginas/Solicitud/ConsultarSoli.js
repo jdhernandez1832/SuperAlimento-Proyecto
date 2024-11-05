@@ -61,45 +61,75 @@ const ConsultarSoli = () => {
 
     const totalPaginas = Math.ceil(solicitudesFiltradas.length / registrosPorPagina);
     const handleAceptarEntrega = async (id) => {
-        try {
-            const response = await fetch(`http://localhost:3001/api/solicitud/aceptar-entrega/${id}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                    'X-Rol': rol, 
-                },
-            });
-            if (response.ok) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Entrega Aceptada',
-                    text: 'Los productos han sido actualizados exitosamente.',
-                    confirmButtonColor: '#28a745', 
+        const { value: formValues } = await Swal.fire({
+            title: 'Ingresar Lote y Fecha de Vencimiento',
+            html:
+                '<div><p>Lote</p></div>' +
+                '<input id="lote" class="swal2-input" placeholder="Lote">' +
+                '<div><p>Fecha de vencimiento</p></div>' +
+                '<input id="fecha_vencimiento" type="date" class="swal2-input">',
+            focusConfirm: false,
+            confirmButtonText: 'Agregar',
+            confirmButtonColor: '#28a745', 
+            cancelButtonText: 'Cancelar',
+            cancelButtonColor: '#6c757d', 
+            showCancelButton: true, 
+            preConfirm: () => {
+                const lote = document.getElementById('lote').value;
+                const fechaVencimiento = document.getElementById('fecha_vencimiento').value;
+                if (!lote || !fechaVencimiento) {
+                    Swal.showValidationMessage('Por favor, ingresa ambos valores');
+                }
+                return { lote, fechaVencimiento };
+            }
+        });
+
+        if (formValues) {
+            try {
+                const response = await fetch(`http://localhost:3001/api/solicitud/aceptar-entrega/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'X-Rol': rol,
+                    },
+                    body: JSON.stringify({
+                        lote: formValues.lote,
+                        fecha_vencimiento: formValues.fechaVencimiento,
+                    })
                 });
 
-                setSolicitudes(prevSolicitudes =>
-                    prevSolicitudes.map(solicitud =>
-                        solicitud.id_solicitud === id
-                            ? { ...solicitud, estado_solicitud: 'Aprobada' }
-                            : solicitud
-                    )
-                );
-            } else {
+                if (response.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Entrega Aceptada',
+                        text: 'Los productos han sido actualizados exitosamente.',
+                        confirmButtonColor: '#28a745',
+                    });
+
+                    setSolicitudes(prevSolicitudes =>
+                        prevSolicitudes.map(solicitud =>
+                            solicitud.id_solicitud === id
+                                ? { ...solicitud, estado_solicitud: 'Aprobada' }
+                                : solicitud
+                        )
+                    );
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error al aceptar la entrega.',
+                        confirmButtonColor: '#28a745',
+                    });
+                }
+            } catch (error) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Error',
-                    text: 'Error al aceptar la entrega.',
-                    confirmButtonColor: '#28a745', 
+                    title: 'Error en la solicitud',
+                    text: error.message,
+                    confirmButtonColor: '#28a745',
                 });
             }
-        } catch (error) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error en la solicitud',
-                text: error.message,
-                confirmButtonColor: '#28a745',
-            });
         }
     };
 

@@ -11,7 +11,7 @@ const ConsultarInci = () => {
   
   const token = localStorage.getItem('token');
   const rol = localStorage.getItem('Rol');
-
+  
   useEffect(() => {
     const fetchIncidencias = async () => {
       try {
@@ -22,13 +22,14 @@ const ConsultarInci = () => {
             'X-Rol': rol,
           },
         });
-
+    
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(`Error ${response.status}: ${errorData.message || response.statusText}`);
         }
-
+    
         const data = await response.json();
+        console.log(data); // Verificar la estructura de datos
         setIncidencias(data);
       } catch (error) {
         console.error("Error fetching incidencias:", error);
@@ -105,30 +106,32 @@ const ConsultarInci = () => {
                 </div>
               </div>
               {incidenciasMostradas.length === 0 ? (
-                <p>No hay datos en esta vista</p>
-              ) : (
-                <div className="row w-100">
-                  {incidenciasMostradas.map((incidencia) => (
-                    <div className="col-12 col-sm-6 col-md-4 mb-4 p-2" key={incidencia.id_incidencia}>
-                      <div className="card h-100">
-                        <div className="card-body">
-                          <h5 className="card-title">{incidencia.descripcion_incidencia}</h5>
-                          <img src={incidencia.producto.imagen ? `http://localhost:3001/uploads/${incidencia.producto.imagen}` : ''} 
-                            style={{ width: '100%', maxHeight: '100px', objectFit: 'contain' }} 
-                            className="card-img-top" 
-                            alt="Imagen Productos" />
-                          <p>
-                            Fecha: {new Date(incidencia.fecha_incidencia).toLocaleDateString()}
-                          </p>
-                          <p>Cantidad Afectada: {incidencia.cantidad_afectada}<br />
-                            Producto: {incidencia.producto.nombre_producto}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+  <p>No hay datos en esta vista</p>
+) : (
+  <div className="row w-100">
+    {incidenciasMostradas.map((incidencia) => (
+      <div className="col-12 col-sm-6 col-md-4 mb-4 p-2" key={incidencia.id_incidencia}>
+        <div className="card h-100">
+          <div className="card-body">
+            <h5 className="card-title">{incidencia.descripcion_incidencia}</h5>
+            <img 
+              src={incidencia.producto.imagen ? `http://localhost:3001/uploads/${incidencia.producto.imagen}` : ''} 
+              style={{ width: '100%', maxHeight: '100px', objectFit: 'contain' }} 
+              className="card-img-top" 
+              alt="Imagen Productos" 
+            />
+            <p>
+              Fecha: {new Date(incidencia.fecha_incidencia).toISOString().split('T')[0]}
+            </p>
+            <p>Cantidad Afectada: {incidencia.cantidad_afectada}<br />
+              Producto: {incidencia.producto.nombre_producto}
+            </p>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+)}
             </div>
             <nav aria-label="Page navigation" className="text-center">
               <div className="text-left">

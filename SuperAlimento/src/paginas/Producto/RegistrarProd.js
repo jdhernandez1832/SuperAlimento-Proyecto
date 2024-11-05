@@ -13,7 +13,6 @@ const RegistrarProd = () => {
         precio_compra: '',
         precio_venta: '',
         descripcion_producto: '',
-        cantidad: '',
         estado: 1,
         id_categoria: '',
         numero_documento: '',
@@ -108,7 +107,7 @@ const RegistrarProd = () => {
             } else if (value.length > 50) {
                 error = 'El campo no puede superar los 50 caracteres.';
             }
-        } else if (['codigo_barras', 'precio_compra', 'precio_venta', 'cantidad'].includes(name)) {
+        } else if (['codigo_barras', 'precio_compra', 'precio_venta'].includes(name)) {
             // Validar solo números
             const regex = /^\d+$/;
             if (!regex.test(value)) {
@@ -349,18 +348,6 @@ const RegistrarProd = () => {
                                             required
                                         />
                                         {errors.descripcion_producto && <span className="text-danger">{errors.descripcion_producto}</span>}
-                                    </div>
-                                    <div className="form-group">
-                                        <label htmlFor="cantidad">Cantidad</label>
-                                        <input
-                                            type="text"
-                                            className={`form-control ${errors.cantidad ? 'is-invalid' : ''}`}
-                                            id="cantidad"
-                                            value={formData.cantidad}
-                                            onChange={handleChange}
-                                            required
-                                        />
-                                        {errors.cantidad && <span className="text-danger">{errors.cantidad}</span>}
                                     </div>
                                     <div className="form-group">
                                         <label htmlFor="id_categoria">Categoría</label>

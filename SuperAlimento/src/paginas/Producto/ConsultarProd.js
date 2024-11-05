@@ -57,7 +57,20 @@ const ConsultarProd = () => {
         });
         if (response.ok) {
           const data = await response.json();
-          setProductos(data);
+  
+          // Para cada producto, obtenemos la cantidad
+          const productosConCantidad = await Promise.all(data.map(async (producto) => {
+            const cantidadResponse = await fetch(`http://localhost:3001/api/producto/cantidad/${producto.id_producto}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'X-Rol': rol,
+              },
+            });
+            const cantidadData = await cantidadResponse.json();
+            return { ...producto, cantidad: cantidadData.cantidad }; // Añadimos la cantidad al producto
+          }));
+  
+          setProductos(productosConCantidad);
         } else {
           Swal.fire('Error', 'Error al obtener los productos', 'error');
         }
@@ -65,9 +78,10 @@ const ConsultarProd = () => {
         Swal.fire('Error', 'Error en la solicitud', 'error');
       }
     };
-/* eslint-disable no-mixed-operators */
+  
     fetchProductos();
   }, [rol, token]);
+  
 
   const handleEstado = async (id_producto, estadoActual) => {
     const nuevoEstado = estadoActual === 'Activo' ? 'Desactivo' : 'Activo';

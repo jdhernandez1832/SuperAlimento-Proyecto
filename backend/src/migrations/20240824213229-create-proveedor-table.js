@@ -29,10 +29,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      cantidad: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
       estado: {
         type: Sequelize.ENUM('Activo', 'Desactivo'),
         allowNull: false,

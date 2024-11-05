@@ -20,6 +20,7 @@ const RegistrarSoli = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [setUsuarios] = useState([]);
   const [cart, setCart] = useState([]);
+  const [cantidadesProductos, setCantidadesProductos] = useState({});
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
   const rol = localStorage.getItem('Rol');
@@ -81,6 +82,7 @@ const RegistrarSoli = () => {
     const fetchProductosPorProveedor = async () => {
       if (!formData.id_proveedor) {
         setProductos([]);
+        setCantidadesProductos({}); // Limpiar las cantidades si no hay proveedor seleccionado
         return;
       }
       try {
@@ -93,6 +95,14 @@ const RegistrarSoli = () => {
         if (response.ok) {
           const data = await response.json();
           setProductos(data);
+  
+          // Obtener las cantidades para cada producto al cambiar de proveedor
+          const nuevasCantidades = {};
+          await Promise.all(data.map(async (producto) => {
+            const cantidad = await fetchCantidad(producto.id_producto);
+            nuevasCantidades[producto.id_producto] = cantidad;
+          }));
+          setCantidadesProductos(nuevasCantidades);
         } else {
           console.error('Error al obtener productos del proveedor:', response.statusText);
           setProductos([]);
@@ -102,9 +112,31 @@ const RegistrarSoli = () => {
         setProductos([]);
       }
     };
-
+  
+    const fetchCantidad = async (id_producto) => {
+      try {
+        const response = await fetch(`http://localhost:3001/api/producto/cantidad/${id_producto}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'X-Rol': rol,
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          return data.cantidad; // Asegúrate de que esto coincida con la estructura de tu respuesta
+        } else {
+          console.error('Error al obtener cantidad:', response.statusText);
+          return 0; // Retornar 0 si hay un error
+        }
+      } catch (error) {
+        console.error("Error al obtener cantidad:", error);
+        return 0;
+      }
+    };
+  
     fetchProductosPorProveedor();
   }, [formData.id_proveedor, token, rol]);
+  
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -201,39 +233,67 @@ const RegistrarSoli = () => {
   const handleSearch = (e) => {
     setSearchTerm(e.target.value || '');
   };
-
-  const handleAddToCart = (product) => {
-    Swal.fire({
-      title: `<strong>${product.nombre_producto}</strong>`,
-      html: `
-        <img src="${product.imagen ? `http://localhost:3001/uploads/${product.imagen}` : 'default-product-image.png'}" alt="${product.nombre_producto}" width="200" /><br/>
-        <strong>Precio: </strong> $${product.precio_compra.toLocaleString()}<br/>
-        <strong>Disponibilidad: </strong> ${product.cantidad} unidades<br/><br/>
-        <label for="cantidad">Cantidad a agregar:</label>
-        <input type="number" id="cantidad" class="swal2-input" min="1" max="${product.cantidad}" placeholder="Cantidad" />`,
-      showCancelButton: true,
-      confirmButtonText: 'Agregar a la solicitud',
-      confirmButtonColor: '#4caf50',
-      cancelButtonText: 'Cancelar',
-      preConfirm: () => {
-        const cantidad = Swal.getPopup().querySelector('#cantidad').value;
-        if (!cantidad || isNaN(cantidad) || cantidad <= 0) {
-          Swal.showValidationMessage('Por favor ingrese una cantidad válida');
-        }
-        return { cantidad: parseInt(cantidad, 10) };
-      }
-    }).then((result) => {
-      if (result.isConfirmed && result.value.cantidad > 0) {
-        setCart([...cart, { ...product, quantity: result.value.cantidad }]);
-        Swal.fire({
-          icon: 'success',
-          title: 'Producto agregado',
-          text: `${result.value.cantidad} unidades de ${product.nombre_producto} han sido agregadas a la solicitud.`,
-          confirmButtonColor: '#28a745'
+  
+  const handleAddToCart = async (producto) => {
+    // Mueve la función fetchCantidad fuera de handleAddToCart
+    const fetchCantidad = async () => {
+        const response = await fetch(`http://localhost:3001/api/producto/cantidad/${producto.id_producto}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                'X-Rol': rol,
+            },
         });
-      }
+
+        if (response.ok) {
+            const data = await response.json();
+            return data.cantidad; // Asegúrate de que esto coincida con la estructura de tu respuesta
+        } else {
+            console.error('Error al obtener cantidad:', response.statusText);
+            return 0; // Retornar 0 si hay un error
+        }
+    };
+
+    const cantidadDisponible = await fetchCantidad();
+
+    // Actualiza el estado de las cantidades de productos antes de mostrar el Swal
+    setCantidadesProductos(prev => ({ ...prev, [producto.id_producto]: cantidadDisponible }));
+
+    // Ahora muestra el Swal con la cantidad actualizada
+    Swal.fire({
+        title: `<strong>${producto.nombre_producto}</strong>`,
+        html: ` 
+            <img src="${producto.imagen ? `http://localhost:3001/uploads/${producto.imagen}` : 'default-product-image.png'}" alt="${producto.nombre_producto}" width="200" /><br/>
+            <strong>Precio: </strong> $${producto.precio_compra.toLocaleString()}<br/>
+            <strong>Disponibilidad: </strong> ${cantidadDisponible} unidades<br/><br/>
+            <label for="cantidad">Cantidad a agregar:</label>
+            <input type="number" id="cantidad" class="swal2-input" min="1" placeholder="Cantidad" />`, // Elimina max="${cantidadDisponible}"
+        showCancelButton: true,
+        confirmButtonText: 'Agregar a la solicitud',
+        confirmButtonColor: '#4caf50',
+        cancelButtonText: 'Cancelar',
+        preConfirm: () => {
+            const cantidad = Swal.getPopup().querySelector('#cantidad').value;
+            if (!cantidad || isNaN(cantidad) || cantidad <= 0) {
+                Swal.showValidationMessage('Por favor ingrese una cantidad válida');
+            }
+            return { cantidad: parseInt(cantidad, 10) };
+        }
+    }).then((result) => {
+        if (result.isConfirmed && result.value.cantidad > 0) {
+            // Asegúrate de que la cantidad se agregue al carrito sin restricciones
+            setCart([...cart, { ...producto, quantity: result.value.cantidad }]);
+            Swal.fire({
+                icon: 'success',
+                title: 'Producto agregado',
+                text: `${result.value.cantidad} unidades de ${producto.nombre_producto} han sido agregadas a la solicitud.`,
+                confirmButtonColor: '#28a745'
+            });
+        }
     });
-  };
+};
+
+
 
   const filteredProducts = productos.filter(
     (product) =>
@@ -268,22 +328,18 @@ const RegistrarSoli = () => {
                     </div>
                   </div>
                   <div className="product-list">
-                    {filteredProducts.length > 0 ? (
-                      filteredProducts.map((producto) => (
-                        <div
-                          key={producto.id_producto}
-                          className="product-item"
-                          onClick={() => handleAddToCart(producto)}
-                        >
-                          <img src={producto.imagen ? `http://localhost:3001/uploads/${producto.imagen}` : "default-product-image.png"} alt={producto.nombre_producto} width={'200'}/>
-                          <h4>{producto.nombre_producto}</h4>
-                          <p>{producto.cantidad}</p>
-                          <p>${producto.precio_compra.toLocaleString()}</p>
-                        </div>
-                      ))
-                    ) : (
-                      <p>No hay productos disponibles para este proveedor.</p>
-                    )}
+                    {filteredProducts.map((producto) => (
+                      <div
+                        key={producto.id_producto}
+                        className="product-item"
+                        onClick={() => handleAddToCart(producto)}
+                      >
+                        <img src={producto.imagen ? `http://localhost:3001/uploads/${producto.imagen}` : "default-product-image.png"} alt={producto.nombre_producto} width={'200'} />
+                        <h4>{producto.nombre_producto}</h4>
+                        <p>Cantidad disponible: {cantidadesProductos[producto.id_producto] || 0} unidades</p> {/* Mostrar cantidad */}
+                        <p>${producto.precio_compra.toLocaleString()}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
                 <div className="col-lg-6">

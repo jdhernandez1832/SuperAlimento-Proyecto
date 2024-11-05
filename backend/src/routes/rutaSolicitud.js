@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Solicitud, Solicitud_Producto, sequelize } = require('../models');
+const { Solicitud, Solicitud_Producto,FechaVencimiento, sequelize } = require('../models');
 
 router.post('/registrar', async (req, res) => {
   const transaction = await sequelize.transaction(); 
@@ -66,11 +66,11 @@ router.get('/detalles/:id', async (req, res) => {
 
 router.post('/aceptar-entrega/:id', async (req, res) => {
   const { id } = req.params;
+  const { lote, fecha_vencimiento } = req.body;
 
   const transaction = await sequelize.transaction();
 
   try {
-    // Encuentra la solicitud
     const solicitud = await Solicitud.findByPk(id);
     if (!solicitud) {
       return res.status(404).json({ message: 'Solicitud no encontrada' });
@@ -80,6 +80,18 @@ router.post('/aceptar-entrega/:id', async (req, res) => {
     solicitud.estado_solicitud = 'Aprobada';
     await solicitud.save({ transaction });
 
+    // Insertar en la tabla fechas_vencimiento
+    const productosSolicitud = await Solicitud_Producto.findAll({ where: { id_solicitud: id } });
+
+    for (const producto of productosSolicitud) {
+      await FechaVencimiento.create({
+        id_producto: producto.id_producto,
+        lote: lote,
+        fecha_vencimiento: fecha_vencimiento,
+        cantidad: producto.cantidad
+      }, { transaction });
+    }
+
     await transaction.commit();
     res.status(200).json({ message: 'Solicitud aceptada y productos agregados' });
   } catch (error) {
@@ -88,6 +100,7 @@ router.post('/aceptar-entrega/:id', async (req, res) => {
     res.status(500).json({ message: 'Error al procesar la solicitud' });
   }
 });
+
 
 module.exports = router;
 
