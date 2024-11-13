@@ -15,7 +15,7 @@ router.post('/correo', async (req, res) => {
     service: 'gmail',
     auth: {
       user: 'supermercadosuperalimento@gmail.com', 
-      pass: 'ejzzqaisipfojrzr', 
+      pass: 'qygg xrdr qfpd qzit', 
     },
   });
 

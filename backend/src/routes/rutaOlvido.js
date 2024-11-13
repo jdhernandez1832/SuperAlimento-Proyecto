@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
       user: 'supermercadosuperalimento@gmail.com', 
-      pass: 'ejzzqaisipfojrzr', 
+      pass: 'qygg xrdr qfpd qzit', 
     },
 });
 
