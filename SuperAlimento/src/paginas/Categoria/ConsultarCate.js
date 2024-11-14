@@ -21,7 +21,7 @@ const ConsultarCate = () => {
     useEffect(() => {
         const fetchCategorias = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/categoria/todos', {
+                const response = await fetch('https://superalimento-proyecto.onrender.com/api/categoria/todos', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'X-Rol': rol,
@@ -53,7 +53,7 @@ const ConsultarCate = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    const response = await fetch(`http://localhost:3001/api/categoria/estado/${id_categoria}`, {
+                    const response = await fetch(`https://superalimento-proyecto.onrender.com/api/categoria/estado/${id_categoria}`, {
                         method: 'PATCH',
                         headers: {
                             'Content-Type': 'application/json',

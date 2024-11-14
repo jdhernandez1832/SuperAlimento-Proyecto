@@ -63,7 +63,7 @@ const RegistrarCate = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:3001/api/categoria/registrar', {
+            const response = await fetch('https://superalimento-proyecto.onrender.com/api/categoria/registrar', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -36,7 +36,7 @@ const RegistrarSoli = () => {
   useEffect(() => {
     const fetchProveedores = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/proveedor/todos', {
+        const response = await fetch('https://superalimento-proyecto.onrender.com/api/proveedor/todos', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'X-Rol': rol,
@@ -57,7 +57,7 @@ const RegistrarSoli = () => {
 
     const fetchUsuarios = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/usuario/todos', {
+        const response = await fetch('https://superalimento-proyecto.onrender.com/api/usuario/todos', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'X-Rol': rol,
@@ -86,7 +86,7 @@ const RegistrarSoli = () => {
         return;
       }
       try {
-        const response = await fetch(`http://localhost:3001/api/producto/por-proveedor/${formData.id_proveedor}`, {
+        const response = await fetch(`https://superalimento-proyecto.onrender.com/api/producto/por-proveedor/${formData.id_proveedor}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'X-Rol': rol,
@@ -115,7 +115,7 @@ const RegistrarSoli = () => {
   
     const fetchCantidad = async (id_producto) => {
       try {
-        const response = await fetch(`http://localhost:3001/api/producto/cantidad/${id_producto}`, {
+        const response = await fetch(`https://superalimento-proyecto.onrender.com/api/producto/cantidad/${id_producto}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'X-Rol': rol,
@@ -193,7 +193,7 @@ const RegistrarSoli = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:3001/api/solicitud/registrar', {
+      const response = await fetch('https://superalimento-proyecto.onrender.com/api/solicitud/registrar', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -237,7 +237,7 @@ const RegistrarSoli = () => {
   const handleAddToCart = async (producto) => {
     // Mueve la función fetchCantidad fuera de handleAddToCart
     const fetchCantidad = async () => {
-        const response = await fetch(`http://localhost:3001/api/producto/cantidad/${producto.id_producto}`, {
+        const response = await fetch(`https://superalimento-proyecto.onrender.com/api/producto/cantidad/${producto.id_producto}`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,

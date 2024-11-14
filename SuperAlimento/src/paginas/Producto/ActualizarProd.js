@@ -32,7 +32,7 @@ const ActualizarProd = () => {
     useEffect(() => {
         const fetchProducto = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/api/producto/${id_producto}`, {
+                const response = await fetch(`https://superalimento-proyecto.onrender.com/api/producto/${id_producto}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'X-Rol': rol,
@@ -62,7 +62,7 @@ const ActualizarProd = () => {
 
         const fetchCategorias = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/categoria/todos', {
+                const response = await fetch('https://superalimento-proyecto.onrender.com/api/categoria/todos', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'X-Rol': rol,
@@ -93,7 +93,7 @@ const ActualizarProd = () => {
 
         const fetchUsuarios = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/usuario/todos', {
+                const response = await fetch('https://superalimento-proyecto.onrender.com/api/usuario/todos', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'X-Rol': rol,
@@ -123,7 +123,7 @@ const ActualizarProd = () => {
 
         const fetchProveedores = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/proveedor/todos', {
+                const response = await fetch('https://superalimento-proyecto.onrender.com/api/proveedor/todos', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'X-Rol': rol,
@@ -224,7 +224,7 @@ const ActualizarProd = () => {
         });
     
         try {
-            const response = await fetch(`http://localhost:3001/api/producto/actualizar/${id_producto}`, {
+            const response = await fetch(`https://superalimento-proyecto.onrender.com/api/producto/actualizar/${id_producto}`, {
                 method: 'PUT',
                 body: data,
                 headers: {
@@ -271,7 +271,7 @@ const ActualizarProd = () => {
             showLoaderOnConfirm: true,
             preConfirm: async (nombreCategoria) => {
                 try {
-                    const response = await fetch('http://localhost:3001/api/categoria/registrar', {
+                    const response = await fetch('https://superalimento-proyecto.onrender.com/api/categoria/registrar', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

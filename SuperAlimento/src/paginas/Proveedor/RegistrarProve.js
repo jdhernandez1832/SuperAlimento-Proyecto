@@ -93,7 +93,7 @@ const RegistrarProve = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:3001/api/proveedor/registrar', {
+            const response = await fetch('https://superalimento-proyecto.onrender.com/api/proveedor/registrar', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

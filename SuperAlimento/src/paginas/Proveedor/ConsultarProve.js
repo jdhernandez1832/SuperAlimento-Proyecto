@@ -21,7 +21,7 @@ const ConsultarProve = () => {
     useEffect(() => {
         const fetchProveedores = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/proveedor/todos', {
+                const response = await fetch('https://superalimento-proyecto.onrender.com/api/proveedor/todos', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'X-Rol': rol,
@@ -53,7 +53,7 @@ const ConsultarProve = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    const response = await fetch(`http://localhost:3001/api/proveedor/estado/${id_proveedor}`, {
+                    const response = await fetch(`https://superalimento-proyecto.onrender.com/api/proveedor/estado/${id_proveedor}`, {
                         method: 'PATCH',
                         headers: {
                             'Content-Type': 'application/json',

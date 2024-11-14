@@ -103,26 +103,27 @@ const DetallesVenta = () => {
         const doc = new jsPDF();
     
         const logo = new Image();
-        logo.src = '../../dist/img/SuperAlimento.png';
+        logo.src = '../../dist/img/SuperAlimento.png'; // Verifica que la ruta sea correcta.
     
         logo.onload = () => {
-
+            console.log('Imagen cargada con éxito');
+    
             const pageWidth = doc.internal.pageSize.getWidth();
             const logoWidth = 40;
             const logoHeight = 40;
             const logoX = (pageWidth - logoWidth) / 2; 
+    
             doc.addImage(logo, 'PNG', logoX, 20, logoWidth, logoHeight);
     
-
+            // Título del documento
             doc.setFontSize(20);
             doc.setFont('helvetica', 'bold');
             const nombreSupermercado = 'SuperAlimento';
             const textWidth = doc.getTextWidth(nombreSupermercado);
             const textX = (pageWidth - textWidth) / 2; 
+            doc.text(nombreSupermercado, textX, 80);
     
-            doc.text(nombreSupermercado, textX, 80); 
-    
-
+            // Detalles de la venta
             doc.setFontSize(16);
             doc.setFont('helvetica', 'normal');
             doc.text('Detalles de la Venta', 20, 100); 
@@ -131,7 +132,7 @@ const DetallesVenta = () => {
             doc.text(`Método de Pago: ${venta?.metodo_pago}`, 20, 135);
             doc.text(`Usuario: ${usuarios.find(usuario => usuario.numero_documento === venta?.numero_documento)?.nombre_usuario || 'No disponible'}`, 20, 150);
     
-     
+            // Datos de los productos
             const productosTabla = productos.map((prod) => {
                 const productoExistente = productosExistentes.find(p => p.id_producto === prod.id_producto);
                 return [
@@ -141,7 +142,7 @@ const DetallesVenta = () => {
                 ];
             });
     
-  
+            // Agregar tabla de productos
             doc.autoTable({
                 head: [['Producto', 'Cantidad', 'Precio']],
                 body: productosTabla,
@@ -152,14 +153,21 @@ const DetallesVenta = () => {
                 },
             });
     
-   
+            // Total
             doc.setFontSize(12);
             doc.text(`Total: $${venta?.total_venta}`, 20, doc.autoTable.previous.finalY + 20);
     
-  
+            // Guardar el PDF
             doc.save('detalles_venta.pdf');
-        }
+        };
+    
+        // Manejo de error en caso de que la imagen no se cargue correctamente
+        logo.onerror = (err) => {
+            console.error('Error al cargar la imagen:', err);
+            alert('No se pudo cargar la imagen. Por favor, verifica la URL.');
+        };
     };
+    
     
 
     if (loading) {

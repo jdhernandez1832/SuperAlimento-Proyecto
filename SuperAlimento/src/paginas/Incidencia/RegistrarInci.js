@@ -30,7 +30,7 @@ const RegistrarIncidencia = () => {
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/producto/todos', {
+        const response = await fetch('https://superalimento-proyecto.onrender.com/api/producto/todos', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'X-Rol': rol,
@@ -41,7 +41,7 @@ const RegistrarIncidencia = () => {
   
           // Para cada producto, obtenemos la cantidad
           const productosConCantidad = await Promise.all(data.map(async (producto) => {
-            const cantidadResponse = await fetch(`http://localhost:3001/api/producto/cantidad/${producto.id_producto}`, {
+            const cantidadResponse = await fetch(`https://superalimento-proyecto.onrender.com/api/producto/cantidad/${producto.id_producto}`, {
               headers: {
                 'Authorization': `Bearer ${token}`,
                 'X-Rol': rol,
@@ -64,7 +64,7 @@ const RegistrarIncidencia = () => {
   }, [rol, token]);
   const handleAddToCart = async (product) => { 
     try {
-        const response = await fetch(`http://localhost:3001/api/producto/fechas-vencimiento/${product.id_producto}`, {
+        const response = await fetch(`https://superalimento-proyecto.onrender.com/api/producto/fechas-vencimiento/${product.id_producto}`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'X-Rol': rol,
@@ -190,7 +190,7 @@ const RegistrarIncidencia = () => {
     }));
 
     try {
-      const response = await fetch('http://localhost:3001/api/incidencia/registrar', {
+      const response = await fetch('https://superalimento-proyecto.onrender.com/api/incidencia/registrar', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -20,7 +20,7 @@ const ConsultarSoli = () => {
     useEffect(() => {
         const fetchSolicitudes = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/solicitud/todos', {
+                const response = await fetch('https://superalimento-proyecto.onrender.com/api/solicitud/todos', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'X-Rol': rol,
@@ -86,7 +86,7 @@ const ConsultarSoli = () => {
 
         if (formValues) {
             try {
-                const response = await fetch(`http://localhost:3001/api/solicitud/aceptar-entrega/${id}`, {
+                const response = await fetch(`https://superalimento-proyecto.onrender.com/api/solicitud/aceptar-entrega/${id}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

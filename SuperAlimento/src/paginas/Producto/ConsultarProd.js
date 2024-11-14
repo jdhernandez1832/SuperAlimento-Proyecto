@@ -26,7 +26,7 @@ const ConsultarProd = () => {
   useEffect(() => {
     const fetchCategorias = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/categoria/todos', {
+        const response = await fetch('https://superalimento-proyecto.onrender.com/api/categoria/todos', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'X-Rol': rol,
@@ -49,7 +49,7 @@ const ConsultarProd = () => {
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/producto/todos', {
+        const response = await fetch('https://superalimento-proyecto.onrender.com/api/producto/todos', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'X-Rol': rol,
@@ -60,7 +60,7 @@ const ConsultarProd = () => {
   
           // Para cada producto, obtenemos la cantidad
           const productosConCantidad = await Promise.all(data.map(async (producto) => {
-            const cantidadResponse = await fetch(`http://localhost:3001/api/producto/cantidad/${producto.id_producto}`, {
+            const cantidadResponse = await fetch(`https://superalimento-proyecto.onrender.com/api/producto/cantidad/${producto.id_producto}`, {
               headers: {
                 'Authorization': `Bearer ${token}`,
                 'X-Rol': rol,
@@ -96,7 +96,7 @@ const ConsultarProd = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await fetch(`http://localhost:3001/api/producto/estado/${id_producto}`, {
+          const response = await fetch(`https://superalimento-proyecto.onrender.com/api/producto/estado/${id_producto}`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
@@ -161,69 +161,81 @@ const ConsultarProd = () => {
     const nuevaDireccion = orden.campo === campo && orden.direccion === 'asc' ? 'desc' : 'asc';
     setOrden({ campo, direccion: nuevaDireccion });
   };
-  const generarReporte = () => {
-    const doc = new jsPDF('p', 'pt', 'a4');
 
+  const generarReporte = () => {
+    console.log('Generando reporte...');
+    const doc = new jsPDF('p', 'pt', 'a4');
+  
     const logo = new Image();
     logo.src = '../../dist/img/SuperAlimento.png';
-
+  
     logo.onload = () => {
-        doc.addImage(logo, 'PNG', 40, 30, 50, 50); 
-        doc.setFontSize(18);
-        doc.text('SuperAlimento', 150, 60); 
-
-        doc.setFontSize(14);
-        doc.text('Reporte de Productos', 40, 100);
-
-        const headers = [['Imagen', 'Nombre', 'Código de Barras', 'Precio Compra', 'Precio Venta', 'Cantidad', 'Categoría']];
-
-        // Filtra los productos que están activos
-        const productosActivos = productos.filter(producto => producto.estado === 'Activo');
-
-        // Mapea solo los productos activos, agregando el nombre de la categoría
-        const data = productosActivos.map((producto) => {
-            const categoria = categorias.find(c => c.id_categoria === producto.id_categoria);
-            return [
-                '', 
-                producto.nombre_producto,
-                producto.codigo_barras,
-                producto.precio_compra.toFixed(2),
-                producto.precio_venta.toFixed(2),
-                producto.cantidad,
-                categoria ? categoria.nombre : 'Sin categoría'  // Muestra el nombre de la categoría o 'Sin categoría' si no se encuentra
-            ];
-        });
-
-        doc.autoTable({
-            head: headers,
-            body: data,
-            startY: 120, 
-            styles: { fontSize: 8 }, 
-            headStyles: {
-                fillColor: [34, 139, 34], 
-                textColor: [255, 255, 255], 
-            },
-            didDrawCell: (data) => {
-                if (data.column.index === 0 && data.cell.section === 'body') {
-                    const imgUrl = `http://localhost:3001/uploads/${productosActivos[data.row.index].imagen}`;
-                    const img = new Image();
-                    img.src = imgUrl;
-
-                    img.onload = () => {
-                        doc.addImage(img, 'JPEG', data.cell.x + 2, data.cell.y + 2, 30, 30); 
-                        if (data.row.index === productosActivos.length - 1) {
-                            doc.save('reporte_productos.pdf'); 
-                        }
-                    };
-                }
-            },
-        });
-        
-        if (productosActivos.every(p => !p.imagen)) {
-            doc.save('reporte_productos.pdf');
-        }
+      console.log('Logo cargado');
+  
+      doc.addImage(logo, 'PNG', 40, 30, 50, 50);
+      doc.setFontSize(18);
+      doc.text('SuperAlimento', 150, 60);
+  
+      doc.setFontSize(14);
+      doc.text('Reporte de Productos', 40, 100);
+  
+      const headers = [['Imagen', 'Nombre', 'Código de Barras', 'Precio Compra', 'Precio Venta', 'Cantidad', 'Categoría']];
+  
+      const productosActivos = productos.filter(producto => producto.estado === 'Activo');
+      console.log('Productos activos:', productosActivos);
+  
+      const data = productosActivos.map((producto) => {
+        const categoria = categorias.find(c => c.id_categoria === producto.id_categoria);
+        return [
+          '', // Dejar vacía la imagen si no se desea incluir en la tabla
+          producto.nombre_producto,
+          producto.codigo_barras,
+          producto.precio_compra.toFixed(2),
+          producto.precio_venta.toFixed(2),
+          producto.cantidad,
+          categoria ? categoria.nombre : 'Sin categoría',
+        ];
+      });
+  
+      doc.autoTable({
+        head: headers,
+        body: data,
+        startY: 120,
+        styles: { fontSize: 8 },
+        headStyles: {
+          fillColor: [34, 139, 34],
+          textColor: [255, 255, 255],
+        },
+        didDrawCell: (data) => {
+          if (data.column.index === 0 && data.cell.section === 'body') {
+            const imgUrl = productosActivos[data.row.index].imagen; // Imagen de Cloudinary
+            const img = new Image();
+            img.src = imgUrl;
+  
+            img.onload = () => {
+              console.log('Imagen cargada para el producto:', imgUrl);
+              doc.addImage(img, 'JPEG', data.cell.x + 2, data.cell.y + 2, 30, 30); 
+              if (data.row.index === productosActivos.length - 1) {
+                console.log('Generando PDF...');
+                doc.save('reporte_productos.pdf');
+              }
+            };
+  
+            img.onerror = (error) => {
+              console.error('Error al cargar la imagen:', error);
+            };
+          }
+        },
+      });
+  
+      // Caso en que no haya imagen
+      if (productosActivos.every(p => !p.imagen)) {
+        doc.save('reporte_productos.pdf');
+      }
     };
-};
+  };
+  
+
 
   return (
     <div>

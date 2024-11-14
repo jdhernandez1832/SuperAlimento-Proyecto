@@ -15,7 +15,7 @@ const ConsultarInci = () => {
   useEffect(() => {
     const fetchIncidencias = async () => {
       try {
-        const response = await fetch("http://localhost:3001/api/incidencia/todos", {
+        const response = await fetch("https://superalimento-proyecto.onrender.com/api/incidencia/todos", {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

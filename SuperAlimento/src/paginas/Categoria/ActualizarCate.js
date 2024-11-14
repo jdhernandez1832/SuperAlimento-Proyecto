@@ -17,7 +17,7 @@ const ActualizarCate = () => {
   useEffect(() => {
     const fetchCategoria = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/api/categoria/${id_categoria}`, {
+        const response = await fetch(`https://superalimento-proyecto.onrender.com/api/categoria/${id_categoria}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'X-Rol': rol,
@@ -92,7 +92,7 @@ const ActualizarCate = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/api/categoria/actualizar/${id_categoria}`, {
+      const response = await fetch(`https://superalimento-proyecto.onrender.com/api/categoria/actualizar/${id_categoria}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

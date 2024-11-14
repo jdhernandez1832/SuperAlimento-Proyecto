@@ -21,7 +21,7 @@ const DetallesSolicitud = () => {
     useEffect(() => {
         const fetchSolicitud = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/api/solicitud/detalles/${id_solicitud}`, {
+                const response = await fetch(`https://superalimento-proyecto.onrender.com/api/solicitud/detalles/${id_solicitud}`, {
                     headers: {
                       'Authorization': `Bearer ${token}`,
                       'X-Rol': rol, // Agregar el token en los encabezados
@@ -45,7 +45,7 @@ const DetallesSolicitud = () => {
 
         const fetchProveedores = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/proveedor/todos', {
+                const response = await fetch('https://superalimento-proyecto.onrender.com/api/proveedor/todos', {
                     headers: {
                       'Authorization': `Bearer ${token}`,
                       'X-Rol': rol, // Agregar el token en los encabezados
@@ -64,7 +64,7 @@ const DetallesSolicitud = () => {
 
         const fetchUsuarios = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/usuario/todos', {
+                const response = await fetch('https://superalimento-proyecto.onrender.com/api/usuario/todos', {
                     headers: {
                       'Authorization': `Bearer ${token}`,
                       'X-Rol': rol, // Agregar el token en los encabezados
@@ -83,7 +83,7 @@ const DetallesSolicitud = () => {
 
         const fetchProductos = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/producto/todos', {
+                const response = await fetch('https://superalimento-proyecto.onrender.com/api/producto/todos', {
                     headers: {
                       'Authorization': `Bearer ${token}`,
                       'X-Rol': rol, // Agregar el token en los encabezados

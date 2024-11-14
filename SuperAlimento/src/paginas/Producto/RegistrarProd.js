@@ -37,7 +37,7 @@ const RegistrarProd = () => {
     useEffect(() => {
         const fetchCategorias = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/categoria/todos', {
+                const response = await fetch('https://superalimento-proyecto.onrender.com/api/categoria/todos', {
                     headers: {
                       'Authorization': `Bearer ${token}`,
                       'X-Rol': rol, 
@@ -58,7 +58,7 @@ const RegistrarProd = () => {
 
         const fetchProveedores = async () => {
             try {
-              const response = await fetch('http://localhost:3001/api/proveedor/todos', {
+              const response = await fetch('https://superalimento-proyecto.onrender.com/api/proveedor/todos', {
                 headers: {
                   'Authorization': `Bearer ${token}`,
                   'X-Rol': rol,
@@ -232,7 +232,7 @@ const RegistrarProd = () => {
         };
     
         try {
-            const response = await fetch('http://localhost:3001/api/producto/registrar', {
+            const response = await fetch('https://superalimento-proyecto.onrender.com/api/producto/registrar', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -281,7 +281,7 @@ const RegistrarProd = () => {
             showLoaderOnConfirm: true,
             preConfirm: async (nombreCategoria) => {
                 try {
-                    const response = await fetch('http://localhost:3001/api/categoria/registrar', {
+                    const response = await fetch('https://superalimento-proyecto.onrender.com/api/categoria/registrar', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

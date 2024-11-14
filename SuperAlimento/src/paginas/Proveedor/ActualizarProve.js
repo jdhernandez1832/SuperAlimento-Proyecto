@@ -27,7 +27,7 @@ const ActualizarProve = () => {
     useEffect(() => {
         const fetchProveedor = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/api/proveedor/${id_proveedor}`, {
+                const response = await fetch(`https://superalimento-proyecto.onrender.com/api/proveedor/${id_proveedor}`, {
                     headers: {
                       'Authorization': `Bearer ${token}`,
                       'X-Rol': rol, 
@@ -126,7 +126,7 @@ const ActualizarProve = () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:3001/api/proveedor/actualizar/${id_proveedor}`, {
+            const response = await fetch(`https://superalimento-proyecto.onrender.com/api/proveedor/actualizar/${id_proveedor}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
