@@ -148,10 +148,10 @@ const Principal = () => {
             </div>
           </div>
         </div>
-        <footer class="container">
-        <p class="float-end"><a href="#i" className="letras">Volver</a></p>
-        <p>&copy; 2024 SuperAlimento.</p>
-      </footer>
+        <footer className="container">
+          <p className="float-end"><a href="#i" className="letras">Volver</a></p>
+          <p>&copy; {new Date().getFullYear()} SuperAlimento.</p>
+        </footer>
       </section>
     </div>
   );

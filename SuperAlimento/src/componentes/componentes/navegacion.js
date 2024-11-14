@@ -59,9 +59,9 @@ const Navegacion = ({ children }) => {
 
   // Función para manejar el despliegue de secciones
   const toggleSection = (sectionTitle) => {
-    setOpenSections(prevState => ({
+    setOpenSections((prevState) => ({
       ...prevState,
-      [sectionTitle]: !prevState[sectionTitle]
+      [sectionTitle]: !prevState[sectionTitle],
     }));
   };
 
@@ -125,16 +125,49 @@ const Navegacion = ({ children }) => {
     },
     ];
 
-    return navItems.map(item => {
+    return navItems.map((item) => {
       if (item.roles.includes(rol)) {
+        const isOpen = openSections[item.title];
         return (
           <li className="nav-item" key={item.title}>
-            <Link to="#" className="nav-link" onClick={() => toggleSection(item.title)}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '0.5rem 1rem',
+                color: '#c2c7d0',
+                textDecoration: 'none',
+                cursor: 'pointer',
+                border: '1px solid transparent', // Borde transparente por defecto
+                borderRadius: '5px', // Bordes redondeados
+                transition: 'background-color 0.3s, border-color 0.3s, color 0.3s', // Animación suave para los cambios
+              }}
+              onClick={() => toggleSection(item.title)}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#494e53'; // Cambio de color de fondo
+                const pElement = e.currentTarget.querySelector('p');
+                if (pElement) pElement.style.color = '#ffffff'; // Cambio de color de texto si el elemento p existe
+              }} 
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent'; // Vuelve al color original cuando el mouse sale
+                const pElement = e.currentTarget.querySelector('p');
+                if (pElement) pElement.style.color = '#c2c7d0'; // Vuelve al color de texto original
+              }}
+            >
               <i className={`${item.icon} nav-icon`} />
-              <p>{item.title}<i className="right fas fa-angle-left" /></p>
-            </Link>
-            <ul className="nav nav-treeview" style={{ display: openSections[item.title] ? 'block' : 'none' }}>
-              {item.links.map(link => (
+              <p style={{ margin: '0', paddingLeft: '10px', flexGrow: 1 }}>
+                {item.title}
+              </p>
+              <i
+                className={`right fas ${isOpen ? 'fa-angle-down' : 'fa-angle-left'}`}
+                style={{
+                  paddingLeft: '10px',
+                  marginLeft: 'auto', // Empuja la flecha a la derecha
+                }}
+              />
+            </div>
+            <ul className="nav nav-treeview" style={{ display: isOpen ? 'block' : 'none' }}>
+              {item.links.map((link) => (
                 <li className="nav-item" key={link.to}>
                   <Link to={link.to} className="nav-link">
                     <p>{link.title}</p>
@@ -202,7 +235,7 @@ const Navegacion = ({ children }) => {
         {children}
       </div>
       <footer className="main-footer dark-mode">
-        <strong>Copyright © 2024 <Link to="#">SuperAlimento</Link>.</strong>
+        <strong>Copyright © {new Date().getFullYear()} SuperAlimento.</strong>
       </footer>
       <aside className="control-sidebar control-sidebar-dark">
       </aside>
