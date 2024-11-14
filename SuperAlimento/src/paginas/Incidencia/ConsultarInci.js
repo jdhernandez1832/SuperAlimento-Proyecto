@@ -115,10 +115,9 @@ const ConsultarInci = () => {
           <div className="card-body">
             <h5 className="card-title">{incidencia.descripcion_incidencia}</h5>
             <img 
-              src={incidencia.producto.imagen ? `http://localhost:3001/uploads/${incidencia.producto.imagen}` : ''} 
+              src={incidencia.producto.imagen} alt={incidencia.producto.nombre_producto}
               style={{ width: '100%', maxHeight: '100px', objectFit: 'contain' }} 
               className="card-img-top" 
-              alt="Imagen Productos" 
             />
             <p>
               Fecha: {new Date(incidencia.fecha_incidencia).toISOString().split('T')[0]}

@@ -21,7 +21,7 @@ const Navegacion = ({ children }) => {
 
   const fetchUsuario = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/usuario/${numeroDocumento}`, {
+      const response = await fetch(`https://superalimento-proyecto.onrender.com/api/usuario/${numeroDocumento}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'X-Rol': rol,

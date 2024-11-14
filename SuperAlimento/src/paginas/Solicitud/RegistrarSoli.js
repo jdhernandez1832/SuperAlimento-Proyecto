@@ -261,25 +261,26 @@ const RegistrarSoli = () => {
 
     // Ahora muestra el Swal con la cantidad actualizada
     Swal.fire({
-        title: `<strong>${producto.nombre_producto}</strong>`,
-        html: ` 
-            <img src="${producto.imagen ? `http://localhost:3001/uploads/${producto.imagen}` : 'default-product-image.png'}" alt="${producto.nombre_producto}" width="200" /><br/>
-            <strong>Precio: </strong> $${producto.precio_compra.toLocaleString()}<br/>
-            <strong>Disponibilidad: </strong> ${cantidadDisponible} unidades<br/><br/>
-            <label for="cantidad">Cantidad a agregar:</label>
-            <input type="number" id="cantidad" class="swal2-input" min="1" placeholder="Cantidad" />`, // Elimina max="${cantidadDisponible}"
-        showCancelButton: true,
-        confirmButtonText: 'Agregar a la solicitud',
-        confirmButtonColor: '#4caf50',
-        cancelButtonText: 'Cancelar',
-        preConfirm: () => {
-            const cantidad = Swal.getPopup().querySelector('#cantidad').value;
-            if (!cantidad || isNaN(cantidad) || cantidad <= 0) {
-                Swal.showValidationMessage('Por favor ingrese una cantidad válida');
-            }
-            return { cantidad: parseInt(cantidad, 10) };
-        }
-    }).then((result) => {
+      title: `<strong>${producto.nombre_producto}</strong>`,
+      html: ` 
+          <img src="${producto.imagen ? producto.imagen : 'default-product-image.png'}" 
+              alt="${producto.nombre_producto}" width="200" /><br/>
+          <strong>Precio: </strong> $${producto.precio_compra.toLocaleString()}<br/>
+          <strong>Disponibilidad: </strong> ${cantidadDisponible} unidades<br/><br/>
+          <label for="cantidad">Cantidad a agregar:</label>
+          <input type="number" id="cantidad" class="swal2-input" min="1" placeholder="Cantidad" />`, 
+      showCancelButton: true,
+      confirmButtonText: 'Agregar a la solicitud',
+      confirmButtonColor: '#4caf50',
+      cancelButtonText: 'Cancelar',
+      preConfirm: () => {
+          const cantidad = Swal.getPopup().querySelector('#cantidad').value;
+          if (!cantidad || isNaN(cantidad) || cantidad <= 0) {
+              Swal.showValidationMessage('Por favor ingrese una cantidad válida');
+          }
+          return { cantidad: parseInt(cantidad, 10) };
+      }
+  }).then((result) => {
         if (result.isConfirmed && result.value.cantidad > 0) {
             // Asegúrate de que la cantidad se agregue al carrito sin restricciones
             setCart([...cart, { ...producto, quantity: result.value.cantidad }]);
@@ -334,7 +335,7 @@ const RegistrarSoli = () => {
                         className="product-item"
                         onClick={() => handleAddToCart(producto)}
                       >
-                        <img src={producto.imagen ? `http://localhost:3001/uploads/${producto.imagen}` : "default-product-image.png"} alt={producto.nombre_producto} width={'200'} />
+                        <img src={producto.imagen} alt={producto.nombre_producto} width={'200'} />
                         <h4>{producto.nombre_producto}</h4>
                         <p>Cantidad disponible: {cantidadesProductos[producto.id_producto] || 0} unidades</p> {/* Mostrar cantidad */}
                         <p>${producto.precio_compra.toLocaleString()}</p>

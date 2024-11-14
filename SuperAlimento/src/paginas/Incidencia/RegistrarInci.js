@@ -115,7 +115,7 @@ const RegistrarIncidencia = () => {
         const { value: selectedFecha } = await Swal.fire({
             title: product.nombre_producto,
             html: `<div style="text-align: center;">
-                        <img src="http://localhost:3001/uploads/${product.imagen}" alt="${product.nombre_producto}" style="width: 100px; height: 100px; margin-bottom: 10px;">
+                        <img src="${product.imagen ? product.imagen : 'default-product-image.png'}"  style="width: 100px; height: 100px; margin-bottom: 10px;">
                         <div><p>Seleccione la fecha de vencimiento relacionada con el producto afectado</p></div>
                    </div>`,
             input: 'select',
@@ -133,7 +133,7 @@ const RegistrarIncidencia = () => {
             const { value: quantity } = await Swal.fire({
                 title: product.nombre_producto,
                 html: `<div style="text-align: center;">
-                            <img src="http://localhost:3001/uploads/${product.imagen}" alt="${product.nombre_producto}" style="width: 100px; height: 100px; margin-bottom: 10px;">
+                      <img src="${product.imagen ? product.imagen : 'default-product-image.png'}" alt="${product.nombre_producto}" style="width: 100px; height: 100px; margin-bottom: 10px;">
                        </div>
                        <div><p>Agregue la cantidad afectada</p></div>
                        <p>Fecha de vencimiento: ${fechaSeleccionada.fecha}</p>
@@ -292,7 +292,7 @@ const RegistrarIncidencia = () => {
                         className="product-item"
                         onClick={() => handleAddToCart(producto)}
                       >
-                        <img src={producto.imagen ? `http://localhost:3001/uploads/${producto.imagen}` : 'default-product-image.png'} alt={producto.nombre_producto} />
+                        <img src={producto.imagen} alt={producto.nombre_producto}/>
                         <h4>{producto.nombre_producto}</h4>
                         <p>Cantidad disponible: {producto.cantidad}</p>
                       </div>

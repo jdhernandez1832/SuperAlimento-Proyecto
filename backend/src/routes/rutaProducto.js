@@ -6,24 +6,28 @@ const moment = require('moment');
 const cron = require('node-cron');
 const nodemailer = require('nodemailer');
 const { Op } = require('sequelize');
+const cloudinary = require('cloudinary').v2; // Importa el SDK de Cloudinary
+const dotenv = require('dotenv');  // Cargar variables de entorno
+
 
 // Configuración de multer para almacenar imágenes
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}_${file.originalname}`);
-    }
-});
+const storage = multer.memoryStorage(); 
 const upload = multer({ storage: storage });
 
-// Crear producto con imagen
-router.post('/registrar', upload.single('imagen'), async (req, res) => {
-    try {
-        const { nombre_producto, codigo_barras, precio_compra, precio_venta, descripcion_producto, estado, id_categoria, numero_documento, id_proveedor } = req.body;
-        const imagen = req.file ? req.file.filename : null;
 
+// Cargar las variables de entorno del archivo .env
+dotenv.config();
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,  // Nombre de tu Cloud en Cloudinary
+    api_key: process.env.CLOUDINARY_API_KEY,        // API Key de Cloudinary
+    api_secret: process.env.CLOUDINARY_API_SECRET   // API Secret de Cloudinary
+});
+
+router.post('/registrar', async (req, res) => {
+    try {
+        const { nombre_producto, codigo_barras, precio_compra, precio_venta, descripcion_producto, estado, id_categoria, numero_documento, id_proveedor, imagen } = req.body;
+
+        // Aquí solo guardas la URL de la imagen, no necesitas procesarla más
         const nuevoProducto = await Producto.create({
             nombre_producto,
             codigo_barras,
@@ -34,12 +38,12 @@ router.post('/registrar', upload.single('imagen'), async (req, res) => {
             id_categoria,
             numero_documento,
             id_proveedor,
-            imagen // Guardamos el nombre del archivo en la base de datos
+            imagen, // Guardar la URL de la imagen
         });
 
-        res.status(201).json(nuevoProducto);
+        return res.status(201).json(nuevoProducto); // Respondemos con el producto creado
     } catch (error) {
-        console.error(error);
+        console.error('Error al registrar producto:', error);
         res.status(500).json({ message: 'Error al registrar producto' });
     }
 });
@@ -70,16 +74,19 @@ router.get('/:id_producto', async (req, res) => {
     }
 });
 
-// Actualizar un producto por ID
 router.put('/actualizar/:id_producto', upload.single('imagen'), async (req, res) => {
     try {
         const { id_producto } = req.params;
         const { nombre_producto, codigo_barras, precio_compra, precio_venta, descripcion_producto, estado, id_categoria, numero_documento, id_proveedor } = req.body;
-        const imagen = req.file ? req.file.filename : null;
-
+        
+        // Si se subió una nueva imagen, la URL se extrae de req.file.path (Cloudinary en este caso)
+        const imagenUrl = req.file ? req.file.path : req.body.imagen; // Si no hay nueva imagen, usar la existente
+        
+        // Buscar el producto en la base de datos
         const producto = await Producto.findOne({ where: { id_producto } });
-
+        
         if (producto) {
+            // Actualizar el producto en la base de datos
             await producto.update({
                 nombre_producto,
                 codigo_barras,
@@ -90,8 +97,10 @@ router.put('/actualizar/:id_producto', upload.single('imagen'), async (req, res)
                 id_categoria,
                 numero_documento,
                 id_proveedor,
-                imagen: imagen || producto.imagen // Si no se sube nueva imagen, se mantiene la existente
+                imagen: imagenUrl // Asegúrate de actualizar el campo de la imagen
             });
+
+            // Retornar el producto actualizado
             res.status(200).json(producto);
         } else {
             res.status(404).json({ message: 'Producto no encontrado' });

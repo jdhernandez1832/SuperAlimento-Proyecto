@@ -125,9 +125,10 @@ const RegistrarProd = () => {
         });
     };
 
-    const handleFileChange = (e) => {
+    const handleFileChange = async (e) => {
         const file = e.target.files[0];
-
+    
+        // Verificar si el archivo tiene un tipo permitido
         const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
         if (file && !allowedTypes.includes(file.type)) {
             Swal.fire({
@@ -138,18 +139,54 @@ const RegistrarProd = () => {
             e.target.value = null;
             return;
         }
-
-        setFormData({
-            ...formData,
-            imagen: file,
-        });
+    
+        // Previsualizar la imagen localmente (esto es solo para mostrar la imagen en la interfaz)
+        const imageUrl = URL.createObjectURL(file);
+        setFormData(prevFormData => ({
+            ...prevFormData,
+            imagen: imageUrl,  // Almacena la URL temporal para previsualización
+        }));
+    
+        try {
+            // Subir la imagen a Cloudinary
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", "h6i1y3x1");  // Asegúrate de usar tu upload_preset de Cloudinary
+    
+            const response = await fetch('https://api.cloudinary.com/v1_1/dtuawjvux/image/upload', {
+                method: 'POST',
+                body: formData,
+            });
+    
+            const data = await response.json();
+    
+            if (data.secure_url) {
+                // Si la imagen se sube correctamente, obtienes la URL segura
+                setFormData(prevFormData => ({
+                    ...prevFormData,
+                    imagen: data.secure_url,  // Establecer la URL en el formulario
+                }));
+            } else {
+                throw new Error('Error al obtener la URL de la imagen');
+            }
+        } catch (error) {
+            console.error('Error al subir la imagen a Cloudinary:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error al subir la imagen',
+                text: 'Hubo un problema al intentar subir la imagen.',
+            });
+        }
     };
+    
+    
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         let isValid = true;
         let newErrors = {};
-
+    
         // Validar todos los campos antes de enviar
         Object.keys(formData).forEach(key => {
             const error = validateField(key, formData[key]);
@@ -158,7 +195,7 @@ const RegistrarProd = () => {
                 isValid = false;
             }
         });
-
+    
         if (!isValid) {
             setErrors(newErrors);
             Swal.fire({
@@ -169,23 +206,44 @@ const RegistrarProd = () => {
             });
             return;
         }
-
+    
+        // Si la imagen está vacía (no se subió nada), devolver un error
+        if (!formData.imagen) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Por favor, sube una imagen para el producto.',
+            });
+            return;
+        }
+    
         // Si es válido, envía los datos
-        const data = new FormData();
-        Object.keys(formData).forEach(key => {
-            data.append(key, formData[key]);
-        });
-
+        const postData = {
+            nombre_producto: formData.nombre_producto,
+            codigo_barras: formData.codigo_barras,  // Asegúrate de que este es un número
+            precio_compra: Number(formData.precio_compra),  // Asegúrate de que es un número
+            precio_venta: Number(formData.precio_venta),  // Asegúrate de que es un número
+            descripcion_producto: formData.descripcion_producto,
+            estado: formData.estado,
+            id_categoria: formData.id_categoria,
+            numero_documento: formData.numero_documento,
+            id_proveedor: formData.id_proveedor,
+            imagen: formData.imagen,  // Aquí va la URL de la imagen que obtuviste de Cloudinary
+        };
+    
         try {
             const response = await fetch('http://localhost:3001/api/producto/registrar', {
                 method: 'POST',
-                body: data,
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'X-Rol': rol,
+                    'Content-Type': 'application/json',
                 },
+                body: JSON.stringify(postData),
             });
-
+    
+            const result = await response.json();
+    
             if (response.ok) {
                 Swal.fire({
                     icon: 'success',
@@ -198,7 +256,7 @@ const RegistrarProd = () => {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error al registrar producto',
-                    text: 'Hubo un problema al registrar el producto.',
+                    text: result.message || 'Hubo un problema al registrar el producto.',
                 });
             }
         } catch (error) {
@@ -209,7 +267,9 @@ const RegistrarProd = () => {
             });
         }
     };
-
+    
+    
+    
     // Función para abrir la alerta y registrar la nueva categoría
     const handleAddCategoria = () => {
         Swal.fire({
@@ -257,6 +317,20 @@ const RegistrarProd = () => {
         });
     };
 
+    const postData = {
+        nombre_producto: formData.nombre_producto,
+        codigo_barras: formData.codigo_barras,
+        precio_compra: formData.precio_compra,
+        precio_venta: formData.precio_venta,
+        descripcion_producto: formData.descripcion_producto,
+        estado: formData.estado,
+        id_categoria: formData.id_categoria,
+        numero_documento: formData.numero_documento,
+        id_proveedor: formData.id_proveedor,
+        imagen: formData.imagen, // Si la imagen se cargó correctamente
+    };
+
+    console.log(postData)
     return (
 <div>
     <Navegacion>
@@ -332,7 +406,12 @@ const RegistrarProd = () => {
                                     {formData.imagen && (
                                         <div className="form-group">
                                             <label>Vista previa de la imagen:</label>
-                                            <img src={URL.createObjectURL(formData.imagen)} alt="Vista previa" style={{ width: '100%', maxHeight: '200px', objectFit: 'contain' }} />
+                                            {/* Si es una URL de Cloudinary, no usamos createObjectURL */}
+                                            <img 
+                                                src={formData.imagen} 
+                                                alt="Vista previa" 
+                                                style={{ width: '100%', maxHeight: '200px', objectFit: 'contain' }} 
+                                            />
                                         </div>
                                     )}
                                 </div>

@@ -33,7 +33,7 @@ const RegistrarVenta = () => {
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/usuario/todos', {
+        const response = await fetch('https://superalimento-proyecto.onrender.com/api/usuario/todos', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'X-Rol': rol,
@@ -56,7 +56,7 @@ const RegistrarVenta = () => {
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/producto/todos', {
+        const response = await fetch('https://superalimento-proyecto.onrender.com/api/producto/todos', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'X-Rol': rol,
@@ -164,7 +164,7 @@ const RegistrarVenta = () => {
     }
   
     try {
-      const response = await fetch('http://localhost:3001/api/venta/registrar', {
+      const response = await fetch('https://superalimento-proyecto.onrender.com/api/venta/registrar', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -213,7 +213,7 @@ const RegistrarVenta = () => {
   
   const getProductQuantity = async (id_producto) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/producto/cantidad/${id_producto}`, {
+      const response = await fetch(`https://superalimento-proyecto.onrender.com/api/producto/cantidad/${id_producto}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'X-Rol': rol,
@@ -244,7 +244,7 @@ const RegistrarVenta = () => {
       title: product.nombre_producto,
       html: `
         <div>
-          <img src="${product.imagen ? `http://localhost:3001/uploads/${product.imagen}` : 'default-product-image.png'}" alt="${product.nombre_producto}" width="200" />
+        <img src="${product.imagen ? product.imagen : 'default-product-image.png'}"  : 'default-product-image.png'}" alt="${product.nombre_producto}" width="200" />
           <p>Precio: $${product.precio_venta.toLocaleString()}</p>
           <p>Cantidad disponible: ${cantidadDisponible}</p>
           <input id="quantityInput" type="number" min="1" max="${cantidadDisponible}" placeholder="Cantidad" class="swal2-input" style="width: 80%;" />
@@ -317,7 +317,7 @@ const RegistrarVenta = () => {
                           className="product-item"
                           onClick={() => handleAddToCart(producto)}
                         >
-                          <img src={producto.imagen ? `http://localhost:3001/uploads/${producto.imagen}` : "default-product-image.png"} alt={producto.nombre_producto} width={'200'} />
+                          <img src={producto.imagen} alt={producto.nombre_producto} width={'200'} />
                           <h4>{producto.nombre_producto}</h4>
                           <p>${producto.precio_venta.toLocaleString()}</p>
                           <p>Cantidad disponible: {producto.cantidad}</p>

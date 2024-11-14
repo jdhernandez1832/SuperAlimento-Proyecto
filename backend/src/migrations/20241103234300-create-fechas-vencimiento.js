@@ -13,8 +13,8 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'productos',   // Nombre de la tabla productos
-          key: 'id_producto'    // Llave primaria en la tabla productos
+          model: 'Productos',   // Asegúrate que el nombre de la tabla sea 'productos'
+          key: 'id_producto'    // Llave primaria de la tabla productos
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'

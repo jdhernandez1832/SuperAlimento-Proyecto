@@ -30,7 +30,7 @@ const VentaList = () => {
   useEffect(() => {
     const fetchProductosBajoStock = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/producto/todos', {
+        const response = await fetch('https://superalimento-proyecto.onrender.com/api/producto/todos', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'X-Rol': rol,
@@ -42,7 +42,7 @@ const VentaList = () => {
   
           // Para cada producto, obtenemos la cantidad
           const productosConCantidad = await Promise.all(data.map(async (producto) => {
-            const cantidadResponse = await fetch(`http://localhost:3001/api/producto/cantidad/${producto.id_producto}`, {
+            const cantidadResponse = await fetch(`https://superalimento-proyecto.onrender.com/api/producto/cantidad/${producto.id_producto}`, {
               headers: {
                 'Authorization': `Bearer ${token}`,
                 'X-Rol': rol,
@@ -75,7 +75,7 @@ const VentaList = () => {
   useEffect(() => {
     const fetchVentas = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/venta/todos', {
+        const response = await fetch('https://superalimento-proyecto.onrender.com/api/venta/todos', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'X-Rol': rol,
@@ -101,7 +101,7 @@ const VentaList = () => {
 
     const fetchVentasSemanal = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/venta/semana', {
+        const response = await fetch('https://superalimento-proyecto.onrender.com/api/venta/semana', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'X-Rol': rol,
@@ -130,7 +130,7 @@ const VentaList = () => {
      
     const fetchSolicitudes = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/solicitud/todos', {
+        const response = await fetch('https://superalimento-proyecto.onrender.com/api/solicitud/todos', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'X-Rol': rol,

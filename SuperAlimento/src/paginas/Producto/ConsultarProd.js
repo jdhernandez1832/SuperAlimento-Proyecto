@@ -302,14 +302,14 @@ const ConsultarProd = () => {
                           <tbody>
                             {productosMostrados.map((producto) => (
                              <tr key={producto.id_producto}>
-                             <td>
-                               <img
-                                 src={`http://localhost:3001/uploads/${producto.imagen}`}
-                                 alt={producto.nombre_producto}
-                                 width="50"
-                                 height="50"
-                               />
-                             </td>
+                              <td>
+                                <img
+                                  src={producto.imagen}  // Aquí usamos directamente la URL de Cloudinary
+                                  alt={producto.nombre_producto}
+                                  width="50"
+                                  height="50"
+                                />
+                              </td>
                              <td>{producto.nombre_producto}</td>
                              <td>{producto.codigo_barras}</td>
                              <td>{producto.precio_compra}</td>

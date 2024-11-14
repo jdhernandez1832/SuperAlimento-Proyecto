@@ -27,7 +27,7 @@ const Olvido = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:3001/api/olvido/recuperar-password', {
+            const response = await fetch('https://superalimento-proyecto.onrender.com/api/olvido/recuperar-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

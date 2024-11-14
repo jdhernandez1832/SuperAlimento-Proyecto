@@ -17,13 +17,25 @@ const Perfil = () => {
     id_rol: '',
   });
   const token = localStorage.getItem('token');
-  const rol = localStorage.getItem('Rol');  
+  const rol = localStorage.getItem('Rol'); 
+  const userDocument = localStorage.getItem('numero_documento');
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
+    if (numero_documento !== userDocument) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Acceso denegado',
+        text: 'No tienes permiso para acceder a este perfil.',
+        confirmButtonColor: '#28a745',
+      }).then(() => {
+        navigate('/Index'); // Redirigir al inicio o a una página permitida
+      });
+      return;
+    }
     const fetchUsuario = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/api/usuario/${numero_documento}`, {
+        const response = await fetch(`https://superalimento-proyecto.onrender.com/api/usuario/${numero_documento}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'X-Rol': rol,
@@ -52,7 +64,7 @@ const Perfil = () => {
     };
 
     fetchUsuario();
-  }, [numero_documento, token, rol]);
+  }, [numero_documento, token, rol, userDocument, navigate]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -120,7 +132,7 @@ const Perfil = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/api/usuario/actualizar/${numero_documento}`, {
+      const response = await fetch(`https://superalimento-proyecto.onrender.com/api/usuario/actualizar/${numero_documento}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

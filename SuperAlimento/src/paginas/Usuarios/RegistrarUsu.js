@@ -98,7 +98,7 @@ const RegistrarUsu = () => {
     const claveGenerada = generarClaveAleatoria();
 
     try {
-      const response = await fetch('http://localhost:3001/api/usuario/registrar', {
+      const response = await fetch('https://superalimento-proyecto.onrender.com/api/usuario/registrar', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ const RegistrarUsu = () => {
         const result = await response.json();
         console.log(result);
         // Enviar la clave generada por correo
-        await fetch('http://localhost:3001/api/usuario/correo', {
+        await fetch('https://superalimento-proyecto.onrender.com/api/usuario/correo', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

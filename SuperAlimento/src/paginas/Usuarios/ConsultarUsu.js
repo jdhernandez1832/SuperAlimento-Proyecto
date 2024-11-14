@@ -27,7 +27,7 @@ const ConsultarUsu = () => {
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/usuario/todos', {
+        const response = await fetch('https://superalimento-proyecto.onrender.com/api/usuario/todos', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'X-Rol': rol,
@@ -61,7 +61,7 @@ const ConsultarUsu = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await fetch(`http://localhost:3001/api/usuario/estado/${numero_documento}`, {
+          const response = await fetch(`https://superalimento-proyecto.onrender.com/api/usuario/estado/${numero_documento}`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',

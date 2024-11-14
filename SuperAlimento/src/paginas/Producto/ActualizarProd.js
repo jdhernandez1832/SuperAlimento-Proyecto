@@ -196,7 +196,7 @@ const ActualizarProd = () => {
         e.preventDefault();
         let isValid = true;
         let newErrors = {};
-
+    
         // Validar todos los campos antes de enviar
         Object.keys(formData).forEach(key => {
             const error = validateField(key, formData[key]);
@@ -205,7 +205,7 @@ const ActualizarProd = () => {
                 isValid = false;
             }
         });
-
+    
         if (!isValid) {
             setErrors(newErrors);
             Swal.fire({
@@ -216,12 +216,13 @@ const ActualizarProd = () => {
             });
             return;
         }
-
+    
+        // Si no se seleccionó una nueva imagen, enviar la URL que ya está en el producto
         const data = new FormData();
         Object.keys(formData).forEach(key => {
             data.append(key, formData[key]);
         });
-
+    
         try {
             const response = await fetch(`http://localhost:3001/api/producto/actualizar/${id_producto}`, {
                 method: 'PUT',
@@ -231,7 +232,7 @@ const ActualizarProd = () => {
                     'X-Rol': rol,
                 },
             });
-
+    
             if (response.ok) {
                 const result = await response.json();
                 Swal.fire({
@@ -305,10 +306,10 @@ const ActualizarProd = () => {
             }
         });
     };
-    const handleFileChange = (e) => {
+    const handleFileChange = async (e) => {
         const file = e.target.files[0];
-    
-        // Validar si el archivo es una imagen comprobando su tipo MIME
+        
+        // Validar si el archivo es una imagen
         const allowedTypes = ['image/jpeg', 'image/png', 'image/gif']; // Tipos de imágenes permitidos
         if (file && !allowedTypes.includes(file.type)) {
             Swal.fire({
@@ -316,16 +317,41 @@ const ActualizarProd = () => {
                 title: 'Tipo de archivo no permitido',
                 text: 'Por favor, sube un archivo de imagen (JPEG, PNG, GIF).',
             });
-            // Limpia el campo de archivo
-            e.target.value = null;
+            e.target.value = null;  // Limpia el campo de archivo
             return;
         }
     
-        setFormData({
-            ...formData,
-            imagen: file,
-        });
+        // Subir la imagen a Cloudinary
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', 'h6i1y3x1'); // Reemplaza con tu preset de Cloudinary
+    
+        try {
+            const uploadResponse = await fetch('https://api.cloudinary.com/v1_1/dtuawjvux/image/upload', {
+                method: 'POST',
+                body: formData,
+            });
+    
+            const result = await uploadResponse.json();
+    
+            // Verifica si la carga fue exitosa
+            if (result.secure_url) {
+                setFormData({
+                    ...formData,
+                    imagen: result.secure_url,  // Guarda la URL de la imagen
+                });
+            } else {
+                throw new Error('Error al subir la imagen');
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error al subir la imagen',
+                text: error.message,
+            });
+        }
     };
+
     const handleSelectChange = (selectedOption, actionMeta) => {
         const { name } = actionMeta;
         setFormData({
@@ -407,15 +433,13 @@ const ActualizarProd = () => {
                                     </div>
                                     {formData.imagen && (
                                         <div className="form-group">
-                                        <label>Vista previa de la imagen:</label>
-                                        {formData.imagen && (
+                                            <label>Vista previa de la imagen:</label>
                                             <img 
-                                                src={`http://localhost:3001/uploads/${formData.imagen}`} 
+                                                src={formData.imagen} // URL de la imagen cargada
                                                 alt="Vista previa" 
                                                 style={{ width: '100%', maxHeight: '200px', objectFit: 'contain' }} 
                                             />
-                                        )}
-                                    </div>
+                                        </div>
                                     )}
                                 </div>
                                 <div className="col-md-6">

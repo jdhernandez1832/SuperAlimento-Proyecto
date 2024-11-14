@@ -23,7 +23,7 @@ const ActualizarUsuario = () => {
   useEffect(() => {
     const fetchUsuario = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/api/usuario/${numero_documento}`, {
+        const response = await fetch(`https://superalimento-proyecto.onrender.com/api/usuario/${numero_documento}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'X-Rol': rol,
@@ -112,7 +112,7 @@ const ActualizarUsuario = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/api/usuario/actualizar/${numero_documento}`, {
+      const response = await fetch(`https://superalimento-proyecto.onrender.com/api/usuario/actualizar/${numero_documento}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

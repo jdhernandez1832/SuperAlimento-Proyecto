@@ -20,7 +20,7 @@ const DetallesVenta = () => {
     useEffect(() => {
         const fetchVenta = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/api/venta/detalles/${id_venta}`, {
+                const response = await fetch(`https://superalimento-proyecto.onrender.com/api/venta/detalles/${id_venta}`, {
                     headers: {
                       'Authorization': `Bearer ${token}`,
                       'X-Rol': rol,
@@ -44,7 +44,7 @@ const DetallesVenta = () => {
 
         const fetchUsuarios = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/usuario/todos', {
+                const response = await fetch('https://superalimento-proyecto.onrender.com/api/usuario/todos', {
                     headers: {
                       'Authorization': `Bearer ${token}`,
                       'X-Rol': rol,
@@ -63,7 +63,7 @@ const DetallesVenta = () => {
 
         const fetchProductos = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/producto/todos', {
+                const response = await fetch('https://superalimento-proyecto.onrender.com/api/producto/todos', {
                     headers: {
                       'Authorization': `Bearer ${token}`,
                       'X-Rol': rol,

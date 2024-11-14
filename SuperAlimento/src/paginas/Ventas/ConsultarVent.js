@@ -20,7 +20,7 @@ const ConsultarVent = () => {
     useEffect(() => {
         const fetchVentas = async () => {
             try {
-                const response = await fetch('http://localhost:3001/api/venta/todos', {
+                const response = await fetch('https://superalimento-proyecto.onrender.com/api/venta/todos', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'X-Rol': rol,
