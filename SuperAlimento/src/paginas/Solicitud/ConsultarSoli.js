@@ -63,10 +63,10 @@ const ConsultarSoli = () => {
     const handleAceptarEntrega = async (id) => {
         const today = new Date();
         const minDate = new Date(today);
-
+        minDate.setMonth(minDate.getMonth() + 1); // Un mes después de la fecha actual
 
         const formattedToday = today.toISOString().split('T')[0]; // Fecha actual en formato YYYY-MM-DD
-
+        const formattedMinDate = minDate.toISOString().split('T')[0]; // Mínimo un mes después en formato YYYY-MM-DD
 
         const { value: formValues } = await Swal.fire({
             title: 'Ingresar Lote y Fecha de Vencimiento',
