@@ -61,13 +61,20 @@ const ConsultarSoli = () => {
 
     const totalPaginas = Math.ceil(solicitudesFiltradas.length / registrosPorPagina);
     const handleAceptarEntrega = async (id) => {
+        const today = new Date();
+        const minDate = new Date(today);
+
+
+        const formattedToday = today.toISOString().split('T')[0]; // Fecha actual en formato YYYY-MM-DD
+
+
         const { value: formValues } = await Swal.fire({
             title: 'Ingresar Lote y Fecha de Vencimiento',
             html:
                 '<div><p>Lote</p></div>' +
                 '<input id="lote" class="swal2-input" placeholder="Lote">' +
                 '<div><p>Fecha de vencimiento</p></div>' +
-                '<input id="fecha_vencimiento" type="date" class="swal2-input">',
+                `<input id="fecha_vencimiento" type="date" class="swal2-input" min="${formattedToday}">`,
             focusConfirm: false,
             confirmButtonText: 'Agregar',
             confirmButtonColor: '#28a745', 
@@ -77,9 +84,21 @@ const ConsultarSoli = () => {
             preConfirm: () => {
                 const lote = document.getElementById('lote').value;
                 const fechaVencimiento = document.getElementById('fecha_vencimiento').value;
+
                 if (!lote || !fechaVencimiento) {
                     Swal.showValidationMessage('Por favor, ingresa ambos valores');
+                    return false; // No continua con el flujo si falta algún dato
                 }
+
+                // Convertir la fecha ingresada a un objeto Date
+                const fechaIngresada = new Date(fechaVencimiento);
+
+                // Validar que la fecha ingresada sea al menos un mes después de la fecha actual
+                if (fechaIngresada < minDate) {
+                    Swal.showValidationMessage('La fecha de vencimiento debe ser al menos un mes después de hoy.');
+                    return false; // No continua con el flujo si la fecha no es válida
+                }
+
                 return { lote, fechaVencimiento };
             }
         });

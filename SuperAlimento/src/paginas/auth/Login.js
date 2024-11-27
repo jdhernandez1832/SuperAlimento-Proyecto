@@ -194,11 +194,11 @@ const Login = () => {
               />
             </center>
             <center>
-              <h2>Inciar Sesion</h2>
+              <h2>Inciar Sesión</h2>
             </center>
             <br />
             <form onSubmit={handleLogin}>
-              <p>Numero de Identificacion</p>
+              <p>Numero de Identificación</p>
               <div className="input-group mb-3">
                 <input
                   type="number"
@@ -207,6 +207,7 @@ const Login = () => {
                   onChange={handleNumeroDocumentoChange}
                   required
                   min={1}
+                  autoFocus
                 />
                 <div className="input-group-append">
                   <div className="input-group-text">
@@ -254,7 +255,7 @@ const Login = () => {
                 <div className="col-8">
                   <div className="icheck-primary">
                     <input type="checkbox" id="remember" />
-                    <label htmlFor="remember">Recuerdame</label>
+                    <label htmlFor="remember">Recuérdame</label>
                   </div>
                 </div>
                 <div className="col-4">
@@ -265,7 +266,7 @@ const Login = () => {
               </div>
             </form>
             <p className="mb-1">
-              <Link to="/Olvido" className="letras">Olvide mi Contraseña</Link>
+              <Link to="/Olvido" className="letras">Olvidé mi Contraseña</Link>
             </p>
           </div>
         </div>
