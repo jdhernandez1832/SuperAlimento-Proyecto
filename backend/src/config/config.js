@@ -1,10 +1,6 @@
 module.exports = {
   development: {
-    username: process.env.DB_USERNAME || "superalimento_mzwz_user",
-    password: process.env.DB_PASSWORD || "uE3qs2GoFPG42JTWWo52VLcX80vTNPnP",
-    database: process.env.DB_NAME || "superalimento_mzwz",
-    host: process.env.DB_HOST || "dpg-d6otvchr0fns73dvph8g-a.oregon-postgres.render.com",
-    port: process.env.DB_PORT || 5432,
+    use_env_variable: "DATABASE_URL",
     dialect: "postgres",
     dialectOptions: {
       ssl: {
