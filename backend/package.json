@@ -23,6 +23,8 @@
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.15",
     "sequelize": "^6.37.3",
-    "sequelize-cli": "^6.6.2"
+    "sequelize-cli": "^6.6.2",
+    "pg": "^8.11.0",
+    "pg-hstore": "^2.3.4"
   }
 }
