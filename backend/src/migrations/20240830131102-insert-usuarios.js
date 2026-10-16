@@ -6,16 +6,16 @@ const saltRounds = 10;
 module.exports = {
   up: async (queryInterface, Sequelize) => {
 
-    const hashedPassword1 = await bcrypt.hash('Ti1075792381', saltRounds);
+    const hashedPassword1 = await bcrypt.hash('Ti1232345', saltRounds);
     const hashedPassword2 = await bcrypt.hash('elpepe1', saltRounds);
 
     return queryInterface.bulkInsert('Usuarios', [
       {
-        numero_documento: 1075792381,
+        numero_documento: 107232,
         nombre_usuario: 'Julian Hernandez',
         tipo_documento: 'Cédula',
-        correo_usuario: 'julian.hernandez1563@hotmail.com',
-        telefono_usuario: 3052433356,
+        correo_usuario: 'julian@hotmail.com',
+        telefono_usuario: 3052456,
         clave: hashedPassword1,
         id_rol: 1,
         estado: 'Activo',
